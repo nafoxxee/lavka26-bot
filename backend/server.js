@@ -1,40 +1,86 @@
 const express = require('express');
 const http = require('http');
-const socketIo = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const authMiddleware = require('./src/middleware/auth');
-const telegramAuth = require('./src/middleware/telegramAuth');
-const adsRoutes = require('./src/routes/ads');
-const usersRoutes = require('./src/routes/users');
-const chatsRoutes = require('./src/routes/chats');
-const paymentsRoutes = require('./src/routes/payments');
-const adminRoutes = require('./src/routes/admin');
-const { initializeSocket } = require('./src/services/socketService');
-const { expireBoostedAds } = require('./src/services/adService');
-
 const app = express();
 const server = http.createServer(app);
-
-// Настройка Socket.IO
-const io = socketIo(server, {
-  cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
 
 // Middleware
 app.use(helmet());
 app.use(compression());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-  credentials: true
+  methods: ["GET", "POST"]
 }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 100 // лимит запросов
+});
+app.use(limiter);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
+// Базовые роуты для теста
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend работает!', timestamp: new Date().toISOString() });
+});
+
+// Заглушки для роутов (чтобы избежать ошибок импорта)
+app.use('/api/ads', (req, res) => {
+  res.json({ ads: [], message: 'Ads endpoint - заглушка' });
+});
+
+app.use('/api/users', (req, res) => {
+  res.json({ users: [], message: 'Users endpoint - заглушка' });
+});
+
+app.use('/api/chats', (req, res) => {
+  res.json({ chats: [], message: 'Chats endpoint - заглушка' });
+});
+
+app.use('/api/payments', (req, res) => {
+  res.json({ payments: [], message: 'Payments endpoint - заглушка' });
+});
+
+app.use('/api/admin', (req, res) => {
+  res.json({ admin: [], message: 'Admin endpoint - заглушка' });
+});
+
+// Обработка ошибок
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: err.message 
+  });
+});
+
+// 404
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+const PORT = process.env.PORT || 3001;
+
+server.listen(PORT, () => {
+  console.log(`Lavka26 Backend запущен на порту ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+});
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
