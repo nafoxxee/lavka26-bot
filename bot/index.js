@@ -1,7 +1,6 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
-const bodyParser = require('body-parser');
 const { createClient } = require('@supabase/supabase-js');
 
 // Инициализация Supabase
@@ -24,7 +23,7 @@ const bot = new TelegramBot(token);
 const app = express();
 
 // Middleware
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
