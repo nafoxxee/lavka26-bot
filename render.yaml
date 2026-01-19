@@ -50,7 +50,7 @@ services:
     healthCheckInterval: 60
     envVars:
       - key: TELEGRAM_BOT_TOKEN
-        sync: false
+        value: 8500920411:AAH_lBSuXMpkDLDMs6IRpLhrTe0G9JTaKmg
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
