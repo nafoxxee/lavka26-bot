@@ -1,37 +1,53 @@
 services:
-  # Telegram Bot Service
-  - type: worker
-    name: lavka26-bot
+  # Backend API
+  - type: web
+    name: lavka26-backend
     env: node
-    repo: https://github.com/nafoxxee/lavka26-bot.git
-    rootDir: .
+    plan: free
+    rootDir: ./backend
     buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3001
       - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
         sync: false
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_KEY
+      - key: SUPABASE_ANON_KEY
         sync: false
-      - key: ADMIN_ID
+      - key: SUPABASE_SERVICE_KEY
         sync: false
-      - key: CHANNEL_ID
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: TELEGRAM_PAYMENT_PROVIDER_TOKEN
+        sync: false
+      - key: ADMIN_TELEGRAM_ID
         sync: false
     healthCheckPath: /health
     autoDeploy: true
-    
-  # Supabase Functions (if needed)
-  - type: web
-    name: lavka26-webhook
-    env: static
-    repo: https://github.com/nafoxxee/lavka26-bot.git
-    rootDir: ./supabase/functions/telegram-bot
-    buildCommand: echo "Static files"
-    staticPublishPath: .
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.js
+
+  # Telegram Bot
+  - type: worker
+    name: lavka26-bot
+    env: node
+    plan: free
+    rootDir: ./bot
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+    autoDeploy: true
