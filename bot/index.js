@@ -42,7 +42,7 @@ app.post(`/bot${token}`, (req, res) => {
 bot.onText(/\/start/, async (msg) => {
   console.log('🎯 Получена команда /start от:', msg.chat.id);
   
-  // URL Mini App на Vercel
+  // URL Mini App на Vercel (нужно обновить после развертывания)
   const webAppUrl = process.env.VERCEL_URL || 'https://lavka26.vercel.app';
   
   try {

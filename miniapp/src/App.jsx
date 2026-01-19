@@ -24,7 +24,12 @@ function App() {
   }
 
   if (!user) {
-    return <LoginPage />
+    return (
+      <LoginPage 
+        botUsername="@lavka26city_bot"
+        botName="Lavka26 Bot"
+      />
+    )
   }
 
   return (
