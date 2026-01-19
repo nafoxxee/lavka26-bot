@@ -15,7 +15,7 @@ services:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_WEBHOOK_URL
-        sync: false
+        value: https://lavka26-backend.onrender.com/bot/webhook
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -25,12 +25,33 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGIN
-        sync: false
+        value: https://lavka26-miniapp.onrender.com
       - key: TELEGRAM_PAYMENT_PROVIDER_TOKEN
         sync: false
       - key: ADMIN_TELEGRAM_ID
         sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: ad-images
+      - key: MAX_FILE_SIZE
+        value: 5242880
     healthCheckPath: /health
+    autoDeploy: true
+
+  # Mini App (Frontend)
+  - type: web
+    name: lavka26-miniapp
+    env: static
+    plan: free
+    rootDir: ./miniapp
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://lavka26-backend.onrender.com
+    routes:
+      - type: rewrite
+        source: /.*
+        destination: /index.html
     autoDeploy: true
 
   # Telegram Bot
@@ -45,9 +66,13 @@ services:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_WEBHOOK_URL
-        sync: false
+        value: https://lavka26-backend.onrender.com/bot/webhook
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
     autoDeploy: true
