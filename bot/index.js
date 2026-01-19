@@ -104,7 +104,7 @@ const sendAdminStats = async (chatId) => {
 // Bot commands
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
-  const webAppUrl = process.env.CORS_ORIGIN || 'https://your-miniapp.vercel.app';
+  const webAppUrl = process.env.CORS_ORIGIN || 'http://localhost:3003';
   
   const stats = await getUserStats(msg.from.id);
   const isAdmin = stats?.user?.is_admin;
@@ -360,17 +360,17 @@ const deleteWebhook = async () => {
 };
 
 // Start server
-if (process.env.TELEGRAM_WEBHOOK_URL) {
-  // Webhook mode
+if (process.env.TELEGRAM_WEBHOOK_URL && process.env.NODE_ENV === 'production') {
+  // Webhook mode (только для production)
   app.listen(PORT, async () => {
     console.log(`Bot webhook server running on port ${PORT}`);
     await setWebhook();
   });
 } else {
-  // Polling mode
+  // Polling mode (для разработки)
   console.log('Bot started in polling mode');
   
-  // For development, you can export these functions
+  // Для разработки не запускаем веб-сервер
   module.exports = {
     setWebhook,
     deleteWebhook
