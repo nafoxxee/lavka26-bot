@@ -7,6 +7,8 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
+    healthCheckGracePeriod: 60
+    healthCheckInterval: 60
     envVars:
       - key: NODE_ENV
         value: production
@@ -30,6 +32,8 @@ services:
     rootDir: ./miniapp
     buildCommand: npm install && npm run build
     startCommand: npm run preview
+    healthCheckGracePeriod: 120
+    healthCheckInterval: 120
     envVars:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
@@ -42,6 +46,8 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
+    healthCheckGracePeriod: 60
+    healthCheckInterval: 60
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
