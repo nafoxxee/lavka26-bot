@@ -2,10 +2,11 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 
-console.log('Запуск бота...');
+console.log('🚀 Запуск бота для Render + Vercel...');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const webhookUrl = process.env.TELEGRAM_WEBHOOK_URL;
+const vercelApiUrl = process.env.VERCEL_API_URL;
 
 if (!token) {
   console.error('❌ TELEGRAM_BOT_TOKEN не найден!');
@@ -13,6 +14,7 @@ if (!token) {
 }
 
 console.log('✅ Токен найден:', token.substring(0, 10) + '...');
+console.log('🔗 Vercel API:', vercelApiUrl);
 
 const bot = new TelegramBot(token);
 const app = express();
@@ -21,7 +23,12 @@ app.use(express.json());
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'webhook-bot', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    service: 'render-bot', 
+    vercel_api: vercelApiUrl,
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Webhook endpoint
@@ -32,23 +39,25 @@ app.post(`/bot${token}`, (req, res) => {
 });
 
 // Команда /start
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/start/, async (msg) => {
   console.log('🎯 Получена команда /start от:', msg.chat.id);
   
-  const webAppUrl = 'https://lavka26-miniapp.onrender.com';
+  // URL Mini App на Vercel
+  const webAppUrl = process.env.VERCEL_URL || 'https://lavka26.vercel.app';
   
-  bot.sendMessage(msg.chat.id, '🛍️ Добро пожаловать в Lavka26!', {
-    reply_markup: {
-      inline_keyboard: [[{
-        text: '🚀 Открыть приложение',
-        web_app: { url: webAppUrl }
-      }]]
-    }
-  }).then(() => {
+  try {
+    await bot.sendMessage(msg.chat.id, '🛍️ Добро пожаловать в Lavka26!', {
+      reply_markup: {
+        inline_keyboard: [[{
+          text: '🚀 Открыть приложение',
+          web_app: { url: webAppUrl }
+        }]]
+      }
+    });
     console.log('✅ Сообщение отправлено успешно');
-  }).catch(err => {
+  } catch (err) {
     console.error('❌ Ошибка отправки:', err);
-  });
+  }
 });
 
 // Запуск
@@ -70,18 +79,7 @@ if (webhookUrl) {
   
   console.log('🚀 Бот запущен в режиме webhook');
 } else {
-  // Polling режим
-  bot.setWebHook('').then(() => {
-    console.log('✅ Webhook удален');
-  }).catch(err => {
-    console.error('❌ Ошибка удаления webhook:', err);
-  });
-  
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Сервер запущен на порту ${PORT}`);
-  });
-  
-  console.log('🚀 Бот запущен в режиме polling');
+  console.log('❌ Webhook URL не найден!');
 }
 
 console.log('📱 Ожидаю команды...');

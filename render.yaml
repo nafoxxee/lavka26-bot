@@ -1,22 +1,20 @@
 services:
   - type: web
-    name: lavka26-unified
+    name: lavka26-bot
     env: node
     plan: free
-    rootDir: ./backend
-    buildCommand: npm install && cd ../miniapp && npm install && npm run build
-    startCommand: node server-with-bot.js
+    rootDir: ./bot
+    buildCommand: npm install
+    startCommand: npm start
     healthCheckPath: /health
     healthCheckGracePeriod: 60
     healthCheckInterval: 60
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3000
       - key: TELEGRAM_BOT_TOKEN
         value: 8500920411:AAH_lBSuXMpkDLDMs6IRpLhrTe0G9JTaKmg
-      - key: BASE_URL
-        value: https://lavka26-unified.onrender.com
-      - key: JWT_SECRET
-        value: lavka26_jwt_super_secret_key_2024_secure_token_8500920411
+      - key: TELEGRAM_WEBHOOK_URL
+        value: https://lavka26-bot.onrender.com
+      - key: VERCEL_API_URL
+        value: https://lavka26.vercel.app/api
+      - key: NODE_ENV
+        value: production
