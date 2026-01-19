@@ -26,6 +26,15 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'lavka26-bot',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Webhook endpoint
 app.post(`/bot${token}`, (req, res) => {
   bot.processUpdate(req.body);
