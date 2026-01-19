@@ -34,13 +34,14 @@ services:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
 
-  - type: worker
+  - type: web
     name: lavka26-bot
     env: node
     plan: free
     rootDir: ./bot
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
