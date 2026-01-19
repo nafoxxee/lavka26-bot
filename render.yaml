@@ -25,11 +25,11 @@ services:
 
   - type: web
     name: lavka26-miniapp
-    env: static
+    env: node
     plan: free
     rootDir: ./miniapp
-    buildCommand: npm run build
-    staticPublishPath: ./dist
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
     envVars:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
