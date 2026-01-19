@@ -33,3 +33,24 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
+
+  - type: worker
+    name: lavka26-bot
+    env: node
+    plan: free
+    rootDir: ./bot
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
+        value: https://lavka26-backend.onrender.com/bot/webhook
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://lavka26-miniapp.onrender.com

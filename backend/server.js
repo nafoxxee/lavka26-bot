@@ -35,6 +35,11 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Telegram Webhook endpoint
+app.post('/bot/webhook', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Базовые роуты для теста
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend работает!', timestamp: new Date().toISOString() });
@@ -80,6 +85,7 @@ const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Lavka26 Backend запущен на порту ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`Webhook: http://localhost:${PORT}/bot/webhook`);
 });
 
 const limiter = rateLimit({
