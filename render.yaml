@@ -14,11 +14,7 @@ services:
         value: 3001
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-      - key: TELEGRAM_WEBHOOK_URL
-        value: https://lavka26-backend.onrender.com/bot/webhook
       - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
@@ -26,14 +22,6 @@ services:
         sync: false
       - key: CORS_ORIGIN
         value: https://lavka26-miniapp.onrender.com
-      - key: TELEGRAM_PAYMENT_PROVIDER_TOKEN
-        sync: false
-      - key: ADMIN_TELEGRAM_ID
-        sync: false
-      - key: SUPABASE_STORAGE_BUCKET
-        value: ad-images
-      - key: MAX_FILE_SIZE
-        value: 5242880
 
   - type: web
     name: lavka26-miniapp
@@ -45,28 +33,3 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
-    routes:
-      - type: rewrite
-        source: /.*
-        destination: /index.html
-
-  - type: worker
-    name: lavka26-bot
-    env: node
-    plan: free
-    rootDir: ./bot
-    buildCommand: npm install
-    startCommand: npm start
-    envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: TELEGRAM_WEBHOOK_URL
-        value: https://lavka26-backend.onrender.com/bot/webhook
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3001
