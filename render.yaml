@@ -51,11 +51,7 @@ services:
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         value: 8500920411:AAH_lBSuXMpkDLDMs6IRpLhrTe0G9JTaKmg
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
+      - key: TELEGRAM_WEBHOOK_URL
+        value: https://lavka26-bot.onrender.com
       - key: NODE_ENV
         value: production
-      - key: CORS_ORIGIN
-        value: https://lavka26-miniapp.onrender.com
