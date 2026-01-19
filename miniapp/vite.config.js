@@ -13,6 +13,11 @@ export default defineConfig({
     port: 3000,
     host: true,
   },
+  preview: {
+    port: 3000,
+    host: true,
+    allowedHosts: ['lavka26-miniapp.onrender.com', 'localhost', '127.0.0.1']
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
