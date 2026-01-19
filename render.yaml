@@ -1,5 +1,4 @@
 services:
-  # Backend API (оптимизирован для бесплатного плана)
   - type: web
     name: lavka26-backend
     env: node
@@ -8,12 +7,9 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
-    
-    # Оптимизация для бесплатного плана
     healthCheckGracePeriod: 30
     healthCheckInterval: 30
     autoDeploy: true
-    
     envVars:
       - key: NODE_ENV
         value: production
@@ -42,7 +38,6 @@ services:
       - key: MAX_FILE_SIZE
         value: 5242880
 
-  # Mini App (статический, минимальное потребление)
   - type: web
     name: lavka26-miniapp
     env: static
@@ -50,22 +45,17 @@ services:
     rootDir: ./miniapp
     buildCommand: npm run build
     staticPublishPath: ./dist
-    
-    # Оптимизация для статического сайта
     healthCheckGracePeriod: 60
     healthCheckInterval: 60
     autoDeploy: true
-    
     envVars:
       - key: VITE_API_URL
         value: https://lavka26-backend.onrender.com
-        
     routes:
       - type: rewrite
         source: /.*
         destination: /index.html
 
-  # Telegram Bot (worker, минимальное потребление)
   - type: worker
     name: lavka26-bot
     env: node
@@ -73,11 +63,8 @@ services:
     rootDir: ./bot
     buildCommand: npm install
     startCommand: npm start
-    
-    # Worker оптимизация
     healthCheckGracePeriod: 60
     autoDeploy: true
-    
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         sync: false
