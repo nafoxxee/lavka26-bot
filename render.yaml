@@ -19,7 +19,7 @@ services:
       - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: JWT_SECRET
-        sync: false
+        value: lavka26_jwt_super_secret_key_2024_secure_token_8500920411
       - key: CORS_ORIGIN
         value: https://lavka26-miniapp.onrender.com
 
