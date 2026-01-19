@@ -1,11 +1,11 @@
 services:
   - type: web
-    name: lavka26-backend
+    name: lavka26-unified
     env: node
     plan: free
     rootDir: ./backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install && cd ../miniapp && npm install && npm run build
+    startCommand: node server-with-bot.js
     healthCheckPath: /health
     healthCheckGracePeriod: 60
     healthCheckInterval: 60
@@ -13,45 +13,10 @@ services:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3001
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: JWT_SECRET
-        value: lavka26_jwt_super_secret_key_2024_secure_token_8500920411
-      - key: CORS_ORIGIN
-        value: https://lavka26-miniapp.onrender.com
-
-  - type: web
-    name: lavka26-miniapp
-    env: node
-    plan: free
-    rootDir: ./miniapp
-    buildCommand: npm install && npm run build
-    startCommand: npm run preview
-    healthCheckGracePeriod: 120
-    healthCheckInterval: 120
-    envVars:
-      - key: VITE_API_URL
-        value: https://lavka26-backend.onrender.com
-
-  - type: web
-    name: lavka26-bot
-    env: node
-    plan: free
-    rootDir: ./bot
-    buildCommand: npm install
-    startCommand: npm start
-    healthCheckPath: /health
-    healthCheckGracePeriod: 60
-    healthCheckInterval: 60
-    envVars:
+        value: 3000
       - key: TELEGRAM_BOT_TOKEN
         value: 8500920411:AAH_lBSuXMpkDLDMs6IRpLhrTe0G9JTaKmg
-      - key: TELEGRAM_WEBHOOK_URL
-        value: https://lavka26-bot.onrender.com
-      - key: NODE_ENV
-        value: production
+      - key: BASE_URL
+        value: https://lavka26-unified.onrender.com
+      - key: JWT_SECRET
+        value: lavka26_jwt_super_secret_key_2024_secure_token_8500920411
