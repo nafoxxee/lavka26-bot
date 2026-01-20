@@ -1,7 +1,7 @@
 [build]
   base = "miniapp"
   command = "npm install && npm run build"
-  publish = "miniapp/dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -12,7 +12,7 @@
   status = 200
 
 [functions]
-  directory = "miniapp/netlify/functions"
+  directory = "netlify/functions"
 
 [[headers]]
   for = "/*"
