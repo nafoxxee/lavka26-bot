@@ -7,7 +7,7 @@ import {
   User, 
   Plus
 } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/AuthContext-test'
 
 const BottomNavigation = () => {
   const location = useLocation()
