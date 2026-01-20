@@ -5,8 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 
-import App from './App-full'
-import { AuthProvider } from './contexts/AuthContext-test'
+import App from './App-simple'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -23,19 +22,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AuthProvider>
-            <App />
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: '#374151',
-                  color: '#fff',
-                },
-              }}
-            />
-          </AuthProvider>
+          <App />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#374151',
+                color: '#fff',
+              },
+            }}
+          />
         </BrowserRouter>
       </QueryClientProvider>
     </HelmetProvider>
