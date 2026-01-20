@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 
 import App from './App.jsx'
-import { AuthProvider } from './contexts/AuthContext-simple'
+import { AuthProvider } from './contexts/AuthContext-test'
 import './index.css'
 
 const queryClient = new QueryClient({
