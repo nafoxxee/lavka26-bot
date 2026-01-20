@@ -4,6 +4,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  base: '/lavka26-bot/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -26,7 +27,7 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@headlessui/react', 'framer-motion', 'lucide-react'],
+          ui: ['lucide-react'],
         },
       },
     },
