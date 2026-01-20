@@ -16,6 +16,8 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize Telegram WebApp
   useEffect(() => {
+    console.log('🔍 AuthContext: Initializing...')
+    
     if (window.Telegram && window.Telegram.WebApp) {
       const webApp = window.Telegram.WebApp
       webApp.ready()
@@ -86,9 +88,11 @@ export const AuthProvider = ({ children }) => {
         created_at: new Date().toISOString()
       }
       setUser(fallbackUser)
+      console.log('✅ AuthContext: Fallback user set:', fallbackUser)
     }
     
     setLoading(false)
+    console.log('🔍 AuthContext: Initialization complete')
   }, [])
 
   const login = async (telegramData) => {
@@ -104,7 +108,8 @@ export const AuthProvider = ({ children }) => {
     user,
     login,
     logout,
-    loading
+    loading,
+    isAuthenticated: !!user
   }
 
   return (
