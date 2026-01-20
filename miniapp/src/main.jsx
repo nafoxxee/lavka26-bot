@@ -6,8 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 
 import App from './App.jsx'
-import { AuthProvider } from './contexts/AuthContext'
-import { SocketProvider } from './contexts/SocketContext'
+import { AuthProvider } from './contexts/AuthContext-simple'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -25,19 +24,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <SocketProvider>
-              <App />
-              <Toaster
-                position="top-center"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: '#374151',
-                    color: '#fff',
-                  },
-                }}
-              />
-            </SocketProvider>
+            <App />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#374151',
+                  color: '#fff',
+                },
+              }}
+            />
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
