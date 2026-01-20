@@ -4,7 +4,7 @@ import Layout from './components/Layout'
 import LoadingScreen from './components/LoadingScreen'
 
 // Pages
-import LoginPage from './pages/LoginPage'
+import LoginPage from './pages/LoginPage-simple'
 import FeedPage from './pages/FeedPage'
 import SearchPage from './pages/SearchPage'
 import FavoritesPage from './pages/FavoritesPage'
