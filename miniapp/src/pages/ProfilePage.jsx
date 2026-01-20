@@ -1,263 +1,175 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { User, Settings, LogOut, BarChart3, Package, Star } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
-import api from '../utils/api'
-import toast from 'react-hot-toast'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { User, Settings, LogOut, Package, Heart, Star } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext-test'
 
 const ProfilePage = () => {
-  const { user, logout, isAdmin } = useAuth()
-  const queryClient = useQueryClient()
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    username: '',
-    firstName: '',
-    lastName: '',
-    phone: ''
-  })
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const [activeTab, setActiveTab] = useState('my-ads')
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile'],
-    queryFn: async () => {
-      const response = await api.get('/users/profile')
-      return response.data
-    }
-  })
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data) => {
-      const response = await api.put('/users/profile', data)
-      return response.data
+  const menuItems = [
+    {
+      id: 'my-ads',
+      name: 'Мои объявления',
+      icon: Package,
+      count: 5
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['profile'])
-      setIsEditing(false)
-      toast.success('Профиль обновлен')
+    {
+      id: 'favorites',
+      name: 'Избранное',
+      icon: Heart,
+      count: 12
     },
-    onError: () => {
-      toast.error('Ошибка обновления профиля')
+    {
+      id: 'reviews',
+      name: 'Отзывы',
+      icon: Star,
+      count: 8
+    },
+    {
+      id: 'settings',
+      name: 'Настройки',
+      icon: Settings,
+      count: 0
     }
-  })
+  ]
 
-  const handleEdit = () => {
-    if (profile) {
-      setFormData({
-        username: profile.username || '',
-        firstName: profile.first_name || '',
-        lastName: profile.last_name || '',
-        phone: profile.phone || ''
-      })
-    }
-    setIsEditing(true)
+  const handleLogout = () => {
+    logout()
+    navigate('/feed')
   }
 
-  const handleSave = () => {
-    updateProfileMutation.mutate({
-      username: formData.username,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      phone: formData.phone
-    })
-  }
-
-  const handleCancel = () => {
-    setIsEditing(false)
-    setFormData({
-      username: '',
-      firstName: '',
-      lastName: '',
-      phone: ''
-    })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <div className="animate-pulse">
-          <div className="skeleton h-32 w-32 rounded-full mx-auto mb-4"></div>
-          <div className="skeleton h-6 w-48 mx-auto mb-2"></div>
-          <div className="skeleton h-4 w-32 mx-auto mb-6"></div>
-          <div className="space-y-3">
-            <div className="skeleton h-16 w-full"></div>
-            <div className="skeleton h-16 w-full"></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const isAdmin = user?.telegram_id === 12345 // Замените на реальный ID админа
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-primary-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-          <User size={40} className="text-primary-600" />
-        </div>
-        
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {profile?.first_name || profile?.username || 'Пользователь'}
-        </h1>
-        
-        <p className="text-gray-600">@{profile?.username || 'unknown'}</p>
-        
-        {isAdmin && (
-          <div className="mt-2 inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
-            <Star size={14} fill="currentColor" />
-            Администратор
-          </div>
-        )}
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="card p-4 text-center">
-          <Package className="text-primary-600 mx-auto mb-2" size={24} />
-          <div className="text-2xl font-bold text-gray-900">
-            {profile?.stats?.total_ads || 0}
-          </div>
-          <div className="text-sm text-gray-600">Объявлений</div>
-        </div>
-        
-        <div className="card p-4 text-center">
-          <BarChart3 className="text-primary-600 mx-auto mb-2" size={24} />
-          <div className="text-2xl font-bold text-gray-900">
-            {profile?.stats?.total_views || 0}
-          </div>
-          <div className="text-sm text-gray-600">Просмотров</div>
+      <div className="bg-white border-b">
+        <div className="p-4">
+          <h1 className="text-lg font-semibold">Профиль</h1>
         </div>
       </div>
 
-      {/* Profile Info */}
-      <div className="card p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Информация о профиле</h2>
-          {!isEditing && (
+      {/* User Info */}
+      <div className="bg-white p-4 border-b">
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+            {user?.photo_url ? (
+              <img
+                src={user.photo_url}
+                alt={user.first_name}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <User size={24} className="text-gray-500" />
+            )}
+          </div>
+          
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">
+              {user?.first_name} {user?.last_name}
+            </h2>
+            <p className="text-gray-600">@{user?.username}</p>
+            {isAdmin && (
+              <span className="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded mt-1">
+                Администратор
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="bg-white">
+        {menuItems.map((item) => {
+          const Icon = item.icon
+          return (
             <button
-              onClick={handleEdit}
-              className="btn btn-secondary text-sm"
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center justify-between p-4 border-b hover:bg-gray-50 transition-colors ${
+                activeTab === item.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+              }`}
             >
-              <Settings size={16} className="mr-1" />
-              Редактировать
+              <div className="flex items-center space-x-3">
+                <Icon size={20} className={activeTab === item.id ? 'text-blue-600' : 'text-gray-600'} />
+                <span className={`font-medium ${activeTab === item.id ? 'text-blue-600' : 'text-gray-900'}`}>
+                  {item.name}
+                </span>
+              </div>
+              {item.count > 0 && (
+                <span className="bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded-full">
+                  {item.count}
+                </span>
+              )}
             </button>
-          )}
-        </div>
-
-        {isEditing ? (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Имя пользователя
-              </label>
-              <input
-                type="text"
-                className="input"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="@username"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Имя
-              </label>
-              <input
-                type="text"
-                className="input"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                placeholder="Ваше имя"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Фамилия
-              </label>
-              <input
-                type="text"
-                className="input"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                placeholder="Ваша фамилия"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Телефон
-              </label>
-              <input
-                type="tel"
-                className="input"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+7 (999) 123-45-67"
-              />
-            </div>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={handleSave}
-                disabled={updateProfileMutation.isLoading}
-                className="btn btn-primary flex-1"
-              >
-                {updateProfileMutation.isLoading ? 'Сохранение...' : 'Сохранить'}
-              </button>
-              <button
-                onClick={handleCancel}
-                className="btn btn-secondary"
-              >
-                Отмена
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-600">Имя пользователя</span>
-              <span className="font-medium">@{profile?.username || 'Не указано'}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-600">Имя</span>
-              <span className="font-medium">{profile?.first_name || 'Не указано'}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-600">Фамилия</span>
-              <span className="font-medium">{profile?.last_name || 'Не указано'}</span>
-            </div>
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">Телефон</span>
-              <span className="font-medium">{profile?.phone || 'Не указан'}</span>
-            </div>
-          </div>
-        )}
+          )
+        })}
       </div>
 
-      {/* Admin Link */}
+      {/* Admin Panel */}
       {isAdmin && (
-        <a
-          href="/admin"
-          className="card p-4 block hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Star className="text-yellow-500" size={20} />
-              <span className="font-medium">Админ панель</span>
+        <div className="bg-white mt-4">
+          <button
+            onClick={() => navigate('/admin')}
+            className="w-full flex items-center justify-between p-4 border-b hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center space-x-3">
+              <Settings size={20} className="text-red-600" />
+              <span className="font-medium text-red-600">
+                Панель администратора
+              </span>
             </div>
-            <span className="text-gray-400">→</span>
-          </div>
-        </a>
+          </button>
+        </div>
       )}
 
-      {/* Logout Button */}
-      <button
-        onClick={logout}
-        className="btn btn-danger w-full mt-6"
-      >
-        <LogOut size={16} className="mr-2" />
-        Выйти
-      </button>
+      {/* Logout */}
+      <div className="bg-white mt-4">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center space-x-3 p-4 hover:bg-gray-50 transition-colors"
+        >
+          <LogOut size={20} className="text-red-600" />
+          <span className="font-medium text-red-600">Выйти</span>
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="p-4">
+        {activeTab === 'my-ads' && (
+          <div className="text-center py-8">
+            <Package size={48} className="text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Мои объявления</h3>
+            <p className="text-gray-600">У вас 5 активных объявлений</p>
+          </div>
+        )}
+
+        {activeTab === 'favorites' && (
+          <div className="text-center py-8">
+            <Heart size={48} className="text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Избранное</h3>
+            <p className="text-gray-600">У вас 12 избранных объявлений</p>
+          </div>
+        )}
+
+        {activeTab === 'reviews' && (
+          <div className="text-center py-8">
+            <Star size={48} className="text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Отзывы</h3>
+            <p className="text-gray-600">Ваш рейтинг: 4.8/5 (8 отзывов)</p>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="text-center py-8">
+            <Settings size={48} className="text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Настройки</h3>
+            <p className="text-gray-600">Настройки профиля и приложения</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

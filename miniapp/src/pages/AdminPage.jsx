@@ -1,248 +1,389 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
-  Users, 
-  FileText, 
-  MessageCircle, 
-  CreditCard, 
-  TrendingUp,
-  Check,
-  X,
-  Eye,
-  Ban
-} from 'lucide-react'
-import { formatPrice, formatRelativeTime } from '../utils/formatters'
-import { useAuth } from '../contexts/AuthContext'
-import api from '../utils/api'
-import toast from 'react-hot-toast'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, Users, Package, DollarSign, TrendingUp, Settings, Eye, Ban, Check } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext-test'
 
 const AdminPage = () => {
+  const navigate = useNavigate()
   const { user } = useAuth()
-  const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState('stats')
-
-  const { data: stats } = useQuery({
-    queryKey: ['admin-stats'],
-    queryFn: async () => {
-      const response = await api.get('/admin/stats')
-      return response.data
-    }
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalAds: 0,
+    totalRevenue: 0,
+    activeAds: 0
   })
 
-  const { data: pendingAds } = useQuery({
-    queryKey: ['pending-ads'],
-    queryFn: async () => {
-      const response = await api.get('/admin/ads/pending')
-      return response.data
-    }
-  })
+  const [ads, setAds] = useState([])
+  const [users, setUsers] = useState([])
 
-  const moderateAdMutation = useMutation({
-    mutationFn: async ({ adId, action, reason }) => {
-      const response = await api.post(`/admin/ads/${adId}/moderate`, { action, reason })
-      return response.data
+  const isAdmin = user?.telegram_id === 12345 // Замените на реальный ID админа
+
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/profile')
+      return
+    }
+
+    // Загрузка статистики
+    setStats({
+      totalUsers: 1234,
+      totalAds: 567,
+      totalRevenue: 234500,
+      activeAds: 423
+    })
+
+    // Загрузка объявлений
+    setAds([
+      {
+        id: 1,
+        title: 'iPhone 13 Pro',
+        price: 45000,
+        status: 'active',
+        user: 'user1',
+        created_at: '2024-01-15'
+      },
+      {
+        id: 2,
+        title: 'Куртка зимняя',
+        price: 2500,
+        status: 'pending',
+        user: 'user2',
+        created_at: '2024-01-14'
+      }
+    ])
+
+    // Загрузка пользователей
+    setUsers([
+      {
+        id: 1,
+        username: 'user1',
+        first_name: 'Иван',
+        last_name: 'Иванов',
+        status: 'active',
+        ads_count: 5
+      },
+      {
+        id: 2,
+        username: 'user2',
+        first_name: 'Мария',
+        last_name: 'Петрова',
+        status: 'banned',
+        ads_count: 2
+      }
+    ])
+  }, [isAdmin, navigate])
+
+  const menuItems = [
+    {
+      id: 'dashboard',
+      name: 'Панель управления',
+      icon: TrendingUp
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['pending-ads'])
-      queryClient.invalidateQueries(['admin-stats'])
-      toast.success('Действие выполнено')
+    {
+      id: 'ads',
+      name: 'Объявления',
+      icon: Package
     },
-    onError: () => {
-      toast.error('Ошибка выполнения действия')
+    {
+      id: 'users',
+      name: 'Пользователи',
+      icon: Users
+    },
+    {
+      id: 'finance',
+      name: 'Финансы',
+      icon: DollarSign
     }
-  })
+  ]
 
-  const handleModerate = (adId, action) => {
-    const reason = action === 'reject' || action === 'block' 
-      ? prompt('Укажите причину:') 
-      : null
-
-    if (action !== 'approve' && reason === null) return
-
-    moderateAdMutation.mutate({ adId, action, reason })
+  const handleAdAction = (adId, action) => {
+    console.log(`Ad ${adId}: ${action}`)
+    // Здесь будет логика управления объявлениями
   }
 
-  if (!user?.isAdmin) {
+  const handleUserAction = (userId, action) => {
+    console.log(`User ${userId}: ${action}`)
+    // Здесь будет логика управления пользователями
+  }
+
+  if (!isAdmin) {
     return (
-      <div className="container mx-auto px-4 py-6">
-        <div className="text-center py-12">
-          <p className="text-red-600 mb-4">Доступ запрещен</p>
-          <p className="text-gray-600">У вас нет прав для доступа к админ панели</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Доступ запрещен</h1>
+          <p className="text-gray-600">У вас нет прав администратора</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Админ панель</h1>
-
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('stats')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            activeTab === 'stats' 
-              ? 'bg-primary-600 text-white' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          <TrendingUp size={16} className="inline mr-2" />
-          Статистика
-        </button>
-        
-        <button
-          onClick={() => setActiveTab('pending')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            activeTab === 'pending' 
-              ? 'bg-primary-600 text-white' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          <FileText size={16} className="inline mr-2" />
-          Модерация
-          {pendingAds?.length > 0 && (
-            <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
-              {pendingAds.length}
-            </span>
-          )}
-        </button>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-10">
+        <div className="flex items-center p-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-gray-100 rounded-lg mr-3"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-lg font-semibold">Панель администратора</h1>
+        </div>
       </div>
 
-      {/* Stats Tab */}
-      {activeTab === 'stats' && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-          <div className="card p-4 text-center">
-            <Users className="text-primary-600 mx-auto mb-2" size={24} />
-            <div className="text-2xl font-bold text-gray-900">
-              {stats?.totalUsers || 0}
-            </div>
-            <div className="text-sm text-gray-600">Пользователей</div>
-          </div>
-          
-          <div className="card p-4 text-center">
-            <FileText className="text-primary-600 mx-auto mb-2" size={24} />
-            <div className="text-2xl font-bold text-gray-900">
-              {stats?.totalAds || 0}
-            </div>
-            <div className="text-sm text-gray-600">Объявлений</div>
-          </div>
-          
-          <div className="card p-4 text-center">
-            <MessageCircle className="text-primary-600 mx-auto mb-2" size={24} />
-            <div className="text-2xl font-bold text-gray-900">
-              {stats?.totalChats || 0}
-            </div>
-            <div className="text-sm text-gray-600">Чатов</div>
-          </div>
-          
-          <div className="card p-4 text-center">
-            <CreditCard className="text-primary-600 mx-auto mb-2" size={24} />
-            <div className="text-2xl font-bold text-gray-900">
-              {formatPrice(stats?.totalRevenue || 0)}
-            </div>
-            <div className="text-sm text-gray-600">Доход</div>
-          </div>
+      {/* Admin Menu */}
+      <div className="bg-white border-b">
+        <div className="flex overflow-x-auto">
+          {menuItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === item.id
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Icon size={18} />
+                <span className="text-sm font-medium">{item.name}</span>
+              </button>
+            )
+          })}
         </div>
-      )}
+      </div>
 
-      {/* Pending Ads Tab */}
-      {activeTab === 'pending' && (
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Объявления на модерации
-            </h2>
-            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
-              {pendingAds?.length || 0}
-            </span>
-          </div>
+      {/* Content */}
+      <div className="p-4">
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold mb-4">Общая статистика</h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Всего пользователей</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
+                  </div>
+                  <Users className="text-blue-600" size={24} />
+                </div>
+              </div>
 
-          {!pendingAds || pendingAds.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="text-gray-300 mx-auto mb-4" size={48} />
-              <p className="text-gray-600">Нет объявлений на модерации</p>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Всего объявлений</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalAds}</p>
+                  </div>
+                  <Package className="text-green-600" size={24} />
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Доход</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalRevenue} ₽</p>
+                  </div>
+                  <DollarSign className="text-yellow-600" size={24} />
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Активные объявления</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.activeAds}</p>
+                  </div>
+                  <TrendingUp className="text-purple-600" size={24} />
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {pendingAds.map((ad) => (
-                <div key={ad.id} className="card p-4">
-                  <div className="flex gap-4">
-                    {/* Image */}
-                    {ad.images?.[0] ? (
-                      <img
-                        src={ad.images[0]}
-                        alt={ad.title}
-                        className="w-20 h-20 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <FileText size={24} className="text-gray-400" />
-                      </div>
-                    )}
+          </div>
+        )}
 
-                    {/* Content */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 mb-1">
-                            {ad.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-2">
-                            {formatPrice(ad.price)} • {ad.category?.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {ad.user?.username || ad.user?.first_name} • {formatRelativeTime(ad.created_at)}
-                          </p>
-                        </div>
-                      </div>
+        {activeTab === 'ads' && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Управление объявлениями</h2>
+            
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Название</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Цена</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {ads.map((ad) => (
+                      <tr key={ad.id}>
+                        <td className="px-4 py-2 text-sm">#{ad.id}</td>
+                        <td className="px-4 py-2 text-sm font-medium">{ad.title}</td>
+                        <td className="px-4 py-2 text-sm">{ad.price} ₽</td>
+                        <td className="px-4 py-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            ad.status === 'active' 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {ad.status === 'active' ? 'Активно' : 'На модерации'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleAdAction(ad.id, 'view')}
+                              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            {ad.status === 'pending' && (
+                              <button
+                                onClick={() => handleAdAction(ad.id, 'approve')}
+                                className="p-1 text-green-600 hover:bg-green-50 rounded"
+                              >
+                                <Check size={16} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleAdAction(ad.id, 'delete')}
+                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Ban size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
-                      <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-                        {ad.description}
-                      </p>
+        {activeTab === 'users' && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Управление пользователями</h2>
+            
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Пользователь</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Объявления</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {users.map((user) => (
+                      <tr key={user.id}>
+                        <td className="px-4 py-2">
+                          <div>
+                            <p className="text-sm font-medium">{user.first_name} {user.last_name}</p>
+                            <p className="text-xs text-gray-500">@{user.username}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2 text-sm">{user.ads_count}</td>
+                        <td className="px-4 py-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            user.status === 'active' 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {user.status === 'active' ? 'Активен' : 'Заблокирован'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleUserAction(user.id, 'view')}
+                              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            {user.status === 'active' ? (
+                              <button
+                                onClick={() => handleUserAction(user.id, 'ban')}
+                                className="p-1 text-red-600 hover:bg-red-50 rounded"
+                              >
+                                <Ban size={16} />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleUserAction(user.id, 'unban')}
+                                className="p-1 text-green-600 hover:bg-green-50 rounded"
+                              >
+                                <Check size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleModerate(ad.id, 'approve')}
-                          className="btn btn-primary text-sm"
-                        >
-                          <Check size={16} className="mr-1" />
-                          Одобрить
-                        </button>
-                        
-                        <button
-                          onClick={() => handleModerate(ad.id, 'reject')}
-                          className="btn btn-secondary text-sm"
-                        >
-                          <X size={16} className="mr-1" />
-                          Отклонить
-                        </button>
-                        
-                        <button
-                          onClick={() => handleModerate(ad.id, 'block')}
-                          className="btn btn-danger text-sm"
-                        >
-                          <Ban size={16} className="mr-1" />
-                          Заблокировать
-                        </button>
-                        
-                        <button
-                          onClick={() => window.open(`/ad/${ad.id}`, '_blank')}
-                          className="btn btn-secondary text-sm"
-                        >
-                          <Eye size={16} className="mr-1" />
-                          Просмотр
-                        </button>
-                      </div>
+        {activeTab === 'finance' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold mb-4">Финансовая статистика</h2>
+            
+            <div className="bg-white p-6 rounded-lg border">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Доходы</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Платные объявления:</span>
+                      <span className="font-medium">150,000 ₽</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Премиум-подписки:</span>
+                      <span className="font-medium">84,500 ₽</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                      <span>Итого:</span>
+                      <span className="text-green-600">234,500 ₽</span>
                     </div>
                   </div>
                 </div>
-              ))}
+                
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Текущий месяц</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Доход:</span>
+                      <span className="font-medium">45,200 ₽</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Расходы:</span>
+                      <span className="font-medium">12,300 ₽</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                      <span>Прибыль:</span>
+                      <span className="text-green-600">32,900 ₽</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
