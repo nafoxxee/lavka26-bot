@@ -15,8 +15,15 @@ function initializeApp() {
 }
 
 function showContent() {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    const loadingElement = document.getElementById('loading');
+    const contentElement = document.getElementById('content');
+    
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+    if (contentElement) {
+        contentElement.style.display = 'block';
+    }
 }
 
 function setupTelegramWebApp() {
@@ -56,7 +63,10 @@ function openCreateAd() {
         showNotification('Сначала авторизуйтесь', 'error');
         return;
     }
-    document.getElementById('create-ad-modal').style.display = 'flex';
+    const modalElement = document.getElementById('create-ad-modal');
+    if (modalElement) {
+        modalElement.style.display = 'flex';
+    }
 }
 
 function showNotification(message, type = 'info') {
@@ -65,14 +75,20 @@ function showNotification(message, type = 'info') {
 
 function getUserDataWithTimeout() {
     const tgUser = tg.initDataUnsafe.user;
+    const userDisplayElement = document.getElementById('user-name-display');
+    
     if (tgUser) {
         currentUser = tgUser;
-        document.getElementById('user-name-display').textContent = tgUser.first_name;
+        if (userDisplayElement) {
+            userDisplayElement.textContent = tgUser.first_name;
+        }
         if (tg.MainButton) {
             tg.MainButton.show();
         }
     } else {
-        document.getElementById('user-name-display').textContent = 'Гость';
+        if (userDisplayElement) {
+            userDisplayElement.textContent = 'Гость';
+        }
     }
 }
 
