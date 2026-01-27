@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lavka26 - Маркетплейс в Telegram</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Загрузка -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Загрузка Lavka26...</p>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="content" id="content" style="display: none;">
+            <!-- Шапка -->
+            <header class="header">
+                <h1>🛍️ Lavka26</h1>
+                <div class="user-header">
+                    <span id="user-name-display">Гость</span>
+                </div>
+            </header>
+
+            <!-- Навигация -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="feed">📦 Лента</button>
+                <button class="nav-tab" data-tab="create">➕ Создать</button>
+                <button class="nav-tab" data-tab="my-ads">📱 Мои</button>
+                <button class="nav-tab" data-tab="favorites">❤️ Избранное</button>
+            </nav>
+
+            <!-- Лента объявлений -->
+            <div class="tab-content active" id="feed-tab">
+                <!-- Поиск и фильтры -->
+                <div class="search-section">
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="🔍 Поиск товаров...">
+                        <button onclick="searchAds()">Найти</button>
+                    </div>
+                    <div class="filters">
+                        <select id="category-filter" onchange="filterByCategory()">
+                            <option value="">📂 Все категории</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Список объявлений -->
+                <div class="ads-list" id="ads-list">
+                    <div class="loading-placeholder">Загрузка объявлений...</div>
+                </div>
+            </div>
+
+            <!-- Создание объявления -->
+            <div class="tab-content" id="create-tab">
+                <div class="create-form">
+                    <h2>➕ Создать объявление</h2>
+                    <form id="ad-form">
+                        <div class="form-group">
+                            <label>Название товара *</label>
+                            <input type="text" id="ad-title" required placeholder="Например: iPhone 13 Pro">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Категория *</label>
+                            <select id="ad-category" required>
+                                <option value="">Выберите категорию</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Цена *</label>
+                            <input type="number" id="ad-price" required placeholder="0" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Описание</label>
+                            <textarea id="ad-description" rows="4" placeholder="Опишите товар, состояние, особенности..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">🚀 Опубликовать</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Мои объявления -->
+            <div class="tab-content" id="my-ads-tab">
+                <div class="my-ads-content">
+                    <h2>📱 Мои объявления</h2>
+                    <div class="ads-list" id="my-ads-list">
+                        <div class="loading-placeholder">Загрузка...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Избранное -->
+            <div class="tab-content" id="favorites-tab">
+                <div class="favorites-content">
+                    <h2>❤️ Избранное</h2>
+                    <div class="ads-list" id="favorites-list">
+                        <div class="loading-placeholder">Загрузка...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно объявления -->
+        <div class="modal" id="ad-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Загрузка...</h3>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Контент объявления -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()">Закрыть</button>
+                    <button class="btn-primary" id="contact-btn" onclick="contactSeller()">Связаться</button>
+                    <button class="btn-favorite" id="favorite-btn" onclick="toggleFavorite()">❤️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Уведомления -->
+        <div class="notifications" id="notifications"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

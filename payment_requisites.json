@@ -1,8 +1,0 @@
-{
-  "bank_name": "Сбер",
-  "phone": "+79001234567", 
-  "recipient": "Иван Иванов",
-  "card_last_digits": "1234",
-  "qr_code_url": "",
-  "instructions": "Переведите 199₽ на указанные реквизиты с комментарием Lavka26_{ваш_telegram_id}"
-}
