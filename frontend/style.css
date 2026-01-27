@@ -440,14 +440,19 @@ body {
     }
 }
 
-/* Заглушки */
-.loading-placeholder {
+/* Загрузка */
+.loading {
     text-align: center;
     padding: 40px 20px;
-    color: #6c757d;
-    font-size: 14px;
+    display: none; /* Скрываем загрузку по умолчанию */
 }
 
+/* Основной контент */
+.content {
+    display: block; /* Показываем контент по умолчанию */
+}
+
+/* Заглушки */
 .empty-state {
     text-align: center;
     padding: 40px 20px;
