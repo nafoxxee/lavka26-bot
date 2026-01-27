@@ -432,50 +432,68 @@ body {
 /* Нижняя навигация */
 .bottom-nav {
     display: flex;
-    align-items: center;
     justify-content: space-around;
-    padding: 8px 0;
-    background: var(--white);
+    align-items: center;
+    background: white;
     border-top: 1px solid var(--border);
-    position: sticky;
+    padding: 8px 0;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
-    flex-shrink: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 2px;
-    min-width: 60px;
-    padding: 8px 12px;
-    background: transparent;
+    padding: 12px 8px;
+    background: none;
     border: none;
+    border-radius: 12px;
     cursor: pointer;
-    transition: var(--transition);
-    color: var(--text-secondary);
-    -webkit-tap-highlight-color: transparent;
-}
-
-.nav-item:hover {
-    color: var(--avito-blue);
-}
-
-.nav-item.active {
-    color: var(--avito-blue);
+    transition: all 0.3s ease;
+    min-width: 70px;
+    gap: 4px;
 }
 
 .nav-item i {
     font-size: 20px;
-    margin-bottom: 2px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
 }
 
 .nav-item span {
     font-size: 11px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
     font-weight: 500;
-    line-height: 1.2;
+}
+
+.nav-item:hover {
+    background: var(--background);
+    transform: translateY(-2px);
+}
+
+.nav-item:hover i,
+.nav-item:hover span {
+    color: var(--primary);
+}
+
+.nav-item.active {
+    background: var(--primary-light);
+}
+
+.nav-item.active i,
+.nav-item.active span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.nav-item.active i {
+    font-size: 22px;
 }
 
 /* Стили для объявлений */

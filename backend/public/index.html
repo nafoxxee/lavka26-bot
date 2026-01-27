@@ -35,8 +35,9 @@
                         <i class="fas fa-bell"></i>
                         <span class="badge" id="notification-badge" style="display: none;">0</span>
                     </button>
-                    <button class="icon-btn" onclick="openMessages()">
-                        <i class="fas fa-comment"></i>
+                    <button class="icon-btn" onclick="switchTab('profile')">
+                        <i class="fas fa-user"></i>
+                    </button>
                         <span class="badge" id="message-badge" style="display: none;">0</span>
                     </button>
                     <button class="icon-btn" onclick="openProfile()">
@@ -135,21 +136,17 @@
                 </button>
                 <button class="nav-item" data-tab="my-ads">
                     <i class="fas fa-ad"></i>
-                    <span>Мои</span>
+                    <span>Мои объявления</span>
                 </button>
                 <button class="nav-item" data-tab="messages">
                     <i class="fas fa-comment"></i>
                     <span>Сообщения</span>
                 </button>
-                <button class="nav-item" data-tab="profile">
-                    <i class="fas fa-user"></i>
-                    <span>Профиль</span>
+                <button class="nav-item" data-tab="moderator">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Модерация</span>
                 </button>
             </nav>
-            <button class="nav-item" id="moderator-tab" data-tab="moderator" style="display: none;">
-                <i class="fas fa-shield-alt"></i>
-                <span>Модератор</span>
-            </button>
         </div>
 
         <!-- Модераторская панель -->
@@ -534,11 +531,6 @@
 
         <!-- Уведомления -->
         <div class="notifications" id="notifications"></div>
-        
-        <!-- Тестовая кнопка для отладки -->
-        <button onclick="testFunction()" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: red; color: white; padding: 10px; border: none; border-radius: 5px;">
-            Тест
-        </button>
     </div>
 
     <script src="app.js"></script>
@@ -554,12 +546,16 @@
         
         // Простые функции для кнопок
         window.openCreateAd = function() {
-            alert('Создание объявления работает!');
-            console.log('openCreateAd вызвана');
+            const modal = document.getElementById('create-ad-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                showNotification('Создание объявления', 'info');
+            }
         };
         
         window.switchTab = function(tabName) {
             console.log('switchTab вызвана с:', tabName);
+            
             // Скрываем все вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.style.display = 'none';
@@ -574,6 +570,19 @@
             const tabElement = document.getElementById(tabName + '-tab');
             if (tabElement) {
                 tabElement.style.display = 'block';
+                
+                // Загружаем контент для вкладки
+                if (tabName === 'favorites') {
+                    loadFavorites();
+                } else if (tabName === 'my-ads') {
+                    loadMyAds();
+                } else if (tabName === 'profile') {
+                    loadProfile();
+                } else if (tabName === 'moderator') {
+                    loadModerator();
+                } else if (tabName === 'messages') {
+                    loadMessages();
+                }
             }
             
             // Активируем кнопку
@@ -582,6 +591,87 @@
                 activeBtn.classList.add('active');
             }
         };
+        
+        // Функции загрузки контента
+        function loadFavorites() {
+            const favoritesList = document.getElementById('favorites-list');
+            if (favoritesList) {
+                favoritesList.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-heart" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--text-secondary); margin-bottom: 8px;">У вас пока нет избранных объявлений</h3>
+                        <p style="color: var(--text-muted);">Добавляйте понравившиеся объявления в избранное</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function loadMyAds() {
+            const myAdsList = document.getElementById('my-ads-list');
+            if (myAdsList) {
+                myAdsList.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-ad" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--text-secondary); margin-bottom: 8px;">У вас пока нет объявлений</h3>
+                        <p style="color: var(--text-muted);">Создайте свое первое объявление</p>
+                        <button class="btn-primary" onclick="openCreateAd()" style="margin-top: 16px;">
+                            <i class="fas fa-plus"></i> Создать объявление
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        function loadProfile() {
+            showNotification('Профиль пользователя', 'info');
+        }
+        
+        function loadModerator() {
+            showNotification('Панель модератора', 'info');
+        }
+        
+        function loadMessages() {
+            const messagesList = document.getElementById('messages-list');
+            if (messagesList) {
+                messagesList.innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-comment" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <h3 style="color: var(--text-secondary); margin-bottom: 8px;">У вас пока нет сообщений</h3>
+                        <p style="color: var(--text-muted);">Начните общение с продавцами</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notifications = document.getElementById('notifications');
+            if (!notifications) return;
+            
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
+                background: ${type === 'error' ? '#ff4757' : type === 'success' ? '#00b894' : '#0984e3'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
         
         window.testFunction = function() {
             alert('Кнопки работают! JavaScript загружен правильно.');
