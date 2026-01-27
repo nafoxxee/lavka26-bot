@@ -444,9 +444,11 @@ function switchTab(tabName) {
         targetTab.style.display = 'block';
     }
     
-    // Специальная логика для модераторской панели
+    // Специальная логика для разных вкладок
     if (tabName === 'moderator') {
         loadModeratorPanel();
+    } else if (tabName === 'my-ads') {
+        loadMyAds();
     }
     
     console.log('Переключение на вкладку:', tabName);
@@ -454,11 +456,210 @@ function switchTab(tabName) {
 
 function openCreateAd() {
     if (!currentUser) {
-        showNotification('Сначала авторизуйтесь', 'error');
+        showNotification('Please login first', 'error');
         return;
     }
-    // Здесь будет логика открытия формы создания
-    showNotification('Создание объявления в разработке', 'info');
+    
+    document.getElementById('create-ad-modal').style.display = 'flex';
+    setupCreateAdForm();
+}
+
+function closeCreateAdModal() {
+    document.getElementById('create-ad-modal').style.display = 'none';
+    resetCreateAdForm();
+}
+
+function setupCreateAdForm() {
+    // Счетчики символов
+    const titleInput = document.getElementById('ad-title-input');
+    const descInput = document.getElementById('ad-description-input');
+    const titleCounter = document.getElementById('title-counter');
+    const descCounter = document.getElementById('desc-counter');
+    
+    titleInput.addEventListener('input', () => {
+        titleCounter.textContent = titleInput.value.length;
+    });
+    
+    descInput.addEventListener('input', () => {
+        descCounter.textContent = descInput.value.length;
+    });
+    
+    // Загрузка изображений
+    const imagesInput = document.getElementById('ad-images-input');
+    imagesInput.addEventListener('change', handleImageUpload);
+}
+
+function resetCreateAdForm() {
+    document.getElementById('create-ad-form').reset();
+    document.getElementById('title-counter').textContent = '0';
+    document.getElementById('desc-counter').textContent = '0';
+    document.getElementById('image-preview-container').innerHTML = '';
+    uploadedImages = [];
+}
+
+let uploadedImages = [];
+
+function handleImageUpload(event) {
+    const files = Array.from(event.target.files);
+    const maxFiles = 5;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (uploadedImages.length + files.length > maxFiles) {
+        showNotification(`Maximum ${maxFiles} photos allowed`, 'error');
+        return;
+    }
+    
+    const previewContainer = document.getElementById('image-preview-container');
+    
+    files.forEach(file => {
+        if (file.size > maxSize) {
+            showNotification(`File ${file.name} is too large (max 5MB)`, 'error');
+            return;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+            showNotification(`File ${file.name} is not an image`, 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button type="button" class="remove-image" onclick="removeImage(this, '${file.name}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            previewContainer.appendChild(previewItem);
+            
+            uploadedImages.push({
+                file: file,
+                name: file.name,
+                url: e.target.result
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Скрываем placeholder если есть изображения
+    const uploadArea = document.querySelector('.image-upload-area');
+    if (uploadedImages.length > 0) {
+        uploadArea.style.display = 'none';
+    }
+}
+
+function removeImage(button, fileName) {
+    const previewItem = button.parentElement;
+    previewItem.remove();
+    
+    uploadedImages = uploadedImages.filter(img => img.name !== fileName);
+    
+    // Показываем placeholder если нет изображений
+    const uploadArea = document.querySelector('.image-upload-area');
+    if (uploadedImages.length === 0) {
+        uploadArea.style.display = 'block';
+    }
+}
+
+async function publishAd() {
+    if (!currentUser) {
+        showNotification('Please login first', 'error');
+        return;
+    }
+    
+    const form = document.getElementById('create-ad-form');
+    const formData = new FormData(form);
+    
+    // Валидация
+    const title = formData.get('title').trim();
+    const category = formData.get('category');
+    const price = parseFloat(formData.get('price'));
+    const description = formData.get('description').trim();
+    
+    if (!title) {
+        showNotification('Please enter a title', 'error');
+        return;
+    }
+    
+    if (!category) {
+        showNotification('Please select a category', 'error');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        showNotification('Please enter a valid price', 'error');
+        return;
+    }
+    
+    try {
+        showNotification('Uploading images...', 'info');
+        
+        // Загружаем изображения
+        let imagePaths = [];
+        if (uploadedImages.length > 0) {
+            const imageFormData = new FormData();
+            uploadedImages.forEach(img => {
+                imageFormData.append('images', img.file);
+            });
+            
+            const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: imageFormData
+            });
+            
+            if (uploadResponse.ok) {
+                const uploadResult = await uploadResponse.json();
+                imagePaths = uploadResult.images || [];
+            } else {
+                throw new Error('Failed to upload images');
+            }
+        }
+        
+        showNotification('Creating advertisement...', 'info');
+        
+        // Создаем объявление
+        const adData = {
+            title,
+            description,
+            price,
+            category_id: parseInt(category),
+            user_id: currentUser.id,
+            images: JSON.stringify(imagePaths),
+            location: formData.get('location') || '',
+            contact_info: JSON.stringify({
+                show_phone: document.getElementById('show-phone').checked,
+                allow_messages: document.getElementById('allow-messages').checked
+            })
+        };
+        
+        const response = await fetch('/api/ads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(adData)
+        });
+        
+        if (response.ok) {
+            const ad = await response.json();
+            showNotification('Advertisement submitted for moderation!', 'success');
+            closeCreateAdModal();
+            loadAds(); // Обновляем список
+            
+            // Если модератор, обновляем статистику
+            if (currentUser.telegram_id === 379036860) {
+                loadModeratorStats();
+            }
+        } else {
+            throw new Error('Failed to create advertisement');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error creating ad:', error);
+        showNotification('Error creating advertisement', 'error');
+    }
 }
 
 function openNotifications() {
@@ -858,6 +1059,115 @@ function refreshPendingAds() {
 
 function refreshReports() {
     loadReports();
+}
+
+// Функции для "Моих объявлений"
+let currentStatusFilter = 'all';
+
+async function loadMyAds() {
+    if (!currentUser) {
+        document.getElementById('my-ads-list').innerHTML = '<div class="loading-placeholder">Please login to view your advertisements</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/ads?user_id=${currentUser.id}`);
+        if (response.ok) {
+            const ads = await response.json();
+            displayMyAds(ads);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки моих объявлений:', error);
+        document.getElementById('my-ads-list').innerHTML = '<div class="loading-placeholder">Error loading advertisements</div>';
+    }
+}
+
+function displayMyAds(ads) {
+    const container = document.getElementById('my-ads-list');
+    
+    if (!ads || ads.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">You have no advertisements yet</div>';
+        return;
+    }
+    
+    // Фильтруем по статусу
+    const filteredAds = currentStatusFilter === 'all' 
+        ? ads 
+        : ads.filter(ad => ad.status === currentStatusFilter);
+    
+    if (filteredAds.length === 0) {
+        container.innerHTML = `<div class="loading-placeholder">No ${currentStatusFilter} advertisements</div>`;
+        return;
+    }
+    
+    container.innerHTML = filteredAds.map(ad => `
+        <div class="my-ad-card ${ad.status}">
+            <div class="my-ad-header">
+                <div>
+                    <div class="my-ad-title" onclick="openAd(${ad.id})">${escapeHtml(ad.title)}</div>
+                    <div class="my-ad-meta">
+                        <span>💰 ${formatPrice(ad.price)}</span>
+                        <span>👁 ${ad.views || 0} views</span>
+                        <span>📅 ${formatDate(ad.created_at)}</span>
+                    </div>
+                </div>
+                <div class="my-ad-status ${ad.status}">${ad.status}</div>
+            </div>
+            ${ad.description ? `<div class="my-ad-description">${escapeHtml(ad.description.substring(0, 150))}${ad.description.length > 150 ? '...' : ''}</div>` : ''}
+            <div class="my-ad-actions">
+                <button class="my-ad-btn" onclick="openAd(${ad.id})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="my-ad-btn edit" onclick="editAd(${ad.id})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="my-ad-btn delete" onclick="deleteAd(${ad.id})">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Добавляем обработчики для фильтров
+    setupStatusFilters();
+}
+
+function setupStatusFilters() {
+    document.querySelectorAll('.status-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+            document.querySelectorAll('.status-filter').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            currentStatusFilter = this.dataset.status;
+            loadMyAds();
+        });
+    });
+}
+
+function editAd(adId) {
+    showNotification('Edit functionality coming soon', 'info');
+}
+
+async function deleteAd(adId) {
+    if (!confirm('Are you sure you want to delete this advertisement?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/ads/${adId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showNotification('Advertisement deleted', 'success');
+            await loadMyAds();
+            await loadAds(); // Обновляем основной список
+        } else {
+            showNotification('Error deleting advertisement', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка удаления объявления:', error);
+        showNotification('Error deleting advertisement', 'error');
+    }
 }
 
 console.log('🎉 Lavka26 готов к работе!');

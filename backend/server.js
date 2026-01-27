@@ -113,6 +113,8 @@ function initTables() {
             category_id INTEGER,
             user_id INTEGER NOT NULL,
             images TEXT,
+            location TEXT,
+            contact_info TEXT,
             status TEXT DEFAULT 'pending',
             views INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -309,27 +311,33 @@ app.get('/api/ads', (req, res) => {
 
 // Создание объявления
 app.post('/api/ads', (req, res) => {
-    const { title, description, price, category_id, user_id, images } = req.body;
+    const { title, description, price, category_id, user_id, images, location, contact_info } = req.body;
     
     if (!title || !price || !category_id || !user_id) {
-        res.status(400).json({ error: 'Обязательные поля: title, price, category_id, user_id' });
+        res.status(400).json({ error: 'title, price, category_id, and user_id are required' });
         return;
     }
     
-    db.run('INSERT INTO ads (title, description, price, category_id, user_id, images) VALUES (?, ?, ?, ?, ?, ?)', 
-        [title, description, price, category_id, user_id, JSON.stringify(images || [])], 
+    db.run(
+        `INSERT INTO ads (title, description, price, category_id, user_id, images, location, contact_info) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [title, description, price, category_id, user_id, images || '[]', location || '', contact_info || '{}'],
         function(err) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
-            
-            db.get('SELECT * FROM ads WHERE id = ?', [this.lastID], (err, row) => {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                res.json(row);
+            res.json({ 
+                id: this.lastID,
+                title,
+                description,
+                price,
+                category_id,
+                user_id,
+                images,
+                location,
+                contact_info,
+                status: 'pending'
             });
         }
     );
@@ -509,6 +517,24 @@ app.post('/api/ads/:id/views', (req, res) => {
             return;
         }
         res.json({ success: true, views: this.changes });
+    });
+});
+
+// Удаление объявления
+app.delete('/api/ads/:id', (req, res) => {
+    const adId = req.params.id;
+    
+    // Сначала удаляем связанные записи
+    db.run('DELETE FROM favorites WHERE ad_id = ?', [adId]);
+    db.run('DELETE FROM reports WHERE ad_id = ?', [adId]);
+    
+    // Затем удаляем само объявление
+    db.run('DELETE FROM ads WHERE id = ?', [adId], function(err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ success: true, deleted: this.changes });
     });
 });
 

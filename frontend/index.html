@@ -136,6 +136,10 @@
                     <i class="fas fa-comment"></i>
                     <span>Messages</span>
                 </button>
+                <button class="nav-item" data-tab="my-ads">
+                    <i class="fas fa-list-alt"></i>
+                    <span>My Ads</span>
+                </button>
                 <button class="nav-item" data-tab="profile">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -199,6 +203,131 @@
                     <div class="reports-list" id="reports-list">
                         <div class="loading-placeholder">Loading reports...</div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мои объявления -->
+        <div class="tab-content" id="my-ads-tab" style="display: none;">
+            <div class="my-ads-content">
+                <div class="my-ads-header">
+                    <h2>My Advertisements</h2>
+                    <button class="btn-primary" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i> Create Ad
+                    </button>
+                </div>
+                
+                <!-- Фильтры статусов -->
+                <div class="status-filters">
+                    <button class="status-filter active" data-status="all">All</button>
+                    <button class="status-filter" data-status="pending">Pending</button>
+                    <button class="status-filter" data-status="active">Active</button>
+                    <button class="status-filter" data-status="rejected">Rejected</button>
+                </div>
+                
+                <!-- Список объявлений -->
+                <div class="my-ads-list" id="my-ads-list">
+                    <div class="loading-placeholder">Loading your advertisements...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания объявления -->
+        <div class="modal" id="create-ad-modal" style="display: none;">
+            <div class="modal-content create-ad-modal">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeCreateAdModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>Create Advertisement</h3>
+                    <button class="publish-btn" onclick="publishAd()">
+                        <i class="fas fa-paper-plane"></i> Publish
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-ad-form">
+                        <!-- Заголовок -->
+                        <div class="form-group">
+                            <label for="ad-title-input">Title *</label>
+                            <input type="text" id="ad-title-input" name="title" required 
+                                   placeholder="What are you selling?" maxlength="100">
+                            <div class="char-counter">
+                                <span id="title-counter">0</span>/100
+                            </div>
+                        </div>
+
+                        <!-- Категория -->
+                        <div class="form-group">
+                            <label for="ad-category-input">Category *</label>
+                            <select id="ad-category-input" name="category" required>
+                                <option value="">Select category</option>
+                                <option value="1">Transport</option>
+                                <option value="2">Real Estate</option>
+                                <option value="3">Electronics</option>
+                                <option value="4">Clothing</option>
+                                <option value="5">Services</option>
+                                <option value="6">Jobs</option>
+                            </select>
+                        </div>
+
+                        <!-- Цена -->
+                        <div class="form-group">
+                            <label for="ad-price-input">Price (₽) *</label>
+                            <input type="number" id="ad-price-input" name="price" required 
+                                   placeholder="0" min="0" step="1">
+                        </div>
+
+                        <!-- Описание -->
+                        <div class="form-group">
+                            <label for="ad-description-input">Description</label>
+                            <textarea id="ad-description-input" name="description" 
+                                      placeholder="Describe your item..." rows="4" maxlength="1000"></textarea>
+                            <div class="char-counter">
+                                <span id="desc-counter">0</span>/1000
+                            </div>
+                        </div>
+
+                        <!-- Изображения -->
+                        <div class="form-group">
+                            <label>Photos</label>
+                            <div class="image-upload-area" onclick="document.getElementById('ad-images-input').click()">
+                                <input type="file" id="ad-images-input" accept="image/*" multiple style="display: none;">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-camera"></i>
+                                    <p>Click to add photos</p>
+                                    <small>Up to 5 photos, max 5MB each</small>
+                                </div>
+                            </div>
+                            <div class="image-preview-container" id="image-preview-container"></div>
+                        </div>
+
+                        <!-- Расположение -->
+                        <div class="form-group">
+                            <label for="ad-location-input">Location</label>
+                            <div class="location-input">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="ad-location-input" name="location" 
+                                       placeholder="City or area">
+                            </div>
+                        </div>
+
+                        <!-- Контактная информация -->
+                        <div class="form-group">
+                            <label>Contact Information</label>
+                            <div class="contact-options">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="show-phone" checked>
+                                    <span class="checkmark"></span>
+                                    Show phone number
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="allow-messages" checked>
+                                    <span class="checkmark"></span>
+                                    Allow messages
+                                </label>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
