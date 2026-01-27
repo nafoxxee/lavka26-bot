@@ -5,26 +5,36 @@ let currentAd = null;
 let categories = [];
 let favorites = [];
 
-// Инициализация приложения - запускаем сразу для Telegram WebApp
-console.log('🚀 Запуск Lavka26 Mini App...');
-console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
+// Инициализация приложения - ждем загрузки DOM
+function initializeApp() {
+    console.log('🚀 Запуск Lavka26 Mini App...');
+    console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
 
-// Показываем контент сразу для отладки
-showContent();
+    // Показываем контент сразу для отладки
+    showContent();
 
-// Настройка Telegram WebApp
-setupTelegramWebApp();
+    // Настройка Telegram WebApp
+    setupTelegramWebApp();
 
-// Получение данных пользователя с таймаутом
-getUserDataWithTimeout();
+    // Получение данных пользователя с таймаутом
+    getUserDataWithTimeout();
 
-// Настройка обработчиков событий
-setupEventListeners();
+    // Настройка обработчиков событий
+    setupEventListeners();
 
-// Загрузка начальных данных
-loadInitialData();
+    // Загрузка начальных данных
+    loadInitialData();
 
-console.log('✅ Инициализация завершена');
+    console.log('✅ Инициализация завершена');
+}
+
+// Запускаем инициализацию
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    // DOM уже загружен
+    initializeApp();
+}
 
 // Получение данных пользователя с таймаутом
 function getUserDataWithTimeout() {
