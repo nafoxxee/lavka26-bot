@@ -62,6 +62,9 @@ function getUserDataWithTimeout() {
             last_name: tgUser.last_name || '',
             username: tgUser.username || ''
         });
+        
+        // Проверяем, является ли пользователь модератором
+        checkModeratorAccess(tgUser.id);
     } else {
         const urlParams = new URLSearchParams(window.location.search);
         const userData = {
@@ -73,10 +76,25 @@ function getUserDataWithTimeout() {
         
         if (userData.telegram_id) {
             registerUser(userData);
+            checkModeratorAccess(userData.telegram_id);
         } else {
             console.log('⚠️ Работаем без регистрации');
             loadInitialData();
         }
+    }
+}
+
+// Проверка прав модератора
+function checkModeratorAccess(telegramId) {
+    const MODERATOR_ID = 379036860;
+    
+    if (telegramId.toString() === MODERATOR_ID.toString()) {
+        // Показываем модераторскую вкладку
+        const moderatorTab = document.getElementById('moderator-tab');
+        if (moderatorTab) {
+            moderatorTab.style.display = 'block';
+        }
+        console.log('✅ Доступ модератора предоставлен');
     }
 }
 
@@ -415,7 +433,22 @@ function switchTab(tabName) {
     });
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
     
-    // Здесь можно добавить логику переключения вкладок
+    // Скрываем все вкладки
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Показываем выбранную вкладку
+    const targetTab = document.getElementById(`${tabName}-tab`);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+    
+    // Специальная логика для модераторской панели
+    if (tabName === 'moderator') {
+        loadModeratorPanel();
+    }
+    
     console.log('Переключение на вкладку:', tabName);
 }
 
@@ -637,6 +670,194 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
     initializeApp();
+}
+
+// Модераторские функции
+async function loadModeratorPanel() {
+    if (!currentUser || currentUser.telegram_id !== 379036860) {
+        showNotification('Access denied', 'error');
+        return;
+    }
+    
+    await Promise.all([
+        loadModeratorStats(),
+        loadPendingAds(),
+        loadReports()
+    ]);
+}
+
+async function loadModeratorStats() {
+    try {
+        const response = await fetch(`/api/moderator/stats?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const stats = await response.json();
+            
+            document.getElementById('total-ads').textContent = stats.total_ads || 0;
+            document.getElementById('pending-ads').textContent = stats.pending_ads || 0;
+            document.getElementById('active-ads').textContent = stats.active_ads || 0;
+            document.getElementById('total-reports').textContent = stats.total_reports || 0;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки статистики:', error);
+    }
+}
+
+async function loadPendingAds() {
+    try {
+        const response = await fetch(`/api/moderator/ads?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const ads = await response.json();
+            displayPendingAds(ads);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки объявлений:', error);
+        document.getElementById('pending-ads-list').innerHTML = '<div class="loading-placeholder">Error loading ads</div>';
+    }
+}
+
+function displayPendingAds(ads) {
+    const container = document.getElementById('pending-ads-list');
+    
+    if (!ads || ads.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">No pending ads</div>';
+        return;
+    }
+    
+    container.innerHTML = ads.map(ad => `
+        <div class="pending-ad-card">
+            <div class="pending-ad-header">
+                <div>
+                    <div class="pending-ad-title">${escapeHtml(ad.title)}</div>
+                    <div class="pending-ad-meta">
+                        💰 ${formatPrice(ad.price)} • 👤 ${escapeHtml(ad.first_name)} • 📅 ${formatDate(ad.created_at)}
+                    </div>
+                </div>
+            </div>
+            ${ad.description ? `<div class="pending-ad-description">${escapeHtml(ad.description.substring(0, 200))}${ad.description.length > 200 ? '...' : ''}</div>` : ''}
+            <div class="pending-ad-actions">
+                <button class="btn-approve" onclick="approveAd(${ad.id})">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-reject" onclick="rejectAd(${ad.id})">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadReports() {
+    try {
+        const response = await fetch(`/api/moderator/reports?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const reports = await response.json();
+            displayReports(reports);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки жалоб:', error);
+        document.getElementById('reports-list').innerHTML = '<div class="loading-placeholder">Error loading reports</div>';
+    }
+}
+
+function displayReports(reports) {
+    const container = document.getElementById('reports-list');
+    
+    if (!reports || reports.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">No reports</div>';
+        return;
+    }
+    
+    container.innerHTML = reports.map(report => `
+        <div class="report-card">
+            <div class="report-header">
+                <div>
+                    <div class="report-title">${escapeHtml(report.ad_title)}</div>
+                    <div class="report-meta">
+                        👤 ${escapeHtml(report.reporter_name)} • 📅 ${formatDate(report.created_at)}
+                    </div>
+                </div>
+            </div>
+            <div class="report-reason">
+                <strong>Reason:</strong> ${escapeHtml(report.reason)}
+            </div>
+            ${report.description ? `<div class="report-description">${escapeHtml(report.description)}</div>` : ''}
+            <div class="report-actions">
+                <button class="btn-approve" onclick="viewReportedAd(${report.ad_id})">
+                    <i class="fas fa-eye"></i> View Ad
+                </button>
+                <button class="btn-reject" onclick="dismissReport(${report.id})">
+                    <i class="fas fa-check"></i> Dismiss
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function approveAd(adId) {
+    try {
+        const response = await fetch(`/api/moderator/approve-ad/${adId}?telegram_id=${currentUser.telegram_id}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            showNotification('Advertisement approved', 'success');
+            await loadPendingAds();
+            await loadModeratorStats();
+        } else {
+            showNotification('Error approving ad', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка одобрения:', error);
+        showNotification('Error approving ad', 'error');
+    }
+}
+
+async function rejectAd(adId) {
+    const reason = prompt('Enter rejection reason (optional):');
+    
+    try {
+        const response = await fetch(`/api/moderator/reject-ad/${adId}?telegram_id=${currentUser.telegram_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason || '' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            showNotification('Advertisement rejected', 'success');
+            await loadPendingAds();
+            await loadModeratorStats();
+        } else {
+            showNotification('Error rejecting ad', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка отклонения:', error);
+        showNotification('Error rejecting ad', 'error');
+    }
+}
+
+async function viewReportedAd(adId) {
+    await openAd(adId);
+}
+
+async function dismissReport(reportId) {
+    try {
+        // Здесь можно добавить API для отклонения жалобы
+        showNotification('Report dismissed', 'success');
+        await loadReports();
+    } catch (error) {
+        console.error('❌ Ошибка отклонения жалобы:', error);
+        showNotification('Error dismissing report', 'error');
+    }
+}
+
+function refreshPendingAds() {
+    loadPendingAds();
+}
+
+function refreshReports() {
+    loadReports();
 }
 
 console.log('🎉 Lavka26 готов к работе!');
