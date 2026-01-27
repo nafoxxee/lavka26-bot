@@ -12,15 +12,55 @@ document.addEventListener('DOMContentLoaded', function() {
     // Настройка Telegram WebApp
     setupTelegramWebApp();
     
-    // Получение данных пользователя
-    getUserData();
+    // Получение данных пользователя с таймаутом
+    getUserDataWithTimeout();
     
     // Настройка обработчиков событий
     setupEventListeners();
     
     // Загрузка начальных данных
     loadInitialData();
+    
+    // Показываем контент в любом случае через 3 секунды
+    setTimeout(() => {
+        showContent();
+    }, 3000);
 });
+
+// Получение данных пользователя с таймаутом
+function getUserDataWithTimeout() {
+    // Сначала пробуем получить из Telegram WebApp
+    const tgUser = tg.initDataUnsafe.user;
+    
+    if (tgUser) {
+        console.log('✅ Получены данные из Telegram WebApp:', tgUser);
+        registerUser({
+            telegram_id: tgUser.id,
+            first_name: tgUser.first_name,
+            last_name: tgUser.last_name || '',
+            username: tgUser.username || ''
+        });
+    } else {
+        // Fallback - пробуем получить из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userData = {
+            telegram_id: urlParams.get('telegram_id'),
+            first_name: urlParams.get('first_name') || 'Пользователь',
+            last_name: urlParams.get('last_name') || '',
+            username: urlParams.get('username') || ''
+        };
+        
+        if (userData.telegram_id) {
+            console.log('✅ Получены данные из URL параметров:', userData);
+            registerUser(userData);
+        } else {
+            console.log('⚠️ Не удалось получить данные пользователя, работаем без регистрации');
+            document.getElementById('user-name-display').textContent = 'Гость';
+            showContent();
+        }
+    }
+}
 
 // Настройка Telegram WebApp
 function setupTelegramWebApp() {
@@ -49,41 +89,6 @@ function setupTelegramWebApp() {
     console.log('✅ Telegram WebApp настроен');
 }
 
-// Получение данных пользователя из Telegram WebApp API
-function getUserData() {
-    // Сначала пробуем получить из Telegram WebApp
-    const tgUser = tg.initDataUnsafe.user;
-    
-    if (tgUser) {
-        console.log('✅ Получены данные из Telegram WebApp:', tgUser);
-        registerUser({
-            telegram_id: tgUser.id,
-            first_name: tgUser.first_name,
-            last_name: tgUser.last_name || '',
-            username: tgUser.username || ''
-        });
-    } else {
-        // Fallback - пробуем получить из URL параметров
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const userData = {
-            telegram_id: urlParams.get('telegram_id'),
-            first_name: urlParams.get('first_name') || 'Пользователь',
-            last_name: urlParams.get('last_name') || '',
-            username: urlParams.get('username') || ''
-        };
-        
-        if (userData.telegram_id) {
-            console.log('✅ Получены данные из URL параметров:', userData);
-            registerUser(userData);
-        } else {
-            console.log('❌ Не удалось получить данные пользователя');
-            showNotification('Ошибка: не удалось получить данные пользователя', 'error');
-            showContent();
-        }
-    }
-}
-
 // Регистрация пользователя
 async function registerUser(userData) {
     try {
@@ -108,6 +113,7 @@ async function registerUser(userData) {
     } catch (error) {
         console.error('❌ Ошибка регистрации:', error);
         showNotification('Ошибка регистрации пользователя', 'error');
+        // Показываем контент даже если регистрация не удалась
         showContent();
     }
 }
