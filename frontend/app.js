@@ -8,6 +8,10 @@ let favorites = [];
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Запуск Lavka26 Mini App...');
+    console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
+    
+    // Показываем контент сразу для отладки
+    showContent();
     
     // Настройка Telegram WebApp
     setupTelegramWebApp();
@@ -21,10 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузка начальных данных
     loadInitialData();
     
-    // Показываем контент в любом случае через 3 секунды
-    setTimeout(() => {
-        showContent();
-    }, 3000);
+    console.log('✅ Инициализация завершена');
 });
 
 // Получение данных пользователя с таймаутом
@@ -514,8 +515,27 @@ async function toggleFavorite() {
 
 // Показать контент приложения
 function showContent() {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    console.log('🎯 Показываем контент...');
+    
+    const loading = document.getElementById('loading');
+    const content = document.getElementById('content');
+    
+    console.log('📦 Элемент loading:', loading);
+    console.log('📦 Элемент content:', content);
+    
+    if (loading) {
+        loading.style.display = 'none';
+        console.log('✅ Скрыли loading');
+    } else {
+        console.error('❌ Элемент loading не найден');
+    }
+    
+    if (content) {
+        content.style.display = 'block';
+        console.log('✅ Показали content');
+    } else {
+        console.error('❌ Элемент content не найден');
+    }
 }
 
 // Показать уведомление
