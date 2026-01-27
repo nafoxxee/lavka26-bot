@@ -60,80 +60,87 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Создание таблиц
 function initTables() {
-    // Таблица пользователей
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        telegram_id INTEGER UNIQUE NOT NULL,
-        first_name TEXT,
-        last_name TEXT,
-        username TEXT,
-        phone TEXT,
-        rating REAL DEFAULT 0.0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
+    // Создаем таблицы последовательно
+    db.serialize(() => {
+        // Таблица пользователей
+        db.run(`CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            telegram_id INTEGER UNIQUE NOT NULL,
+            first_name TEXT,
+            last_name TEXT,
+            username TEXT,
+            phone TEXT,
+            rating REAL DEFAULT 0.0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
 
-    // Таблица категорий
-    db.run(`CREATE TABLE IF NOT EXISTS categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        icon TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`);
+        // Таблица категорий
+        db.run(`CREATE TABLE IF NOT EXISTS categories (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            icon TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`, (err) => {
+            if (err) {
+                console.error('Ошибка создания таблицы categories:', err);
+            } else {
+                // Добавляем базовые категории после создания таблицы
+                db.run(`INSERT OR IGNORE INTO categories (name, icon) VALUES 
+                    ('Транспорт', '🚗'),
+                    ('Недвижимость', '🏠'),
+                    ('Электроника', '📱'),
+                    ('Одежда', '👕'),
+                    ('Услуги', '🔧'),
+                    ('Работа', '💼'),
+                    ('Другое', '📦')
+                `, (err) => {
+                    if (err) {
+                        console.error('Ошибка добавления категорий:', err);
+                    } else {
+                        console.log('✅ Категории добавлены');
+                    }
+                });
+            }
+        });
 
-    // Таблица объявлений
-    db.run(`CREATE TABLE IF NOT EXISTS ads (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT,
-        price REAL NOT NULL,
-        category_id INTEGER,
-        user_id INTEGER NOT NULL,
-        images TEXT,
-        status TEXT DEFAULT 'pending',
-        views INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (category_id) REFERENCES categories (id),
-        FOREIGN KEY (user_id) REFERENCES users (id)
-    )`);
+        // Таблица объявлений
+        db.run(`CREATE TABLE IF NOT EXISTS ads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT,
+            price REAL NOT NULL,
+            category_id INTEGER,
+            user_id INTEGER NOT NULL,
+            images TEXT,
+            status TEXT DEFAULT 'pending',
+            views INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
 
-    // Таблица жалоб
-    db.run(`CREATE TABLE IF NOT EXISTS reports (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        ad_id INTEGER NOT NULL,
-        user_id INTEGER NOT NULL,
-        reason TEXT NOT NULL,
-        description TEXT,
-        status TEXT DEFAULT 'pending',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (ad_id) REFERENCES ads (id),
-        FOREIGN KEY (user_id) REFERENCES users (id)
-    )`);
+        // Таблица жалоб
+        db.run(`CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ad_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            description TEXT,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
 
-    // Таблица избранного
-    db.run(`CREATE TABLE IF NOT EXISTS favorites (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        ad_id INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id),
-        FOREIGN KEY (ad_id) REFERENCES ads (id),
-        UNIQUE(user_id, ad_id)
-    )`);
+        // Таблица избранного
+        db.run(`CREATE TABLE IF NOT EXISTS favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            ad_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, ad_id)
+        )`);
 
-    // Добавляем базовые категории
-    db.run(`INSERT OR IGNORE INTO categories (name, icon) VALUES 
-        ('Транспорт', '🚗'),
-        ('Недвижимость', '🏠'),
-        ('Электроника', '📱'),
-        ('Одежда', '👕'),
-        ('Услуги', '🔧'),
-        ('Работа', '💼'),
-        ('Другое', '📦')
-    `);
-
-    console.log('Таблицы созданы успешно');
+        console.log('✅ Все таблицы созданы успешно');
+    });
 }
 
 // API Routes
