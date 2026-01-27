@@ -17,7 +17,8 @@ console.log('📁 Static files path:', publicPath);
 app.use(express.static(publicPath));
 
 // Инициализация базы данных SQLite
-const db = new sqlite3.Database('./database/lavka26.db', (err) => {
+const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/lavka26.db' : './database/lavka26.db';
+const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Ошибка подключения к базе данных:', err.message);
     } else {
