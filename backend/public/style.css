@@ -130,6 +130,22 @@ body {
     font-size: 22px;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    padding: 0 8px;
+}
+
+#user-name-display {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
 .header-actions {
     display: flex;
     gap: 8px;
