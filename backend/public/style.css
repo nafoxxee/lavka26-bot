@@ -113,8 +113,8 @@
 
 .icon-btn {
     position: relative;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
     background: transparent;
     border-radius: 50%;
@@ -127,20 +127,21 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.icon-btn:hover {
+    background: var(--background);
+    color: var(--avito-blue);
+}
+
 .icon-btn:active {
-    background: var(--secondary-color);
+    background: var(--border-light);
     transform: scale(0.95);
 }
 
 .icon-btn i {
-    font-size: 20px;
+    font-size: 18px;
     pointer-events: none;
 }
 
-.icon-btn:hover {
-    background: var(--secondary-color);
-    color: var(--primary-color);
-}
 
 .badge {
     position: absolute;
@@ -219,14 +220,13 @@
 /* Категории в стиле Авито */
 .categories-scroll {
     display: flex;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 16px 16px 12px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
     background: var(--white);
-    border-bottom: 1px solid var(--border);
 }
 
 .categories-scroll::-webkit-scrollbar {
@@ -235,35 +235,43 @@
 
 .category-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: var(--radius-lg);
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
     background: var(--background);
     border: 1px solid var(--border);
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
     color: var(--text-secondary);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 400;
+    min-width: 70px;
     -webkit-tap-highlight-color: transparent;
 }
 
 .category-item i {
-    font-size: 16px;
+    font-size: 20px;
+    margin-bottom: 2px;
 }
 
 .category-item.active {
     background: var(--avito-blue);
     color: var(--white);
     border-color: var(--avito-blue);
+    transform: scale(1.05);
 }
 
 .category-item:hover:not(.active) {
     background: var(--border-light);
     border-color: var(--avito-blue);
     color: var(--avito-blue);
+}
+
+.category-item:active {
+    transform: scale(0.95);
 }
 
 /* Основной контент */
@@ -346,7 +354,7 @@
 /* Список объявлений в стиле Авито */
 .ads-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
 }
 
@@ -364,11 +372,17 @@
     -webkit-tap-highlight-color: transparent;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .ad-card:hover {
     border-color: var(--avito-blue);
     box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.ad-card:active {
+    transform: translateY(0);
 }
 
 .ad-image {
@@ -474,20 +488,20 @@
 /* FAB кнопка в стиле Авито */
 .fab {
     position: fixed;
-    bottom: 80px;
+    bottom: 72px;
     right: 16px;
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: var(--avito-blue);
     color: var(--white);
     border: none;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 12px rgba(0, 137, 209, 0.3);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     transition: var(--transition);
     z-index: 50;
     -webkit-tap-highlight-color: transparent;
@@ -495,11 +509,13 @@
 
 .fab:hover {
     background: var(--avito-blue-hover);
-    transform: scale(1.05);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 137, 209, 0.4);
 }
 
 .fab:active {
     transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 137, 209, 0.3);
 }
 
 /* Нижняя навигация в стиле Авито */
@@ -512,40 +528,50 @@
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-around;
-    padding: 8px 0;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    padding: 6px 0;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
     z-index: 100;
-    height: 60px;
+    height: 56px;
 }
 
 .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 4px 8px;
+    gap: 3px;
+    padding: 6px 12px;
     border: none;
     background: transparent;
     cursor: pointer;
     transition: var(--transition);
     color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 500;
-    min-width: 50px;
+    font-size: 11px;
+    font-weight: 400;
+    min-width: 60px;
     -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
 }
 
 .nav-item i {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 1px;
+    transition: var(--transition);
+}
+
+.nav-item:hover {
+    color: var(--avito-blue);
 }
 
 .nav-item.active {
     color: var(--avito-blue);
 }
 
-.nav-item:hover {
-    color: var(--avito-blue);
+.nav-item.active i {
+    transform: scale(1.1);
+}
+
+.nav-item:active {
+    transform: scale(0.95);
 }
 
 /* Модальные окна в стиле Apple */
@@ -655,33 +681,49 @@
 
 .action-btn {
     flex: 1;
-    padding: 14px;
+    padding: 12px 16px;
     border: none;
-    border-radius: var(--border-radius);
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .action-btn:active {
-    transform: scale(0.98);
+    transform: translateY(0);
 }
 
 .action-btn.primary {
-    background: var(--primary-color);
+    background: var(--avito-blue);
     color: var(--white);
 }
 
+.action-btn.primary:hover {
+    background: var(--avito-blue-hover);
+}
+
 .action-btn.secondary {
-    background: var(--secondary-color);
-    color: var(--text-secondary);
-    border: 0.5px solid var(--border-color);
+    background: var(--white);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.action-btn.secondary:hover {
+    background: var(--background);
+    border-color: var(--avito-blue);
+    color: var(--avito-blue);
 }
 
 /* Фильтры */

@@ -494,14 +494,20 @@ function loadAds() {
 
 // Функции навигации
 function switchTab(tabName) {
+    // Удаляем active у всех кнопок навигации
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    
+    // Добавляем active к выбранной кнопке
+    const activeBtn = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
     
     // Скрываем все вкладки
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.style.display = 'none';
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
     });
     
     // Показываем выбранную вкладку
@@ -510,18 +516,28 @@ function switchTab(tabName) {
         targetTab.style.display = 'block';
     }
     
-    // Специальная логика для разных вкладок
-    if (tabName === 'moderator') {
-        loadModeratorPanel();
-    } else if (tabName === 'my-ads') {
-        loadMyAds();
-    } else if (tabName === 'favorites') {
-        loadFavorites();
-    } else if (tabName === 'profile') {
-        loadProfile();
+    // Загружаем данные для конкретной вкладки
+    switch(tabName) {
+        case 'favorites':
+            loadFavorites();
+            break;
+        case 'profile':
+            loadProfile();
+            break;
+        case 'my-ads':
+            loadMyAds();
+            break;
+        case 'messages':
+            openMessages();
+            break;
+        case 'moderator':
+            loadModeratorPanel();
+            break;
+        case 'feed':
+            // Главная вкладка - показываем объявления
+            document.getElementById('ads-list').style.display = 'grid';
+            break;
     }
-    
-    console.log('Переключение на вкладку:', tabName);
 }
 
 function openCreateAd() {
