@@ -829,6 +829,59 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+// Дополнительные функции для модераторской панели
+function refreshPendingAds() {
+    console.log('Обновление объявлений на модерации...');
+    showNotification('Обновление объявлений...', 'info');
+}
+
+function refreshReports() {
+    console.log('Обновление жалоб...');
+    showNotification('Обновление жалоб...', 'info');
+}
+
+function editAd(adId) {
+    console.log('Редактирование объявления:', adId);
+    showNotification('Функция редактирования в разработке', 'info');
+}
+
+function deleteAd(adId) {
+    console.log('Удаление объявления:', adId);
+    showNotification('Функция удаления в разработке', 'info');
+}
+
+function approveAd(adId) {
+    console.log('Одобрение объявления:', adId);
+    showNotification('Функция одобрения в разработке', 'info');
+}
+
+function rejectAd(adId) {
+    console.log('Отклонение объявления:', adId);
+    showNotification('Функция отклонения в разработке', 'info');
+}
+
+function editProfile() {
+    console.log('Редактирование профиля...');
+    showNotification('Функция редактирования профиля в разработке', 'info');
+}
+
+// Глобальные функции для доступа из HTML
+window.toggleFavorite = toggleFavorite;
+window.contactSeller = contactSeller;
+window.shareAd = shareAd;
+window.openFilters = openFilters;
+window.closeFilters = closeFilters;
+window.applyFilters = applyFilters;
+window.resetFilters = resetFilters;
+window.removeImage = removeImage;
+window.editProfile = editProfile;
+window.refreshPendingAds = refreshPendingAds;
+window.refreshReports = refreshReports;
+window.editAd = editAd;
+window.deleteAd = deleteAd;
+window.approveAd = approveAd;
+window.rejectAd = rejectAd;
+
 // Запуск приложения
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
