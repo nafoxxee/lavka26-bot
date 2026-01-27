@@ -23,8 +23,8 @@
             <!-- Шапка с поиском <!-- Шапка в стиле Авито -->
         <header class="header">
             <div class="header-top">
+                <div class="header-top">
                 <div class="logo">
-                    <i class="fas fa-store"></i>
                     <span>Lavka26</span>
                 </div>
                 <div class="user-info">
@@ -38,10 +38,8 @@
                     <button class="icon-btn" onclick="switchTab('profile')">
                         <i class="fas fa-user"></i>
                     </button>
-                        <span class="badge" id="message-badge" style="display: none;">0</span>
-                    </button>
-                    <button class="icon-btn" onclick="openProfile()">
-                        <i class="fas fa-user"></i>
+                    <button class="icon-btn" onclick="switchTab('messages')">
+                        <i class="fas fa-comment"></i>
                     </button>
                 </div>
             </div>
@@ -899,7 +897,7 @@
                 const stats = await statsResponse.json();
                 
                 // Загружаем объявления на модерации
-                const pendingResponse = await fetch('/api/ads/pending');
+                const pendingResponse = await fetch('/api/ads?status=pending');
                 const pendingAds = await pendingResponse.json();
                 
                 // Обновляем статистику
@@ -910,8 +908,14 @@
                 
                 // Отображаем объявления на модерации
                 const pendingAdsList = document.getElementById('pending-ads-list');
-                if (pendingAds.length === 0) {
-                    pendingAdsList.innerHTML = '<div class="empty-state">Нет объявлений на модерации</div>';
+                if (!pendingAds || pendingAds.length === 0) {
+                    pendingAdsList.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-check-circle" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Нет объявлений на модерации</h3>
+                            <p style="color: var(--text-muted);">Все объявления проверены</p>
+                        </div>
+                    `;
                 } else {
                     const adsHTML = pendingAds.map(ad => `
                         <div class="pending-ad-card">
@@ -1148,8 +1152,16 @@
             showNotification('Редактирование профиля в разработке', 'info');
         };
         
-        window.showSettings = function() {
-            showNotification('Настройки в разработке', 'info');
+        window.openNotifications = function() {
+            showNotification('Уведомления в разработке', 'info');
+        };
+        
+        window.openFilters = function() {
+            showNotification('Фильтры в разработке', 'info');
+        };
+        
+        window.showNotifications = function() {
+            showNotification('Уведомления в разработке', 'info');
         };
     </script>
 </body>
