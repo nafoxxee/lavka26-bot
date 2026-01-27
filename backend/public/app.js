@@ -449,6 +449,8 @@ function switchTab(tabName) {
         loadModeratorPanel();
     } else if (tabName === 'my-ads') {
         loadMyAds();
+    } else if (tabName === 'favorites') {
+        loadFavorites();
     }
     
     console.log('Переключение на вкладку:', tabName);
@@ -456,7 +458,7 @@ function switchTab(tabName) {
 
 function openCreateAd() {
     if (!currentUser) {
-        showNotification('Please login first', 'error');
+        showNotification('Сначала авторизуйтесь', 'error');
         return;
     }
     
@@ -505,7 +507,7 @@ function handleImageUpload(event) {
     const maxSize = 5 * 1024 * 1024; // 5MB
     
     if (uploadedImages.length + files.length > maxFiles) {
-        showNotification(`Maximum ${maxFiles} photos allowed`, 'error');
+        showNotification(`Максимум ${maxFiles} фотографий`, 'error');
         return;
     }
     
@@ -513,12 +515,12 @@ function handleImageUpload(event) {
     
     files.forEach(file => {
         if (file.size > maxSize) {
-            showNotification(`File ${file.name} is too large (max 5MB)`, 'error');
+            showNotification(`Файл ${file.name} слишком большой (максимум 5МБ)`, 'error');
             return;
         }
         
         if (!file.type.startsWith('image/')) {
-            showNotification(`File ${file.name} is not an image`, 'error');
+            showNotification(`Файл ${file.name} не является изображением`, 'error');
             return;
         }
         
@@ -565,7 +567,7 @@ function removeImage(button, fileName) {
 
 async function publishAd() {
     if (!currentUser) {
-        showNotification('Please login first', 'error');
+        showNotification('Сначала авторизуйтесь', 'error');
         return;
     }
     
@@ -579,22 +581,22 @@ async function publishAd() {
     const description = formData.get('description').trim();
     
     if (!title) {
-        showNotification('Please enter a title', 'error');
+        showNotification('Введите заголовок', 'error');
         return;
     }
     
     if (!category) {
-        showNotification('Please select a category', 'error');
+        showNotification('Выберите категорию', 'error');
         return;
     }
     
     if (!price || price <= 0) {
-        showNotification('Please enter a valid price', 'error');
+        showNotification('Введите корректную цену', 'error');
         return;
     }
     
     try {
-        showNotification('Uploading images...', 'info');
+        showNotification('Загрузка изображений...', 'info');
         
         // Загружаем изображения
         let imagePaths = [];
@@ -613,11 +615,11 @@ async function publishAd() {
                 const uploadResult = await uploadResponse.json();
                 imagePaths = uploadResult.images || [];
             } else {
-                throw new Error('Failed to upload images');
+                throw new Error('Ошибка загрузки изображений');
             }
         }
         
-        showNotification('Creating advertisement...', 'info');
+        showNotification('Создание объявления...', 'info');
         
         // Создаем объявление
         const adData = {
@@ -644,7 +646,7 @@ async function publishAd() {
         
         if (response.ok) {
             const ad = await response.json();
-            showNotification('Advertisement submitted for moderation!', 'success');
+            showNotification('Объявление отправлено на модерацию!', 'success');
             closeCreateAdModal();
             loadAds(); // Обновляем список
             
@@ -653,12 +655,12 @@ async function publishAd() {
                 loadModeratorStats();
             }
         } else {
-            throw new Error('Failed to create advertisement');
+            throw new Error('Ошибка создания объявления');
         }
         
     } catch (error) {
-        console.error('❌ Error creating ad:', error);
-        showNotification('Error creating advertisement', 'error');
+        console.error('❌ Ошибка создания объявления:', error);
+        showNotification('Ошибка создания объявления', 'error');
     }
 }
 
@@ -717,24 +719,29 @@ async function toggleFavorite() {
             })
         });
         
-        if (response.ok) {
-            const result = await response.json();
-            const isFavorite = result.success;
+        const result = await response.json();
+        
+        if (result.success) {
+            const isFavorite = result.action === 'added';
             
-            const btn = document.querySelector('.action-btn.secondary');
-            if (isFavorite) {
-                btn.innerHTML = '<i class="fas fa-heart"></i><span>В избранном</span>';
-                btn.classList.add('favorited');
-            } else {
-                btn.innerHTML = '<i class="fas fa-heart"></i><span>В избранное</span>';
-                btn.classList.remove('favorited');
+            // Обновляем кнопку в модальном окне
+            const favoriteBtn = document.querySelector('#modal-actions .action-btn.secondary');
+            if (favoriteBtn) {
+                favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> ${isFavorite ? 'В избранном' : 'В избранное'}`;
+                favoriteBtn.classList.toggle('active', isFavorite);
+            }
+            
+            // Обновляем список избранного если на этой вкладке
+            if (document.getElementById('favorites-tab').style.display !== 'none') {
+                await loadFavorites();
             }
             
             showNotification(isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного', 'success');
         }
+        
     } catch (error) {
-        console.error('❌ Ошибка избранного:', error);
-        showNotification('Ошибка операции с избранным', 'error');
+        console.error('❌ Ошибка управления избранным:', error);
+        showNotification('Ошибка управления избранным', 'error');
     }
 }
 
@@ -1167,6 +1174,155 @@ async function deleteAd(adId) {
     } catch (error) {
         console.error('❌ Ошибка удаления объявления:', error);
         showNotification('Error deleting advertisement', 'error');
+    }
+}
+
+// Функции для избранного
+
+async function loadFavorites() {
+    if (!currentUser) {
+        document.getElementById('favorites-list').innerHTML = '<div class="loading-placeholder">Пожалуйста авторизуйтесь</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/favorites/${currentUser.id}`);
+        if (response.ok) {
+            const data = await response.json();
+            favorites = data.favorites || [];
+            displayFavorites();
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки избранного:', error);
+        document.getElementById('favorites-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки</div>';
+    }
+}
+
+function displayFavorites() {
+    const container = document.getElementById('favorites-list');
+    const emptyState = document.getElementById('empty-favorites');
+    const countElement = document.getElementById('favorites-count');
+    
+    countElement.textContent = favorites.length;
+    
+    if (!favorites || favorites.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    container.style.display = 'grid';
+    emptyState.style.display = 'none';
+    
+    container.innerHTML = favorites.map(ad => `
+        <div class="favorite-card" onclick="openAd(${ad.id})">
+            <div class="favorite-header">
+                <div>
+                    <div class="favorite-title">${escapeHtml(ad.title)}</div>
+                    <div class="favorite-meta">
+                        <span>👁 ${ad.views || 0} просмотров</span>
+                        <span>📅 ${formatDate(ad.created_at)}</span>
+                    </div>
+                </div>
+                <div class="favorite-price">${formatPrice(ad.price)}</div>
+            </div>
+            ${ad.description ? `<div class="favorite-description">${escapeHtml(ad.description.substring(0, 150))}${ad.description.length > 150 ? '...' : ''}</div>` : ''}
+            <div class="favorite-actions">
+                <button class="favorite-btn" onclick="event.stopPropagation(); openAd(${ad.id})">
+                    <i class="fas fa-eye"></i> Посмотреть
+                </button>
+                <button class="favorite-btn remove" onclick="event.stopPropagation(); removeFromFavorites(${ad.id})">
+                    <i class="fas fa-heart"></i> Удалить
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function toggleFavorite() {
+    if (!currentUser || !currentAd) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/favorites', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                ad_id: currentAd.id
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            const isFavorite = result.action === 'added';
+            
+            // Обновляем кнопку в модальном окне
+            const favoriteBtn = document.querySelector('#modal-actions .action-btn.secondary');
+            if (favoriteBtn) {
+                favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> ${isFavorite ? 'В избранном' : 'В избранное'}`;
+                favoriteBtn.classList.toggle('active', isFavorite);
+            }
+            
+            // Обновляем список избранного если на этой вкладке
+            if (document.getElementById('favorites-tab').style.display !== 'none') {
+                await loadFavorites();
+            }
+            
+            showNotification(isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного', 'success');
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка управления избранным:', error);
+        showNotification('Ошибка управления избранным', 'error');
+    }
+}
+
+async function removeFromFavorites(adId) {
+    if (!currentUser) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/favorites', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                ad_id: adId
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Удалено из избранного', 'success');
+            await loadFavorites();
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка удаления из избранного:', error);
+        showNotification('Ошибка удаления из избранного', 'error');
+    }
+}
+
+function updateFavoriteButton() {
+    if (!currentAd || !currentUser) return;
+    
+    const isFavorite = favorites.some(fav => fav.id === currentAd.id);
+    const favoriteBtn = document.querySelector('#modal-actions .action-btn.secondary');
+    
+    if (favoriteBtn) {
+        favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> ${isFavorite ? 'В избранном' : 'В избранное'}`;
+        favoriteBtn.classList.toggle('active', isFavorite);
     }
 }
 
