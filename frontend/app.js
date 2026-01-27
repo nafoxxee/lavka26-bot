@@ -8,39 +8,18 @@ let favorites = [];
 // Инициализация приложения - ждем загрузки DOM
 function initializeApp() {
     console.log('🚀 Запуск Lavka26 Mini App...');
-    console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
-    console.log('📄 DOM готов:', document.readyState);
-    console.log('🔍 Проверяем элементы...');
     
-    // Проверяем существование элементов
-    const loadingEl = document.getElementById('loading');
-    const contentEl = document.getElementById('content');
-    const appEl = document.getElementById('app');
-    
-    console.log('📦 Элемент app:', appEl);
-    console.log('📦 Элемент loading:', loadingEl);
-    console.log('📦 Элемент content:', contentEl);
-    
-    if (!loadingEl || !contentEl) {
-        console.error('❌ Элементы не найдены! Пробуем через таймаут...');
-        setTimeout(initializeApp, 1000);
-        return;
-    }
-
-    // Показываем контент сразу для отладки
+    // СРАЗУ показываем контент
     showContent();
-
+    
     // Настройка Telegram WebApp
     setupTelegramWebApp();
-
-    // Получение данных пользователя с таймаутом
-    getUserDataWithTimeout();
 
     // Настройка обработчиков событий
     setupEventListeners();
 
-    // Загрузка начальных данных
-    loadInitialData();
+    // Получение данных пользователя
+    getUserDataWithTimeout();
 
     console.log('✅ Инициализация завершена');
 }
@@ -60,12 +39,14 @@ function getUserDataWithTimeout() {
     
     if (tgUser) {
         console.log('✅ Получены данные из Telegram WebApp:', tgUser);
-        registerUser({
+        document.getElementById('user-name-display').textContent = tgUser.first_name;
+        // Загружаем данные в фоне
+        setTimeout(() => registerUser({
             telegram_id: tgUser.id,
             first_name: tgUser.first_name,
             last_name: tgUser.last_name || '',
             username: tgUser.username || ''
-        });
+        }), 1000);
     } else {
         // Fallback - пробуем получить из URL параметров
         const urlParams = new URLSearchParams(window.location.search);
@@ -79,15 +60,16 @@ function getUserDataWithTimeout() {
         
         if (userData.telegram_id) {
             console.log('✅ Получены данные из URL параметров:', userData);
-            registerUser(userData);
+            document.getElementById('user-name-display').textContent = userData.first_name;
+            setTimeout(() => registerUser(userData), 1000);
         } else {
             console.log('⚠️ Не удалось получить данные пользователя, работаем без регистрации');
             document.getElementById('user-name-display').textContent = 'Гость';
-            showContent();
-            // Загружаем базовые данные без регистрации
-            loadInitialData();
         }
     }
+    
+    // Загружаем базовые данные в любом случае
+    setTimeout(() => loadInitialData(), 500);
 }
 
 // Настройка Telegram WebApp
