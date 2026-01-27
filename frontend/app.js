@@ -84,6 +84,8 @@ function getUserDataWithTimeout() {
             console.log('⚠️ Не удалось получить данные пользователя, работаем без регистрации');
             document.getElementById('user-name-display').textContent = 'Гость';
             showContent();
+            // Загружаем базовые данные без регистрации
+            loadInitialData();
         }
     }
 }
@@ -118,7 +120,15 @@ function setupTelegramWebApp() {
 // Регистрация пользователя
 async function registerUser(userData) {
     try {
-        const response = await fetch(`/api/user/${userData.telegram_id}?first_name=${encodeURIComponent(userData.first_name)}&last_name=${encodeURIComponent(userData.last_name)}&username=${encodeURIComponent(userData.username)}`);
+        // Добавляем таймаут 10 секунд
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`/api/user/${userData.telegram_id}?first_name=${encodeURIComponent(userData.first_name)}&last_name=${encodeURIComponent(userData.last_name)}&username=${encodeURIComponent(userData.username)}`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
             throw new Error('Ошибка регистрации пользователя');
@@ -138,7 +148,11 @@ async function registerUser(userData) {
         
     } catch (error) {
         console.error('❌ Ошибка регистрации:', error);
-        showNotification('Ошибка регистрации пользователя', 'error');
+        if (error.name === 'AbortError') {
+            showNotification('Превышено время ожидания. Проверьте подключение.', 'error');
+        } else {
+            showNotification('Ошибка регистрации пользователя', 'error');
+        }
         // Показываем контент даже если регистрация не удалась
         showContent();
     }
@@ -184,7 +198,15 @@ async function loadInitialData() {
 // Загрузка категорий
 async function loadCategories() {
     try {
-        const response = await fetch('/api/categories');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
+        const response = await fetch('/api/categories', {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) throw new Error('Ошибка загрузки категорий');
         
         categories = await response.json();
@@ -195,7 +217,11 @@ async function loadCategories() {
         
     } catch (error) {
         console.error('❌ Ошибка загрузки категорий:', error);
-        showNotification('Ошибка загрузки категорий', 'error');
+        if (error.name === 'AbortError') {
+            showNotification('Сеть недоступна. Работаем офлайн.', 'error');
+        } else {
+            showNotification('Ошибка загрузки категорий', 'error');
+        }
     }
 }
 
@@ -221,8 +247,15 @@ function updateCategorySelects() {
 // Загрузка объявлений
 async function loadAds(params = {}) {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
         const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`/api/ads?${queryString}`);
+        const response = await fetch(`/api/ads?${queryString}`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) throw new Error('Ошибка загрузки объявлений');
         
@@ -233,7 +266,11 @@ async function loadAds(params = {}) {
         
     } catch (error) {
         console.error('❌ Ошибка загрузки объявлений:', error);
-        document.getElementById('ads-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки объявлений</div>';
+        if (error.name === 'AbortError') {
+            document.getElementById('ads-list').innerHTML = '<div class="loading-placeholder">Превышено время ожидания. Попробуйте позже.</div>';
+        } else {
+            document.getElementById('ads-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки объявлений</div>';
+        }
     }
 }
 
