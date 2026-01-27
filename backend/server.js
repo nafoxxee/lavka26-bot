@@ -2,6 +2,8 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +12,35 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Настройка загрузки изображений
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, 'public', 'uploads');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Только изображения разрешены'));
+        }
+    }
+});
 
 // Обслуживание статических файлов
 const publicPath = path.join(__dirname, 'public');
@@ -59,11 +90,24 @@ function initTables() {
         category_id INTEGER,
         user_id INTEGER NOT NULL,
         images TEXT,
-        status TEXT DEFAULT 'active',
+        status TEXT DEFAULT 'pending',
         views INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (category_id) REFERENCES categories (id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    )`);
+
+    // Таблица жалоб
+    db.run(`CREATE TABLE IF NOT EXISTS reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ad_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        reason TEXT NOT NULL,
+        description TEXT,
+        status TEXT DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (ad_id) REFERENCES ads (id),
         FOREIGN KEY (user_id) REFERENCES users (id)
     )`);
 
@@ -150,18 +194,28 @@ app.get('/api/categories', (req, res) => {
     });
 });
 
+// Загрузка изображений
+app.post('/api/upload', upload.array('images', 5), (req, res) => {
+    try {
+        const files = req.files.map(file => `/uploads/${file.filename}`);
+        res.json({ images: files });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Получение объявлений
 app.get('/api/ads', (req, res) => {
-    const { category_id, search, limit = 20, offset = 0 } = req.query;
+    const { category_id, search, limit = 20, offset = 0, status = 'active' } = req.query;
     
     let query = `
         SELECT a.*, u.first_name, u.username, c.name as category_name 
         FROM ads a 
         JOIN users u ON a.user_id = u.id 
         JOIN categories c ON a.category_id = c.id 
-        WHERE a.status = 'active'
+        WHERE a.status = ?
     `;
-    const params = [];
+    const params = [status];
     
     if (category_id) {
         query += ' AND a.category_id = ?';
@@ -287,6 +341,88 @@ app.get('/api/favorites/:userId', (req, res) => {
     `;
     
     db.all(query, [userId], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Подача жалобы на объявление
+app.post('/api/reports', (req, res) => {
+    const { ad_id, user_id, reason, description } = req.body;
+    
+    if (!ad_id || !user_id || !reason) {
+        res.status(400).json({ error: 'ad_id, user_id и reason обязательны' });
+        return;
+    }
+    
+    db.run('INSERT INTO reports (ad_id, user_id, reason, description) VALUES (?, ?, ?, ?)', 
+        [ad_id, user_id, reason, description], 
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json({ success: true, id: this.lastID });
+        }
+    );
+});
+
+// Получение жалоб (для модерации)
+app.get('/api/reports', (req, res) => {
+    const query = `
+        SELECT r.*, a.title as ad_title, u.first_name as reporter_name, u.username as reporter_username
+        FROM reports r
+        JOIN ads a ON r.ad_id = a.id
+        JOIN users u ON r.user_id = u.id
+        ORDER BY r.created_at DESC
+    `;
+    
+    db.all(query, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Одобрение/отклонение объявления (модерация)
+app.put('/api/ads/:id/status', (req, res) => {
+    const adId = req.params.id;
+    const { status } = req.body;
+    
+    if (!['active', 'rejected', 'pending'].includes(status)) {
+        res.status(400).json({ error: 'Неверный статус' });
+        return;
+    }
+    
+    db.run('UPDATE ads SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        [status, adId], 
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            res.json({ success: true, changes: this.changes });
+        }
+    );
+});
+
+// Получение объявлений на модерации
+app.get('/api/ads/pending', (req, res) => {
+    const query = `
+        SELECT a.*, u.first_name, u.username, c.name as category_name 
+        FROM ads a 
+        JOIN users u ON a.user_id = u.id 
+        JOIN categories c ON a.category_id = c.id 
+        WHERE a.status = 'pending'
+        ORDER BY a.created_at DESC
+    `;
+    
+    db.all(query, (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;

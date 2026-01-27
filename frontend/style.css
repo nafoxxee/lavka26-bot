@@ -311,22 +311,37 @@ body {
 }
 
 .btn-favorite {
-    background: #dc3545;
+    background: #e83e8c;
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    font-size: 14px;
+    transition: background 0.3s ease;
 }
 
 .btn-favorite:hover {
-    background: #c82333;
+    background: #d91a72;
 }
 
 .btn-favorite.active {
-    background: #28a745;
+    background: #dc3545;
+}
+
+.btn-report {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-report:hover {
+    background: #e0a800;
 }
 
 /* Модальное окно */
@@ -399,34 +414,127 @@ body {
     gap: 8px;
 }
 
+/* Загрузка изображений */
+.image-upload {
+    margin-top: 10px;
+}
+
+.btn-upload {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-upload:hover {
+    background: #5a6268;
+}
+
+.image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.preview-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+}
+
+/* Изображения в объявлениях */
+.ad-images {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.ad-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.ad-image:hover {
+    transform: scale(1.05);
+}
+
+.more-images {
+    width: 80px;
+    height: 80px;
+    background: #6c757d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Полноразмерные изображения в модальном окне */
+.ad-images-full {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.ad-image-full {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.ad-image-full:hover {
+    transform: scale(1.02);
+}
+
 /* Уведомления */
 .notifications {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 2000;
+    z-index: 1000;
 }
 
 .notification {
-    background: white;
-    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
     padding: 12px 16px;
-    margin-bottom: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    border-left: 4px solid #007bff;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     animation: slideIn 0.3s ease;
 }
 
 .notification.success {
-    border-left-color: #28a745;
+    border-left: 4px solid #28a745;
+    color: #155724;
 }
 
 .notification.error {
-    border-left-color: #dc3545;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
 }
 
-.notification.warning {
-    border-left-color: #ffc107;
+.notification.info {
+    border-left: 4px solid #17a2b8;
+    color: #0c5460;
 }
 
 @keyframes slideIn {

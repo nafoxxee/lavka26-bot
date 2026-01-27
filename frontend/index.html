@@ -3,134 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lavka26 - Marketplace in Telegram</title>
+    <title>Lavka26 - Маркетплейс в Telegram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <!-- Loading -->
+        <!-- Загрузка -->
         <div class="loading" id="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>Loading Lavka26...</p>
+            <p>Загрузка Lavka26...</p>
         </div>
 
-        <!-- Main Content -->
+        <!-- Основной контент -->
         <div class="content" id="content">
-            <!-- Header -->
+            <!-- Шапка -->
             <header class="header">
                 <h1>🛍️ Lavka26</h1>
                 <div class="user-header">
-                    <span id="user-name-display">Guest</span>
+                    <span id="user-name-display">Гость</span>
                 </div>
             </header>
 
-            <!-- Navigation -->
+            <!-- Навигация -->
             <nav class="nav-tabs">
-                <button class="nav-tab active" data-tab="feed">📦 Feed</button>
-                <button class="nav-tab" data-tab="create">➕ Create</button>
-                <button class="nav-tab" data-tab="my-ads">📱 My Ads</button>
-                <button class="nav-tab" data-tab="favorites">❤️ Favorites</button>
+                <button class="nav-tab active" data-tab="feed">📦 Лента</button>
+                <button class="nav-tab" data-tab="create">➕ Создать</button>
+                <button class="nav-tab" data-tab="my-ads">📱 Мои</button>
+                <button class="nav-tab" data-tab="favorites">❤️ Избранное</button>
             </nav>
 
-            <!-- Feed Tab -->
+            <!-- Лента объявлений -->
             <div class="tab-content active" id="feed-tab">
+                <!-- Поиск и фильтры -->
                 <div class="search-section">
                     <div class="search-bar">
-                        <input type="text" id="search-input" placeholder="🔍 Search items...">
-                        <button onclick="searchAds()">Search</button>
+                        <input type="text" id="search-input" placeholder="🔍 Поиск товаров...">
+                        <button onclick="searchAds()">Найти</button>
                     </div>
                     <div class="filters">
                         <select id="category-filter" onchange="filterByCategory()">
-                            <option value="">📂 All Categories</option>
+                            <option value="">📂 Все категории</option>
                         </select>
                     </div>
                 </div>
 
+                <!-- Список объявлений -->
                 <div class="ads-list" id="ads-list">
-                    <div class="loading-placeholder">Loading ads...</div>
+                    <div class="loading-placeholder">Загрузка объявлений...</div>
                 </div>
             </div>
 
-            <!-- Create Tab -->
+            <!-- Создание объявления -->
             <div class="tab-content" id="create-tab">
                 <div class="create-form">
-                    <h2>➕ Create Ad</h2>
+                    <h2>➕ Создать объявление</h2>
                     <form id="ad-form">
                         <div class="form-group">
-                            <label>Item Title *</label>
-                            <input type="text" id="ad-title" required placeholder="e.g., iPhone 13 Pro">
+                            <label>Название товара *</label>
+                            <input type="text" id="ad-title" required placeholder="Например: iPhone 13 Pro">
                         </div>
                         
                         <div class="form-group">
-                            <label>Category *</label>
+                            <label>Категория *</label>
                             <select id="ad-category" required>
-                                <option value="">Select category</option>
+                                <option value="">Выберите категорию</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label>Price *</label>
+                            <label>Цена *</label>
                             <input type="number" id="ad-price" required placeholder="0" min="0">
                         </div>
                         
                         <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="ad-description" rows="4" placeholder="Describe the item, condition, features..."></textarea>
+                            <label>Описание</label>
+                            <textarea id="ad-description" rows="4" placeholder="Опишите товар, состояние, особенности..."></textarea>
                         </div>
                         
-                        <button type="submit" class="btn-primary">🚀 Publish</button>
+                        <div class="form-group">
+                            <label>Фотографии</label>
+                            <div class="image-upload">
+                                <input type="file" id="ad-images" multiple accept="image/*" style="display: none;">
+                                <button type="button" class="btn-upload" onclick="document.getElementById('ad-images').click()">
+                                    📷 Добавить фото
+                                </button>
+                                <div class="image-preview" id="image-preview"></div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">🚀 Опубликовать</button>
                     </form>
                 </div>
             </div>
 
-            <!-- My Ads Tab -->
+            <!-- Мои объявления -->
             <div class="tab-content" id="my-ads-tab">
                 <div class="my-ads-content">
-                    <h2>📱 My Ads</h2>
+                    <h2>📱 Мои объявления</h2>
                     <div class="ads-list" id="my-ads-list">
-                        <div class="loading-placeholder">Loading...</div>
+                        <div class="loading-placeholder">Загрузка...</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Favorites Tab -->
+            <!-- Избранное -->
             <div class="tab-content" id="favorites-tab">
                 <div class="favorites-content">
-                    <h2>❤️ Favorites</h2>
+                    <h2>❤️ Избранное</h2>
                     <div class="ads-list" id="favorites-list">
-                        <div class="loading-placeholder">Loading...</div>
+                        <div class="loading-placeholder">Загрузка...</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- Модальное окно объявления -->
         <div class="modal" id="ad-modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modal-title">Loading...</h3>
+                    <h3 id="modal-title">Загрузка...</h3>
                     <button class="close-btn" onclick="closeModal()">&times;</button>
                 </div>
                 <div class="modal-body" id="modal-body">
-                    <!-- Ad content -->
+                    <!-- Контент объявления -->
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeModal()">Close</button>
-                    <button class="btn-primary" id="contact-btn" onclick="contactSeller()">Contact</button>
+                    <button class="btn-secondary" onclick="closeModal()">Закрыть</button>
+                    <button class="btn-primary" id="contact-btn" onclick="contactSeller()">Связаться</button>
                     <button class="btn-favorite" id="favorite-btn" onclick="toggleFavorite()">❤️</button>
+                    <button class="btn-report" id="report-btn" onclick="reportAd()">🚨 Пожаловаться</button>
                 </div>
             </div>
         </div>
 
-        <!-- Notifications -->
+        <!-- Уведомления -->
         <div class="notifications" id="notifications"></div>
     </div>
 
     <script src="app.js"></script>
     <script>
-        // Show content immediately
-        console.log('🚀 Immediate start...');
+        // Показываем контент немедленно
+        console.log('🚀 Немедленный запуск...');
         const loading = document.getElementById('loading');
         const content = document.getElementById('content');
         if (loading) loading.style.display = 'none';

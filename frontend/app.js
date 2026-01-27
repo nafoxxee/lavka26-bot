@@ -4,6 +4,7 @@ let currentUser = null;
 let currentAd = null;
 let categories = [];
 let favorites = [];
+let uploadedImages = [];
 
 // Инициализация приложения - ждем загрузки DOM
 function initializeApp() {
@@ -270,23 +271,45 @@ function displayAds(ads, containerId) {
         return;
     }
     
-    container.innerHTML = ads.map(ad => `
-        <div class="ad-card" onclick="openAd(${ad.id})">
-            <div class="ad-header">
-                <div class="ad-title">${escapeHtml(ad.title)}</div>
-                <div class="ad-price">${formatPrice(ad.price)}</div>
-            </div>
-            <div class="ad-description">${escapeHtml(ad.description || '')}</div>
-            <div class="ad-meta">
-                <span class="ad-category">${ad.category_name || 'Другое'}</span>
-                <div class="ad-author">
-                    <span>${escapeHtml(ad.first_name || 'Аноним')}</span>
-                    <span>•</span>
-                    <span>${formatDate(ad.created_at)}</span>
+    container.innerHTML = ads.map(ad => {
+        let imagesHtml = '';
+        if (ad.images) {
+            try {
+                const images = JSON.parse(ad.images);
+                if (images.length > 0) {
+                    imagesHtml = `
+                        <div class="ad-images">
+                            ${images.slice(0, 3).map(img => 
+                                `<img src="${img}" alt="Фото" class="ad-image" onclick="event.stopPropagation()">`
+                            ).join('')}
+                            ${images.length > 3 ? `<div class="more-images">+${images.length - 3}</div>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error('Ошибка парсинга изображений:', e);
+            }
+        }
+        
+        return `
+            <div class="ad-card" onclick="openAd(${ad.id})">
+                <div class="ad-header">
+                    <div class="ad-title">${escapeHtml(ad.title)}</div>
+                    <div class="ad-price">${formatPrice(ad.price)}</div>
+                </div>
+                ${imagesHtml}
+                <div class="ad-description">${escapeHtml(ad.description || '')}</div>
+                <div class="ad-meta">
+                    <span class="ad-category">${ad.category_name || 'Другое'}</span>
+                    <div class="ad-author">
+                        <span>${escapeHtml(ad.first_name || 'Аноним')}</span>
+                        <span>•</span>
+                        <span>${formatDate(ad.created_at)}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Загрузка моих объявлений
@@ -372,6 +395,52 @@ function filterByCategory() {
     searchAds();
 }
 
+// Загрузка изображений
+async function uploadImages(files) {
+    if (files.length === 0) return [];
+    
+    const formData = new FormData();
+    for (let file of files) {
+        formData.append('images', file);
+    }
+    
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) throw new Error('Ошибка загрузки изображений');
+        
+        const result = await response.json();
+        return result.images;
+    } catch (error) {
+        console.error('❌ Ошибка загрузки изображений:', error);
+        showNotification('Ошибка загрузки изображений', 'error');
+        return [];
+    }
+}
+
+// Предпросмотр изображений
+document.getElementById('ad-images').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    const preview = document.getElementById('image-preview');
+    
+    preview.innerHTML = '';
+    uploadedImages = [];
+    
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'preview-image';
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
 // Создание объявления
 async function createAd() {
     if (!currentUser) {
@@ -390,6 +459,14 @@ async function createAd() {
     }
     
     try {
+        showNotification('Загрузка изображений...', 'info');
+        
+        // Загружаем изображения если есть
+        const imageFiles = document.getElementById('ad-images').files;
+        const images = imageFiles.length > 0 ? await uploadImages(imageFiles) : [];
+        
+        showNotification('Создание объявления...', 'info');
+        
         const response = await fetch('/api/ads', {
             method: 'POST',
             headers: {
@@ -401,7 +478,7 @@ async function createAd() {
                 price,
                 category_id: parseInt(categoryId),
                 user_id: currentUser.id,
-                images: []
+                images: images
             })
         });
         
@@ -410,10 +487,12 @@ async function createAd() {
         const ad = await response.json();
         console.log('✅ Объявление создано:', ad);
         
-        showNotification('Объявление успешно опубликовано!', 'success');
+        showNotification('Объявление отправлено на модерацию!', 'success');
         
         // Очищаем форму
         document.getElementById('ad-form').reset();
+        document.getElementById('image-preview').innerHTML = '';
+        uploadedImages = [];
         
         // Переключаемся на мои объявления
         switchTab('my-ads');
@@ -452,10 +531,31 @@ function displayModalAd() {
     document.getElementById('favorite-btn').textContent = isFavorite ? '❤️' : '🤍';
     document.getElementById('favorite-btn').classList.toggle('active', isFavorite);
     
+    // Обработка изображений
+    let imagesHtml = '';
+    if (currentAd.images) {
+        try {
+            const images = JSON.parse(currentAd.images);
+            if (images.length > 0) {
+                imagesHtml = `
+                    <div class="ad-images-full">
+                        ${images.map(img => 
+                            `<img src="${img}" alt="Фото товара" class="ad-image-full" onclick="window.open('${img}', '_blank')">`
+                        ).join('')}
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error('Ошибка парсинга изображений:', e);
+        }
+    }
+    
     document.getElementById('modal-body').innerHTML = `
         <div class="ad-details">
             <div class="ad-price-large">${formatPrice(currentAd.price)}</div>
             <div class="ad-category-badge">${currentAd.category_name || 'Другое'}</div>
+            
+            ${imagesHtml}
             
             ${currentAd.description ? `
                 <div class="ad-description-full">
@@ -554,6 +654,62 @@ async function toggleFavorite() {
     } catch (error) {
         console.error('❌ Ошибка операции с избранным:', error);
         showNotification('Ошибка операции с избранным', 'error');
+    }
+}
+
+// Подача жалобы на объявление
+async function reportAd() {
+    if (!currentUser || !currentAd) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    
+    const reasons = [
+        'Спам',
+        'Мошенничество', 
+        'Неуместный контент',
+        'Нарушение правил',
+        'Другое'
+    ];
+    
+    const reason = prompt(`Выберите причину жалобы:\n${reasons.map((r, i) => `${i + 1}. ${r}`).join('\n')}\n\nВведите номер причины:`);
+    
+    if (!reason) return;
+    
+    const reasonIndex = parseInt(reason) - 1;
+    if (reasonIndex < 0 || reasonIndex >= reasons.length) {
+        showNotification('Неверный номер причины', 'error');
+        return;
+    }
+    
+    const description = prompt('Опишите подробнее (необязательно):');
+    
+    try {
+        const response = await fetch('/api/reports', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ad_id: currentAd.id,
+                user_id: currentUser.id,
+                reason: reasons[reasonIndex],
+                description: description
+            })
+        });
+        
+        if (!response.ok) throw new Error('Ошибка подачи жалобы');
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Жалоба отправлена на рассмотрение', 'success');
+            closeModal();
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка подачи жалобы:', error);
+        showNotification('Ошибка подачи жалобы', 'error');
     }
 }
 
