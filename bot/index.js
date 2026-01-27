@@ -97,7 +97,7 @@ bot.onText(/\/start/, async (msg) => {
 
 // Команда /help
 bot.onText(/\/help/, async (msg) => {
-    const helpText = `📖 *Справка по Lavka26*\n\n` +
+    let helpText = `📖 *Справка по Lavka26*\n\n` +
         `🔍 *Основные команды:*\n` +
         `/start - открыть приложение\n` +
         `/help - эта справка\n\n` +
@@ -106,8 +106,18 @@ bot.onText(/\/help/, async (msg) => {
         `• Поиск товаров\n` +
         `• Избранные объявления\n` +
         `• Связь с продавцами\n` +
-        `• Рейтинг пользователей\n\n` +
-        `❓ *Нужна помощь?* Напишите @lavka26_support`;
+        `• Рейтинг пользователей\n\n`;
+    
+    if (msg.from.id.toString() === '379036860') {
+        helpText += `🛡️ *Модераторские команды:*\n` +
+            `/mod_pending - Объявления на модерации\n` +
+            `/mod_reports - Жалобы\n` +
+            `/mod_stats - Статистика\n` +
+            `/mod_approve <id> - Одобрить объявление\n` +
+            `/mod_reject <id> [причина] - Отклонить объявление\n\n`;
+    }
+    
+    helpText += `❓ *Нужна помощь?* Напишите @lavka26_support`;
     
     try {
         await bot.sendMessage(msg.chat.id, helpText, { parse_mode: 'Markdown' });
@@ -167,14 +177,29 @@ bot.on('callback_query', async (callbackQuery) => {
                 break;
                 
             case 'settings':
-                await bot.sendMessage(chatId, 
-                    '⚙️ *Настройки*\n\n' +
-                    '👤 Ваш профиль: ' + (callbackQuery.from.first_name || 'Пользователь') + '\n' +
-                    '🆔 ID: ' + callbackQuery.from.id + '\n' +
-                    '👋 Username: @' + (callbackQuery.from.username || 'не указан') + '\n\n' +
-                    '⚡ Изменить настройки можно в мини-приложении',
-                    { parse_mode: 'Markdown' }
-                );
+                if (callbackQuery.from.id.toString() === '379036860') {
+                    // Модераторское меню
+                    await bot.sendMessage(chatId, 
+                        '🛡️ *Панель модератора*\n\n' +
+                        '👤 Вы вошли как модератор\n' +
+                        '🆔 ID: ' + callbackQuery.from.id + '\n\n' +
+                        '📋 *Доступные команды:*\n' +
+                        '/mod_pending - Объявления на модерации\n' +
+                        '/mod_reports - Жалобы\n' +
+                        '/mod_stats - Статистика\n\n' +
+                        '⚡ Управляйте модерацией через команды',
+                        { parse_mode: 'Markdown' }
+                    );
+                } else {
+                    await bot.sendMessage(chatId, 
+                        '⚙️ *Настройки*\n\n' +
+                        '👤 Ваш профиль: ' + (callbackQuery.from.first_name || 'Пользователь') + '\n' +
+                        '🆔 ID: ' + callbackQuery.from.id + '\n' +
+                        '👋 Username: @' + (callbackQuery.from.username || 'не указан') + '\n\n' +
+                        '⚡ Изменить настройки можно в мини-приложении',
+                        { parse_mode: 'Markdown' }
+                    );
+                }
                 break;
                 
             default:
@@ -182,6 +207,157 @@ bot.on('callback_query', async (callbackQuery) => {
         }
     } catch (error) {
         console.error('❌ Ошибка обработки callback:', error);
+    }
+});
+
+// Модераторские команды
+bot.onText(/\/mod_pending/, async (msg) => {
+    if (msg.from.id.toString() !== '379036860') {
+        await bot.sendMessage(msg.chat.id, '❌ Доступ запрещен');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${backendUrl}/api/moderator/ads?telegram_id=${msg.from.id}`);
+        const ads = await response.json();
+        
+        if (ads.length === 0) {
+            await bot.sendMessage(msg.chat.id, '✅ Нет объявлений на модерации');
+            return;
+        }
+        
+        let message = '📋 *Объявления на модерации:*\n\n';
+        ads.slice(0, 10).forEach(ad => {
+            message += `🔸 *ID:* ${ad.id}\n`;
+            message += `📝 *Название:* ${ad.title}\n`;
+            message += `💰 *Цена:* ${ad.price}₽\n`;
+            message += `👤 *Автор:* ${ad.first_name} (@${ad.username || 'no_username'})\n`;
+            message += `📅 *Дата:* ${new Date(ad.created_at).toLocaleDateString('ru-RU')}\n\n`;
+        });
+        
+        if (ads.length > 10) {
+            message += `📝 Показано 10 из ${ads.length} объявлений`;
+        }
+        
+        await bot.sendMessage(msg.chat.id, message, { parse_mode: 'Markdown' });
+    } catch (error) {
+        console.error('Ошибка загрузки объявлений:', error);
+        await bot.sendMessage(msg.chat.id, '❌ Ошибка загрузки объявлений');
+    }
+});
+
+bot.onText(/\/mod_reports/, async (msg) => {
+    if (msg.from.id.toString() !== '379036860') {
+        await bot.sendMessage(msg.chat.id, '❌ Доступ запрещен');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${backendUrl}/api/moderator/reports?telegram_id=${msg.from.id}`);
+        const reports = await response.json();
+        
+        if (reports.length === 0) {
+            await bot.sendMessage(msg.chat.id, '✅ Нет жалоб');
+            return;
+        }
+        
+        let message = '🚨 *Жалобы:*\n\n';
+        reports.slice(0, 10).forEach(report => {
+            message += `🔸 *ID жалобы:* ${report.id}\n`;
+            message += `📝 *Объявление:* ${report.ad_title}\n`;
+            message += `👤 *Жалобщик:* ${report.reporter_name}\n`;
+            message += `⚠️ *Причина:* ${report.reason}\n`;
+            if (report.description) {
+                message += `📄 *Описание:* ${report.description}\n`;
+            }
+            message += `📅 *Дата:* ${new Date(report.created_at).toLocaleDateString('ru-RU')}\n\n`;
+        });
+        
+        await bot.sendMessage(msg.chat.id, message, { parse_mode: 'Markdown' });
+    } catch (error) {
+        console.error('Ошибка загрузки жалоб:', error);
+        await bot.sendMessage(msg.chat.id, '❌ Ошибка загрузки жалоб');
+    }
+});
+
+bot.onText(/\/mod_stats/, async (msg) => {
+    if (msg.from.id.toString() !== '379036860') {
+        await bot.sendMessage(msg.chat.id, '❌ Доступ запрещен');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${backendUrl}/api/moderator/stats?telegram_id=${msg.from.id}`);
+        const stats = await response.json();
+        
+        const message = `📊 *Статистика Lavka26:*\n\n` +
+            `📝 *Всего объявлений:* ${stats.total_ads}\n` +
+            `⏳ *На модерации:* ${stats.pending_ads}\n` +
+            `✅ *Активных:* ${stats.active_ads}\n` +
+            `❌ *Отклоненных:* ${stats.rejected_ads}\n\n` +
+            `🚨 *Всего жалоб:* ${stats.total_reports}\n` +
+            `⏳ *Новых жалоб:* ${stats.pending_reports}\n\n` +
+            `👥 *Всего пользователей:* ${stats.total_users}`;
+        
+        await bot.sendMessage(msg.chat.id, message, { parse_mode: 'Markdown' });
+    } catch (error) {
+        console.error('Ошибка загрузки статистики:', error);
+        await bot.sendMessage(msg.chat.id, '❌ Ошибка загрузки статистики');
+    }
+});
+
+bot.onText(/\/mod_approve (\d+)/, async (msg, match) => {
+    if (msg.from.id.toString() !== '379036860') {
+        await bot.sendMessage(msg.chat.id, '❌ Доступ запрещен');
+        return;
+    }
+    
+    const adId = match[1];
+    
+    try {
+        const response = await fetch(`${backendUrl}/api/moderator/approve-ad/${adId}?telegram_id=${msg.from.id}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            await bot.sendMessage(msg.chat.id, `✅ Объявление #${adId} одобрено и опубликовано`);
+        } else {
+            await bot.sendMessage(msg.chat.id, '❌ Ошибка одобрения объявления');
+        }
+    } catch (error) {
+        console.error('Ошибка одобрения:', error);
+        await bot.sendMessage(msg.chat.id, '❌ Ошибка одобрения объявления');
+    }
+});
+
+bot.onText(/\/mod_reject (\d+)(?:\s+(.+))?/, async (msg, match) => {
+    if (msg.from.id.toString() !== '379036860') {
+        await bot.sendMessage(msg.chat.id, '❌ Доступ запрещен');
+        return;
+    }
+    
+    const adId = match[1];
+    const reason = match[2] || '';
+    
+    try {
+        const response = await fetch(`${backendUrl}/api/moderator/reject-ad/${adId}?telegram_id=${msg.from.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            await bot.sendMessage(msg.chat.id, `❌ Объявление #${adId} отклонено${reason ? `\nПричина: ${reason}` : ''}`);
+        } else {
+            await bot.sendMessage(msg.chat.id, '❌ Ошибка отклонения объявления');
+        }
+    } catch (error) {
+        console.error('Ошибка отклонения:', error);
+        await bot.sendMessage(msg.chat.id, '❌ Ошибка отклонения объявления');
     }
 });
 

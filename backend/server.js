@@ -532,6 +532,139 @@ app.get('/api/notifications/:userId', (req, res) => {
     });
 });
 
+// Проверка прав модератора
+function checkModerator(req, res, next) {
+    const MODERATOR_ID = 379036860;
+    
+    if (!req.query.telegram_id || parseInt(req.query.telegram_id) !== MODERATOR_ID) {
+        return res.status(403).json({ error: 'Access denied. Moderator rights required.' });
+    }
+    
+    next();
+}
+
+// Модераторская панель - получение объявлений на модерации
+app.get('/api/moderator/ads', checkModerator, (req, res) => {
+    const query = `
+        SELECT a.*, u.first_name, u.username, u.telegram_id, c.name as category_name 
+        FROM ads a 
+        JOIN users u ON a.user_id = u.id 
+        JOIN categories c ON a.category_id = c.id 
+        WHERE a.status = 'pending'
+        ORDER BY a.created_at DESC
+    `;
+    
+    db.all(query, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Модераторская панель - получение жалоб
+app.get('/api/moderator/reports', checkModerator, (req, res) => {
+    const query = `
+        SELECT r.*, a.title as ad_title, u.first_name as reporter_name, u.telegram_id as reporter_id,
+               u2.first_name as ad_author_name, u2.telegram_id as ad_author_id
+        FROM reports r
+        JOIN ads a ON r.ad_id = a.id
+        JOIN users u ON r.user_id = u.id
+        JOIN users u2 ON a.user_id = u2.id
+        ORDER BY r.created_at DESC
+    `;
+    
+    db.all(query, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Модераторская панель - одобрение объявления
+app.post('/api/moderator/approve-ad/:id', checkModerator, (req, res) => {
+    const adId = req.params.id;
+    
+    db.run('UPDATE ads SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        ['active', adId], 
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            
+            // Создаем уведомление для автора
+            db.run(`INSERT INTO notifications (user_id, type, title, message) 
+                SELECT user_id, 'ad_approved', 'Объявление одобрено', 
+                'Ваше объявление было одобрено и теперь опубликовано' FROM ads WHERE id = ?`,
+                [adId]
+            );
+            
+            res.json({ success: true, message: 'Advertisement approved' });
+        }
+    );
+});
+
+// Модераторская панель - отклонение объявления
+app.post('/api/moderator/reject-ad/:id', checkModerator, (req, res) => {
+    const adId = req.params.id;
+    const { reason } = req.body;
+    
+    db.run('UPDATE ads SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        ['rejected', adId], 
+        function(err) {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+            
+            // Создаем уведомление для автора
+            const message = reason ? 
+                `Ваше объявление было отклонено. Причина: ${reason}` :
+                'Ваше объявление было отклонено';
+                
+            db.run(`INSERT INTO notifications (user_id, type, title, message) 
+                SELECT user_id, 'ad_rejected', 'Объявление отклонено', ? FROM ads WHERE id = ?`,
+                [message, adId]
+            );
+            
+            res.json({ success: true, message: 'Advertisement rejected' });
+        }
+    );
+});
+
+// Модераторская панель - статистика
+app.get('/api/moderator/stats', checkModerator, (req, res) => {
+    const queries = {
+        total_ads: 'SELECT COUNT(*) as count FROM ads',
+        pending_ads: 'SELECT COUNT(*) as count FROM ads WHERE status = "pending"',
+        active_ads: 'SELECT COUNT(*) as count FROM ads WHERE status = "active"',
+        rejected_ads: 'SELECT COUNT(*) as count FROM ads WHERE status = "rejected"',
+        total_reports: 'SELECT COUNT(*) as count FROM reports',
+        pending_reports: 'SELECT COUNT(*) as count FROM reports WHERE status = "pending"',
+        total_users: 'SELECT COUNT(*) as count FROM users'
+    };
+    
+    const stats = {};
+    let completed = 0;
+    
+    Object.entries(queries).forEach(([key, query]) => {
+        db.get(query, (err, row) => {
+            if (!err && row) {
+                stats[key] = row.count;
+            }
+            
+            completed++;
+            if (completed === Object.keys(queries).length) {
+                res.json(stats);
+            }
+        });
+    });
+});
+
 // Получение сообщений пользователя
 app.get('/api/messages/:userId', (req, res) => {
     const userId = req.params.userId;
