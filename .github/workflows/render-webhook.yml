@@ -1,0 +1,30 @@
+name: Render Webhook Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Render Services
+      run: |
+        # Backend
+        curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_BACKEND_ID }}/deploys" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{}'
+          
+        # Frontend  
+        curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_FRONTEND_ID }}/deploys" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{}'
+          
+        # Bot
+        curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_BOT_ID }}/deploys" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{}'

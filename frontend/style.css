@@ -1036,37 +1036,731 @@ input:checked + .slider:before {
     background: var(--secondary-color);
 }
 
-/* Уведомления */
 .notifications {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 2000;
+    z-index: 10000;
+    pointer-events: none;
 }
 
 .notification {
     background: var(--white);
-    border-radius: var(--border-radius);
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     gap: 12px;
-    min-width: 250px;
-    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
-.notification.success {
-    border-left: 4px solid var(--success-color);
+.notification-success {
+    border-left: 4px solid var(--avito-green);
+    color: var(--avito-green);
 }
 
-.notification.error {
-    border-left: 4px solid var(--error-color);
+.notification-error {
+    border-left: 4px solid var(--avito-red);
+    color: var(--avito-red);
 }
 
-.notification.info {
-    border-left: 4px solid var(--primary-color);
+.notification-info {
+    border-left: 4px solid var(--avito-blue);
+    color: var(--avito-blue);
+}
+
+/* Модальные окна */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 10;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.close-btn, .back-btn {
+    background: transparent;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.close-btn:hover, .back-btn:hover {
+    background: var(--background);
+    color: var(--text-primary);
+}
+
+.share-btn {
+    background: transparent;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.share-btn:hover {
+    background: var(--background);
+    color: var(--avito-blue);
+}
+
+/* Модальное окно объявления */
+.ad-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.ad-gallery img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius);
+}
+
+.no-image-large {
+    width: 100%;
+    height: 300px;
+    background: var(--background);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.ad-details {
+    padding: 0 20px;
+}
+
+.ad-price-large {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.ad-meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.ad-meta-info span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.ad-description-full {
+    margin-bottom: 20px;
+}
+
+.ad-description-full h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.ad-description-full p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.ad-seller-info {
+    margin-bottom: 20px;
+}
+
+.ad-seller-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.seller-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--background);
+    border-radius: var(--radius);
+}
+
+.seller-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--avito-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 20px;
+}
+
+.seller-details {
+    flex: 1;
+}
+
+.seller-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.seller-rating {
+    color: var(--avito-orange);
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.action-btn {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn.primary {
+    background: var(--avito-blue);
+    color: var(--white);
+}
+
+.action-btn.primary:hover {
+    background: var(--avito-blue-hover);
+}
+
+.action-btn.secondary {
+    background: var(--background);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.action-btn.secondary:hover {
+    background: var(--border-light);
+}
+
+/* Модальное окно создания объявления */
+.create-ad-modal {
+    max-width: 600px;
+}
+
+.create-ad-modal .modal-header {
+    padding: 16px 20px;
+}
+
+.publish-btn {
+    background: var(--avito-blue);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.publish-btn:hover {
+    background: var(--avito-blue-hover);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    transition: var(--transition);
+    background: var(--white);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--avito-blue);
+    box-shadow: 0 0 0 2px rgba(0, 137, 209, 0.1);
+}
+
+.char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.image-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--background);
+}
+
+.image-upload-area:hover {
+    border-color: var(--avito-blue);
+    background: var(--white);
+}
+
+.upload-placeholder i {
+    font-size: 48px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.upload-placeholder p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.upload-placeholder small {
+    color: var(--text-muted);
+}
+
+.image-preview-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.image-preview {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.remove-image:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.location-input {
+    position: relative;
+}
+
+.location-input i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.location-input input {
+    padding-left: 44px;
+}
+
+.contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    position: relative;
+    transition: var(--transition);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background: var(--avito-blue);
+    border-color: var(--avito-blue);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--white);
+    font-size: 12px;
+}
+
+/* Модальное окно фильтров */
+.filters-modal {
+    max-width: 400px;
+}
+
+.filter-section {
+    margin-bottom: 24px;
+}
+
+.filter-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.price-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-range input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+}
+
+.price-range span {
+    color: var(--text-secondary);
+}
+
+.distance-slider {
+    margin-top: 12px;
+}
+
+.distance-slider label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.distance-slider input[type="range"] {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.distance-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--avito-blue);
+    cursor: pointer;
+}
+
+.date-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.reset-btn:hover {
+    background: var(--background);
+    color: var(--text-primary);
+}
+
+/* Переключатели */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border);
+    transition: var(--transition);
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--white);
+    transition: var(--transition);
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--avito-blue);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Состояния */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+}
+
+.empty-state p {
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.error-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--avito-red);
+    background: rgba(229, 57, 53, 0.1);
+    border-radius: var(--radius);
+    margin: 20px;
+}
+
+/* Скелетон загрузки */
+.skeleton-card {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: var(--radius);
+    height: 200px;
+    margin-bottom: 16px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header-top {
+        padding: 16px;
+    }
+    
+    .logo {
+        font-size: 20px;
+    }
+    
+    .logo i {
+        font-size: 24px;
+    }
+    
+    .user-info {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+    
+    .categories-scroll {
+        padding: 0 16px;
+    }
+    
+    .main-content {
+        padding: 0 16px;
+    }
+    
+    .modal-content {
+        margin: 0;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        max-height: 100vh;
+    }
+    
+    .modal {
+        padding: 0;
+        align-items: flex-end;
+    }
+    
+    .ad-gallery {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
 }
 
 @keyframes slideIn {
@@ -1080,31 +1774,505 @@ input:checked + .slider:before {
     }
 }
 
-/* Модераторская панель */
-.moderator-content {
+/* Профиль */
+.profile-content {
     padding: 16px;
 }
 
-.moderator-content h2 {
-    color: var(--primary-color);
-    margin-bottom: 24px;
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.mod-stats {
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
     background: var(--white);
-    border-radius: var(--border-radius);
-    padding: 20px;
+    border-radius: var(--radius-lg);
     margin-bottom: 24px;
     box-shadow: var(--shadow-sm);
 }
 
-.mod-stats h3 {
-    margin-bottom: 16px;
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--avito-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 32px;
+}
+
+.profile-info h2 {
+    font-size: 24px;
+    font-weight: 600;
     color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.profile-info p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 24px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item span:first-child {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.stat-item span:last-child {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.profile-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-section h3 {
     font-size: 18px;
     font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.profile-ads-preview,
+.profile-favorites-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.btn-link {
+    background: transparent;
+    border: none;
+    color: var(--avito-blue);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.btn-link:hover {
+    color: var(--avito-blue-hover);
+}
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.setting-item span {
+    color: var(--text-primary);
+}
+
+/* Мои объявления */
+.my-ads-content {
+    padding: 16px;
+}
+
+.my-ads-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.my-ads-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.status-filter {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.status-filter.active {
+    background: var(--avito-blue);
+    color: var(--white);
+    border-color: var(--avito-blue);
+}
+
+.status-filter:hover:not(.active) {
+    border-color: var(--avito-blue);
+    color: var(--avito-blue);
+}
+
+.my-ads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.my-ad-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.my-ad-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.my-ad-image {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+}
+
+.my-ad-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.my-ad-content {
+    padding: 16px;
+    flex: 1;
+}
+
+.my-ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.my-ad-header h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.status-active {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+.status-sold {
+    background: #E2E3E5;
+    color: #383D41;
+}
+
+.my-ad-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.my-ad-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.my-ad-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-danger {
+    background: var(--avito-red);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    background: #C62828;
+}
+
+/* Избранное */
+.favorites-content {
+    padding: 16px;
+}
+
+.favorites-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.favorites-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.favorites-count {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.favorites-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+/* Кнопки */
+.btn-primary {
+    background: var(--avito-blue);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: var(--avito-blue-hover);
+}
+
+.btn-secondary {
+    background: var(--white);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: var(--background);
+    border-color: var(--avito-blue);
+    color: var(--avito-blue);
+}
+
+/* Список объявлений */
+.ads-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.ads-container.list-view {
+    grid-template-columns: 1fr;
+}
+
+.ad-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.ad-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.ad-image {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+
+.ad-image img,
+.no-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    background: var(--background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 32px;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-muted);
+}
+
+.favorite-btn:hover {
+    background: var(--white);
+    transform: scale(1.1);
+}
+
+.favorite-btn.active {
+    color: var(--avito-red);
+    background: var(--white);
+}
+
+.ad-content {
+    padding: 16px;
+}
+
+.ad-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.ad-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.ad-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.ad-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.ad-location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Плавающая кнопка */
+.fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: var(--avito-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+    z-index: 100;
+}
+
+.fab:hover {
+    background: var(--avito-blue-hover);
+    transform: scale(1.1);
+}
+
+.fab:active {
+    transform: scale(0.95);
 }
 
 .stats-grid {

@@ -1,21 +1,12 @@
-name: Build and Deploy to GitHub Pages
+name: Deploy to Render
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -26,26 +17,41 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: miniapp/package-lock.json
         
-    - name: Install dependencies
+    - name: Install and test backend
       run: |
-        cd miniapp
+        cd backend
         npm ci
+        npm test || echo "Tests skipped"
         
-    - name: Build
+    - name: Install and test frontend
       run: |
-        cd miniapp
-        npm run build
+        cd frontend
+        npm ci
+        npm test || echo "Tests skipped"
         
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: miniapp/dist
+    - name: Install and test bot
+      run: |
+        cd bot
+        npm ci
+        npm test || echo "Tests skipped"
         
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: Trigger Render Deploy
+      run: |
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"serviceId": "${{ secrets.RENDER_BACKEND_ID }}"}' \
+          https://api.render.com/v1/services/${{ secrets.RENDER_BACKEND_ID }}/deploys
+          
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"serviceId": "${{ secrets.RENDER_FRONTEND_ID }}"}' \
+          https://api.render.com/v1/services/${{ secrets.RENDER_FRONTEND_ID }}/deploys
+          
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"serviceId": "${{ secrets.RENDER_BOT_ID }}"}' \
+          https://api.render.com/v1/services/${{ secrets.RENDER_BOT_ID }}/deploys

@@ -507,8 +507,49 @@ app.get('/api/ads/pending', (req, res) => {
     });
 });
 
-// Увеличение счетчика просмотров
-app.post('/api/ads/:id/views', (req, res) => {
+// Получение объявлений пользователя
+app.get('/api/ads/user/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const { status } = req.query;
+    
+    let query = `
+        SELECT a.*, c.name as category_name 
+        FROM ads a 
+        JOIN categories c ON a.category_id = c.id 
+        WHERE a.user_id = ?
+    `;
+    const params = [userId];
+    
+    if (status) {
+        query += ' AND a.status = ?';
+        params.push(status);
+    }
+    
+    query += ' ORDER BY a.created_at DESC';
+    
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        // Парсим изображения
+        rows.forEach(row => {
+            if (row.images) {
+                try {
+                    row.images = JSON.parse(row.images);
+                } catch (e) {
+                    row.images = [];
+                }
+            }
+        });
+        
+        res.json(rows);
+    });
+});
+
+// Увеличение счетчика просмотров (исправленный эндпоинт)
+app.post('/api/ads/:id/view', (req, res) => {
     const adId = req.params.id;
     
     db.run('UPDATE ads SET views = views + 1 WHERE id = ?', [adId], function(err) {
@@ -516,7 +557,16 @@ app.post('/api/ads/:id/views', (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ success: true, views: this.changes });
+        res.json({ success: true });
+    });
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
     });
 });
 
