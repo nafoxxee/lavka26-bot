@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lavka26 - Маркетплейс</title>
+    <title>Lavka26 - Marketplace</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div id="app">
-        <!-- Загрузка -->
+        <!-- Loading -->
         <div class="loading" id="loading" style="display: none;">
             <div class="loading-spinner"></div>
-            <p>Загрузка...</p>
+            <p>Loading...</p>
         </div>
 
         <!-- Основной контент -->
@@ -44,7 +44,7 @@
                 <div class="search-container">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="search-input" placeholder="Поиск по объявлениям...">
+                        <input type="text" id="search-input" placeholder="Search ads...">
                         <button class="filter-btn" onclick="openFilters()">
                             <i class="fas fa-sliders-h"></i>
                         </button>
@@ -55,31 +55,31 @@
                 <div class="categories-scroll">
                     <div class="category-item active" data-category="">
                         <i class="fas fa-th"></i>
-                        <span>Все</span>
+                        <span>All</span>
                     </div>
                     <div class="category-item" data-category="1">
                         <i class="fas fa-car"></i>
-                        <span>Транспорт</span>
+                        <span>Transport</span>
                     </div>
                     <div class="category-item" data-category="2">
                         <i class="fas fa-home"></i>
-                        <span>Недвижимость</span>
+                        <span>Real Estate</span>
                     </div>
                     <div class="category-item" data-category="3">
                         <i class="fas fa-mobile-alt"></i>
-                        <span>Электроника</span>
+                        <span>Electronics</span>
                     </div>
                     <div class="category-item" data-category="4">
                         <i class="fas fa-tshirt"></i>
-                        <span>Одежда</span>
+                        <span>Clothing</span>
                     </div>
                     <div class="category-item" data-category="5">
                         <i class="fas fa-tools"></i>
-                        <span>Услуги</span>
+                        <span>Services</span>
                     </div>
                     <div class="category-item" data-category="6">
                         <i class="fas fa-briefcase"></i>
-                        <span>Работа</span>
+                        <span>Jobs</span>
                     </div>
                 </div>
             </header>
@@ -89,9 +89,9 @@
                 <!-- Панель сортировки и фильтров -->
                 <div class="sort-bar">
                     <div class="sort-options">
-                        <button class="sort-btn active" data-sort="date">По дате</button>
-                        <button class="sort-btn" data-sort="price-asc">Дешевле</button>
-                        <button class="sort-btn" data-sort="price-desc">Дороже</button>
+                        <button class="sort-btn active" data-sort="date">By Date</button>
+                        <button class="sort-btn" data-sort="price-asc">Price Low</button>
+                        <button class="sort-btn" data-sort="price-desc">Price High</button>
                     </div>
                     <div class="view-toggle">
                         <button class="view-btn active" data-view="grid">
@@ -122,23 +122,23 @@
             <nav class="bottom-nav">
                 <button class="nav-item active" data-tab="feed">
                     <i class="fas fa-home"></i>
-                    <span>Главная</span>
+                    <span>Home</span>
                 </button>
                 <button class="nav-item" data-tab="search">
                     <i class="fas fa-search"></i>
-                    <span>Поиск</span>
+                    <span>Search</span>
                 </button>
                 <button class="nav-item" data-tab="favorites">
                     <i class="fas fa-heart"></i>
-                    <span>Избранное</span>
+                    <span>Favorites</span>
                 </button>
                 <button class="nav-item" data-tab="messages">
                     <i class="fas fa-comment"></i>
-                    <span>Сообщения</span>
+                    <span>Messages</span>
                 </button>
                 <button class="nav-item" data-tab="profile">
                     <i class="fas fa-user"></i>
-                    <span>Профиль</span>
+                    <span>Profile</span>
                 </button>
             </nav>
         </div>
@@ -150,7 +150,7 @@
                     <button class="back-btn" onclick="closeModal()">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h3 id="modal-title">Объявление</h3>
+                    <h3 id="modal-title">Advertisement</h3>
                     <button class="share-btn" onclick="shareAd()">
                         <i class="fas fa-share-alt"></i>
                     </button>
@@ -161,11 +161,11 @@
                 <div class="modal-actions">
                     <button class="action-btn secondary" onclick="toggleFavorite()">
                         <i class="fas fa-heart"></i>
-                        <span>В избранное</span>
+                        <span>Add to Favorites</span>
                     </button>
                     <button class="action-btn primary" onclick="contactSeller()">
                         <i class="fas fa-phone"></i>
-                        <span>Связаться</span>
+                        <span>Contact</span>
                     </button>
                 </div>
             </div>
@@ -178,43 +178,43 @@
                     <button class="close-btn" onclick="closeFilters()">
                         <i class="fas fa-times"></i>
                     </button>
-                    <h3>Фильтры</h3>
-                    <button class="reset-btn" onclick="resetFilters()">Сбросить</button>
+                    <h3>Filters</h3>
+                    <button class="reset-btn" onclick="resetFilters()">Reset</button>
                 </div>
                 <div class="modal-body">
                     <div class="filter-section">
-                        <h4>Цена</h4>
+                        <h4>Price</h4>
                         <div class="price-range">
-                            <input type="number" id="price-min" placeholder="От">
+                            <input type="number" id="price-min" placeholder="From">
                             <span>-</span>
-                            <input type="number" id="price-max" placeholder="До">
+                            <input type="number" id="price-max" placeholder="To">
                         </div>
                     </div>
                     
                     <div class="filter-section">
-                        <h4>Расположение</h4>
+                        <h4>Location</h4>
                         <div class="location-input">
                             <i class="fas fa-map-marker-alt"></i>
-                            <input type="text" id="location" placeholder="Город или район">
+                            <input type="text" id="location" placeholder="City or area">
                         </div>
                         <div class="distance-slider">
-                            <label>Радиус: <span id="distance-value">10</span> км</label>
+                            <label>Radius: <span id="distance-value">10</span> km</label>
                             <input type="range" id="distance" min="1" max="100" value="10">
                         </div>
                     </div>
                     
                     <div class="filter-section">
-                        <h4>Дата публикации</h4>
+                        <h4>Publication Date</h4>
                         <div class="date-options">
-                            <label><input type="radio" name="date" value="today" checked> Сегодня</label>
-                            <label><input type="radio" name="date" value="week"> За неделю</label>
-                            <label><input type="radio" name="date" value="month"> За месяц</label>
-                            <label><input type="radio" name="date" value="all"> Все время</label>
+                            <label><input type="radio" name="date" value="today" checked> Today</label>
+                            <label><input type="radio" name="date" value="week"> This Week</label>
+                            <label><input type="radio" name="date" value="month"> This Month</label>
+                            <label><input type="radio" name="date" value="all"> All Time</label>
                         </div>
                     </div>
                     
                     <div class="filter-section">
-                        <h4>Только с фото</h4>
+                        <h4>With Photos Only</h4>
                         <label class="switch">
                             <input type="checkbox" id="with-photos">
                             <span class="slider"></span>
@@ -222,8 +222,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeFilters()">Отмена</button>
-                    <button class="btn-primary" onclick="applyFilters()">Применить</button>
+                    <button class="btn-secondary" onclick="closeFilters()">Cancel</button>
+                    <button class="btn-primary" onclick="applyFilters()">Apply</button>
                 </div>
             </div>
         </div>
@@ -234,8 +234,8 @@
 
     <script src="app.js"></script>
     <script>
-        // Показываем контент немедленно
-        console.log('🚀 Lavka26 запускается...');
+        // Show content immediately
+        console.log('🚀 Lavka26 starting...');
         const loading = document.getElementById('loading');
         const content = document.getElementById('content');
         if (loading) loading.style.display = 'none';
