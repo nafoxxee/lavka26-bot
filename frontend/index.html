@@ -543,10 +543,8 @@
 
     <script src="app.js"></script>
     <script>
-        // Отладочная информация
+        // Немедленное исправление кнопок
         console.log('🚀 Lavka26 запускается...');
-        console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
-        console.log('🔧 Functions loaded:', typeof window.openCreateAd !== 'undefined');
         
         // Показываем контент немедленно
         const loading = document.getElementById('loading');
@@ -554,13 +552,71 @@
         if (loading) loading.style.display = 'none';
         if (content) content.style.display = 'block';
         
-        // Проверка загрузки функций
-        setTimeout(() => {
-            console.log('🔍 Проверка функций через 2 секунды:');
-            console.log('- openCreateAd:', typeof window.openCreateAd);
-            console.log('- switchTab:', typeof window.switchTab);
-            console.log('- loadAds:', typeof window.loadAds);
-        }, 2000);
+        // Простые функции для кнопок
+        window.openCreateAd = function() {
+            alert('Создание объявления работает!');
+            console.log('openCreateAd вызвана');
+        };
+        
+        window.switchTab = function(tabName) {
+            console.log('switchTab вызвана с:', tabName);
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Убираем активный класс
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            const tabElement = document.getElementById(tabName + '-tab');
+            if (tabElement) {
+                tabElement.style.display = 'block';
+            }
+            
+            // Активируем кнопку
+            const activeBtn = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        };
+        
+        window.testFunction = function() {
+            alert('Кнопки работают! JavaScript загружен правильно.');
+            console.log('🧪 Тестовая функция вызвана!');
+        };
+        
+        // Добавляем обработчики событий
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен, добавляем обработчики...');
+            
+            // Навигация
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    window.switchTab(tabName);
+                });
+            });
+            
+            // Категории
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
+                    this.classList.add('active');
+                    alert('Категория выбрана: ' + this.dataset.category);
+                });
+            });
+            
+            // FAB кнопка
+            const fab = document.querySelector('.fab');
+            if (fab) {
+                fab.addEventListener('click', window.openCreateAd);
+            }
+            
+            console.log('Обработчики добавлены!');
+        });
     </script>
 </body>
 </html>
