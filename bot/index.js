@@ -16,6 +16,7 @@ if (!token) {
 
 console.log('✅ Токен найден:', token.substring(0, 10) + '...');
 console.log('🔗 Backend URL:', backendUrl);
+console.log('🔗 Webhook URL:', webhookUrl);
 
 const bot = new TelegramBot(token);
 const app = express();

@@ -10,7 +10,11 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Обслуживание статических файлов
+const publicPath = path.join(__dirname, 'public');
+console.log('📁 Static files path:', publicPath);
+app.use(express.static(publicPath));
 
 // Инициализация базы данных SQLite
 const db = new sqlite3.Database('./database/lavka26.db', (err) => {
@@ -292,7 +296,9 @@ app.get('/api/favorites/:userId', (req, res) => {
 
 // Обслуживание frontend
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+    const indexPath = path.join(__dirname, 'public/index.html');
+    console.log('🏠 Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
 });
 
 // Запуск сервера
