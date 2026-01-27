@@ -534,16 +534,33 @@
 
         <!-- Уведомления -->
         <div class="notifications" id="notifications"></div>
+        
+        <!-- Тестовая кнопка для отладки -->
+        <button onclick="testFunction()" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: red; color: white; padding: 10px; border: none; border-radius: 5px;">
+            Тест
+        </button>
     </div>
 
     <script src="app.js"></script>
     <script>
-        // Показываем контент немедленно
+        // Отладочная информация
         console.log('🚀 Lavka26 запускается...');
+        console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
+        console.log('🔧 Functions loaded:', typeof window.openCreateAd !== 'undefined');
+        
+        // Показываем контент немедленно
         const loading = document.getElementById('loading');
         const content = document.getElementById('content');
         if (loading) loading.style.display = 'none';
         if (content) content.style.display = 'block';
+        
+        // Проверка загрузки функций
+        setTimeout(() => {
+            console.log('🔍 Проверка функций через 2 секунды:');
+            console.log('- openCreateAd:', typeof window.openCreateAd);
+            console.log('- switchTab:', typeof window.switchTab);
+            console.log('- loadAds:', typeof window.loadAds);
+        }, 2000);
     </script>
 </body>
 </html>

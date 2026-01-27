@@ -865,7 +865,26 @@ function editProfile() {
     showNotification('Функция редактирования профиля в разработке', 'info');
 }
 
+// Тестовая функция для отладки
+function testFunction() {
+    console.log('🧪 Тестовая функция вызвана!');
+    alert('Кнопки работают! JavaScript загружен правильно.');
+    
+    // Проверим основные функции
+    console.log('Доступные функции:', {
+        openCreateAd: typeof window.openCreateAd,
+        switchTab: typeof window.switchTab,
+        loadAds: typeof window.loadAds,
+        showNotification: typeof window.showNotification
+    });
+}
+
 // Глобальные функции для доступа из HTML
+window.openCreateAd = openCreateAd;
+window.closeCreateAdModal = closeCreateAdModal;
+window.publishAd = publishAd;
+window.openAd = openAd;
+window.closeModal = closeModal;
 window.toggleFavorite = toggleFavorite;
 window.contactSeller = contactSeller;
 window.shareAd = shareAd;
@@ -881,6 +900,7 @@ window.editAd = editAd;
 window.deleteAd = deleteAd;
 window.approveAd = approveAd;
 window.rejectAd = rejectAd;
+window.testFunction = testFunction;
 
 // Запуск приложения
 if (document.readyState === 'loading') {
