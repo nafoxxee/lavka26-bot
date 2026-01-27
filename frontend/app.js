@@ -51,42 +51,36 @@ function setupTelegramWebApp() {
 
 // Получение данных пользователя из Telegram WebApp API
 function getUserData() {
-    // Сначала пробуем получить из Telegram WebApp API
+    // Сначала пробуем получить из Telegram WebApp
     const tgUser = tg.initDataUnsafe.user;
     
     if (tgUser) {
-        console.log('✅ Получен пользователь из Telegram WebApp:', tgUser);
+        console.log('✅ Получены данные из Telegram WebApp:', tgUser);
         registerUser({
             telegram_id: tgUser.id,
             first_name: tgUser.first_name,
             last_name: tgUser.last_name || '',
             username: tgUser.username || ''
         });
-        return;
-    }
-    
-    // Fallback - пробуем URL параметры (для тестирования в браузере)
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    const userData = {
-        telegram_id: urlParams.get('telegram_id'),
-        first_name: urlParams.get('first_name') || 'Тестовый пользователь',
-        last_name: urlParams.get('last_name') || '',
-        username: urlParams.get('username') || ''
-    };
-    
-    if (userData.telegram_id) {
-        console.log('✅ Получен пользователь из URL:', userData);
-        registerUser(userData);
     } else {
-        console.log('⚠️ Данные пользователя не найдены, используем демо-режим');
-        // Демо-режим для тестирования
-        registerUser({
-            telegram_id: 12345,
-            first_name: 'Дemo пользователь',
-            last_name: '',
-            username: 'demo'
-        });
+        // Fallback - пробуем получить из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const userData = {
+            telegram_id: urlParams.get('telegram_id'),
+            first_name: urlParams.get('first_name') || 'Пользователь',
+            last_name: urlParams.get('last_name') || '',
+            username: urlParams.get('username') || ''
+        };
+        
+        if (userData.telegram_id) {
+            console.log('✅ Получены данные из URL параметров:', userData);
+            registerUser(userData);
+        } else {
+            console.log('❌ Не удалось получить данные пользователя');
+            showNotification('Ошибка: не удалось получить данные пользователя', 'error');
+            showContent();
+        }
     }
 }
 

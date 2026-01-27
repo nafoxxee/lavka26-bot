@@ -44,7 +44,7 @@ app.post(`/bot${token}`, (req, res) => {
 bot.onText(/\/start/, async (msg) => {
     console.log('🎯 /start от пользователя:', msg.chat.id, msg.from.first_name);
     
-    const webAppUrl = `${backendUrl}?telegram_id=${msg.from.id}&first_name=${encodeURIComponent(msg.from.first_name || '')}&last_name=${encodeURIComponent(msg.from.last_name || '')}&username=${encodeURIComponent(msg.from.username || '')}`;
+    const webAppUrl = `${backendUrl}`;
     
     const keyboard = {
         inline_keyboard: [
