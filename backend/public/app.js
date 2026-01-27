@@ -1,82 +1,100 @@
-// Lavka26 Mini App - Полный функционал маркетплейса
+// Lavka26 - Полный функционал как у Авито
 let tg = window.Telegram.WebApp;
 let currentUser = null;
 let currentAd = null;
 let categories = [];
 let favorites = [];
+let messages = [];
+let notifications = [];
+let currentView = 'grid';
+let currentSort = 'date';
+let currentFilters = {
+    category: '',
+    search: '',
+    priceMin: '',
+    priceMax: '',
+    location: '',
+    distance: 10,
+    date: 'today',
+    withPhotos: false
+};
 
 // Инициализация приложения
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Запуск Lavka26 Mini App...');
+function initializeApp() {
+    console.log('🚀 Запуск Lavka26...');
+    
+    // Показываем контент сразу
+    showContent();
     
     // Настройка Telegram WebApp
     setupTelegramWebApp();
     
     // Получение данных пользователя
-    getUserData();
+    getUserDataWithTimeout();
     
     // Настройка обработчиков событий
     setupEventListeners();
     
     // Загрузка начальных данных
     loadInitialData();
-});
+    
+    console.log('✅ Инициализация завершена');
+}
 
 // Настройка Telegram WebApp
 function setupTelegramWebApp() {
-    // Расширяем на весь экран
     tg.expand();
-    
-    // Устанавливаем цвета темы
-    tg.setHeaderColor('#007bff');
-    tg.setBackgroundColor('#f8f9fa');
-    
-    // Показываем кнопку назад если нужно
-    if (tg.BackButton) {
-        tg.BackButton.onClick(() => {
-            closeModal();
-        });
-    }
-    
-    // Устанавливаем главную кнопку
-    tg.MainButton.setText('Lavka26');
-    tg.MainButton.color = '#007bff';
-    tg.MainButton.textColor = '#ffffff';
-    
-    // Сообщаем о готовности
+    tg.setHeaderColor('#0066FF');
+    tg.setBackgroundColor('#F7F8FA');
     tg.ready();
-    
     console.log('✅ Telegram WebApp настроен');
 }
 
-// Получение данных пользователя из URL параметров
-function getUserData() {
-    const urlParams = new URLSearchParams(window.location.search);
+// Получение данных пользователя
+function getUserDataWithTimeout() {
+    const tgUser = tg.initDataUnsafe.user;
     
-    const userData = {
-        telegram_id: urlParams.get('telegram_id'),
-        first_name: urlParams.get('first_name') || 'Пользователь',
-        last_name: urlParams.get('last_name') || '',
-        username: urlParams.get('username') || ''
-    };
-    
-    if (userData.telegram_id) {
-        // Регистрируем/получаем пользователя
-        registerUser(userData);
+    if (tgUser) {
+        console.log('✅ Получены данные из Telegram:', tgUser);
+        registerUser({
+            telegram_id: tgUser.id,
+            first_name: tgUser.first_name,
+            last_name: tgUser.last_name || '',
+            username: tgUser.username || ''
+        });
+        
+        // Проверяем, является ли пользователь модератором
+        checkModeratorAccess(tgUser.id);
     } else {
-        // Пробуем получить из Telegram WebApp
-        const tgUser = tg.initDataUnsafe.user;
-        if (tgUser) {
-            registerUser({
-                telegram_id: tgUser.id,
-                first_name: tgUser.first_name,
-                last_name: tgUser.last_name || '',
-                username: tgUser.username || ''
-            });
+        const urlParams = new URLSearchParams(window.location.search);
+        const userData = {
+            telegram_id: urlParams.get('telegram_id'),
+            first_name: urlParams.get('first_name') || 'Пользователь',
+            last_name: urlParams.get('last_name') || '',
+            username: urlParams.get('username') || ''
+        };
+        
+        if (userData.telegram_id) {
+            registerUser(userData);
+            checkModeratorAccess(userData.telegram_id);
         } else {
-            showNotification('Ошибка: не удалось получить данные пользователя', 'error');
-            showContent();
+            console.log('⚠️ Работаем без регистрации');
+            loadInitialData();
         }
+    }
+}
+
+// Проверка прав модератора
+function checkModeratorAccess(telegramId) {
+    const MODERATOR_ID = 379036860;
+    
+    if (telegramId.toString() === MODERATOR_ID.toString()) {
+        // Показываем модераторскую вкладку
+        const moderatorTab = document.getElementById('moderator-tab');
+        if (moderatorTab) {
+            moderatorTab.style.display = 'block';
+        }
+        console.log('✅ Доступ модератора предоставлен');
     }
 }
 
@@ -85,287 +103,193 @@ async function registerUser(userData) {
     try {
         const response = await fetch(`/api/user/${userData.telegram_id}?first_name=${encodeURIComponent(userData.first_name)}&last_name=${encodeURIComponent(userData.last_name)}&username=${encodeURIComponent(userData.username)}`);
         
-        if (!response.ok) {
-            throw new Error('Ошибка регистрации пользователя');
+        if (response.ok) {
+            currentUser = await response.json();
+            console.log('✅ Пользователь зарегистрирован:', currentUser);
+            await loadInitialData();
         }
-        
-        currentUser = await response.json();
-        console.log('✅ Пользователь зарегистрирован:', currentUser);
-        
-        // Обновляем отображение имени
-        document.getElementById('user-name-display').textContent = currentUser.first_name;
-        
-        // Загружаем избранные
-        await loadFavorites();
-        
-        // Показываем контент
-        showContent();
-        
     } catch (error) {
         console.error('❌ Ошибка регистрации:', error);
-        showNotification('Ошибка регистрации пользователя', 'error');
-        showContent();
+        loadInitialData();
     }
 }
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    // Переключение вкладок
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            const tabName = this.dataset.tab;
-            switchTab(tabName);
+    // Поиск
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentFilters.search = e.target.value;
+                loadAds();
+            }, 500);
+        });
+    }
+    
+    // Категории
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.category-item').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            currentFilters.category = this.dataset.category;
+            loadAds();
         });
     });
     
-    // Форма создания объявления
-    document.getElementById('ad-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        createAd();
+    // Сортировка
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentSort = this.dataset.sort;
+            loadAds();
+        });
     });
     
-    // Поиск по Enter
-    document.getElementById('search-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchAds();
-        }
+    // Переключение вида
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentView = this.dataset.view;
+            updateViewMode();
+        });
     });
     
-    // Закрытие модального окна по клику вне его
-    document.getElementById('ad-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
+    // Нижняя навигация
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            switchTab(tab);
+        });
     });
+    
+    // Слайдер расстояния
+    const distanceSlider = document.getElementById('distance');
+    const distanceValue = document.getElementById('distance-value');
+    if (distanceSlider && distanceValue) {
+        distanceSlider.addEventListener('input', (e) => {
+            distanceValue.textContent = e.target.value;
+        });
+    }
 }
 
 // Загрузка начальных данных
 async function loadInitialData() {
-    await loadCategories();
-    await loadAds();
+    await Promise.all([
+        loadCategories(),
+        loadAds(),
+        loadNotifications(),
+        loadMessages()
+    ]);
 }
 
 // Загрузка категорий
 async function loadCategories() {
     try {
         const response = await fetch('/api/categories');
-        if (!response.ok) throw new Error('Ошибка загрузки категорий');
-        
-        categories = await response.json();
-        console.log('✅ Категории загружены:', categories);
-        
-        // Обновляем селекты категорий
-        updateCategorySelects();
-        
+        if (response.ok) {
+            categories = await response.json();
+            console.log('✅ Категории загружены:', categories);
+        }
     } catch (error) {
         console.error('❌ Ошибка загрузки категорий:', error);
-        showNotification('Ошибка загрузки категорий', 'error');
     }
 }
 
-// Обновление селектов категорий
-function updateCategorySelects() {
-    const filterSelect = document.getElementById('category-filter');
-    const createSelect = document.getElementById('ad-category');
-    
-    // Очищаем селекты
-    filterSelect.innerHTML = '<option value="">📂 Все категории</option>';
-    createSelect.innerHTML = '<option value="">Выберите категорию</option>';
-    
-    // Добавляем категории
-    categories.forEach(category => {
-        const option1 = new Option(`${category.icon} ${category.name}`, category.id);
-        const option2 = new Option(`${category.icon} ${category.name}`, category.id);
-        
-        filterSelect.add(option1);
-        createSelect.add(option2);
-    });
-}
-
 // Загрузка объявлений
-async function loadAds(params = {}) {
+async function loadAds() {
     try {
-        const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`/api/ads?${queryString}`);
+        const params = new URLSearchParams();
         
-        if (!response.ok) throw new Error('Ошибка загрузки объявлений');
+        if (currentFilters.category) params.append('category_id', currentFilters.category);
+        if (currentFilters.search) params.append('search', currentFilters.search);
+        if (currentFilters.priceMin) params.append('price_min', currentFilters.priceMin);
+        if (currentFilters.priceMax) params.append('price_max', currentFilters.priceMax);
+        if (currentFilters.withPhotos) params.append('with_photos', 'true');
         
-        const ads = await response.json();
-        console.log('✅ Объявления загружены:', ads.length);
+        params.append('sort', currentSort);
         
-        displayAds(ads, 'ads-list');
+        const response = await fetch(`/api/ads?${params}`);
         
+        if (response.ok) {
+            const ads = await response.json();
+            displayAds(ads);
+            console.log('✅ Объявления загружены:', ads.length);
+        }
     } catch (error) {
         console.error('❌ Ошибка загрузки объявлений:', error);
-        document.getElementById('ads-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки объявлений</div>';
+        showAdsError();
     }
 }
 
 // Отображение объявлений
-function displayAds(ads, containerId) {
-    const container = document.getElementById(containerId);
+function displayAds(ads) {
+    const container = document.getElementById('ads-list');
     
     if (!ads || ads.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <h3>📦 Объявлений нет</h3>
-                <p>Попробуйте изменить фильтры или создайте новое объявление</p>
+                <i class="fas fa-search"></i>
+                <h3>Объявления не найдены</h3>
+                <p>Попробуйте изменить фильтры или поиск</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = ads.map(ad => `
-        <div class="ad-card" onclick="openAd(${ad.id})">
-            <div class="ad-header">
-                <div class="ad-title">${escapeHtml(ad.title)}</div>
+    container.innerHTML = ads.map(ad => createAdCard(ad)).join('');
+    
+    // Добавляем обработчики событий
+    container.querySelectorAll('.ad-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const adId = this.dataset.adId;
+            openAd(adId);
+        });
+    });
+}
+
+// Создание карточки объявления
+function createAdCard(ad) {
+    let imageHtml = '';
+    if (ad.images && ad.images.length > 0) {
+        try {
+            const images = JSON.parse(ad.images);
+            if (images.length > 0) {
+                imageHtml = `<img src="${images[0]}" alt="${escapeHtml(ad.title)}" class="ad-image">`;
+            }
+        } catch (e) {
+            imageHtml = `<div class="ad-image placeholder"><i class="fas fa-image"></i></div>`;
+        }
+    } else {
+        imageHtml = `<div class="ad-image placeholder"><i class="fas fa-image"></i></div>`;
+    }
+    
+    return `
+        <div class="ad-card" data-ad-id="${ad.id}">
+            ${imageHtml}
+            <div class="ad-content">
+                <h3 class="ad-title">${escapeHtml(ad.title)}</h3>
                 <div class="ad-price">${formatPrice(ad.price)}</div>
-            </div>
-            <div class="ad-description">${escapeHtml(ad.description || '')}</div>
-            <div class="ad-meta">
-                <span class="ad-category">${ad.category_name || 'Другое'}</span>
-                <div class="ad-author">
-                    <span>${escapeHtml(ad.first_name || 'Аноним')}</span>
-                    <span>•</span>
-                    <span>${formatDate(ad.created_at)}</span>
+                <div class="ad-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${escapeHtml(ad.location || 'Не указано')}</span>
                 </div>
             </div>
         </div>
-    `).join('');
+    `;
 }
 
-// Загрузка моих объявлений
-async function loadMyAds() {
-    if (!currentUser) return;
-    
-    try {
-        const response = await fetch(`/api/ads?user_id=${currentUser.id}`);
-        
-        if (!response.ok) throw new Error('Ошибка загрузки моих объявлений');
-        
-        const ads = await response.json();
-        console.log('✅ Мои объявления загружены:', ads.length);
-        
-        displayAds(ads, 'my-ads-list');
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки моих объявлений:', error);
-        document.getElementById('my-ads-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки</div>';
-    }
-}
-
-// Загрузка избранных
-async function loadFavorites() {
-    if (!currentUser) return;
-    
-    try {
-        const response = await fetch(`/api/favorites/${currentUser.id}`);
-        
-        if (!response.ok) throw new Error('Ошибка загрузки избранного');
-        
-        const ads = await response.json();
-        favorites = ads;
-        console.log('✅ Избранное загружено:', ads.length);
-        
-        displayAds(ads, 'favorites-list');
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки избранного:', error);
-        document.getElementById('favorites-list').innerHTML = '<div class="loading-placeholder">Ошибка загрузки</div>';
-    }
-}
-
-// Переключение вкладок
-function switchTab(tabName) {
-    // Обновляем кнопки
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-    
-    // Обновляем контент
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById(`${tabName}-tab`).classList.add('active');
-    
-    // Загружаем данные для вкладки
-    switch (tabName) {
-        case 'my-ads':
-            loadMyAds();
-            break;
-        case 'favorites':
-            loadFavorites();
-            break;
-    }
-}
-
-// Поиск объявлений
-function searchAds() {
-    const searchTerm = document.getElementById('search-input').value.trim();
-    const categoryId = document.getElementById('category-filter').value;
-    
-    const params = {};
-    if (searchTerm) params.search = searchTerm;
-    if (categoryId) params.category_id = categoryId;
-    
-    loadAds(params);
-}
-
-// Фильтр по категории
-function filterByCategory() {
-    searchAds();
-}
-
-// Создание объявления
-async function createAd() {
-    if (!currentUser) {
-        showNotification('Сначала авторизуйтесь', 'error');
-        return;
-    }
-    
-    const title = document.getElementById('ad-title').value.trim();
-    const categoryId = document.getElementById('ad-category').value;
-    const price = parseFloat(document.getElementById('ad-price').value);
-    const description = document.getElementById('ad-description').value.trim();
-    
-    if (!title || !categoryId || !price) {
-        showNotification('Заполните все обязательные поля', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/ads', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title,
-                description,
-                price,
-                category_id: parseInt(categoryId),
-                user_id: currentUser.id,
-                images: []
-            })
-        });
-        
-        if (!response.ok) throw new Error('Ошибка создания объявления');
-        
-        const ad = await response.json();
-        console.log('✅ Объявление создано:', ad);
-        
-        showNotification('Объявление успешно опубликовано!', 'success');
-        
-        // Очищаем форму
-        document.getElementById('ad-form').reset();
-        
-        // Переключаемся на мои объявления
-        switchTab('my-ads');
-        
-    } catch (error) {
-        console.error('❌ Ошибка создания объявления:', error);
-        showNotification('Ошибка создания объявления', 'error');
+// Обновление режима отображения
+function updateViewMode() {
+    const container = document.getElementById('ads-list');
+    if (currentView === 'list') {
+        container.classList.add('list-view');
+    } else {
+        container.classList.remove('list-view');
     }
 }
 
@@ -374,13 +298,13 @@ async function openAd(adId) {
     try {
         const response = await fetch(`/api/ads/${adId}`);
         
-        if (!response.ok) throw new Error('Ошибка загрузки объявления');
-        
-        currentAd = await response.json();
-        console.log('✅ Объявление загружено:', currentAd);
-        
-        displayModalAd();
-        
+        if (response.ok) {
+            currentAd = await response.json();
+            displayModalAd();
+            
+            // Увеличиваем счетчик просмотров
+            incrementViews(adId);
+        }
     } catch (error) {
         console.error('❌ Ошибка загрузки объявления:', error);
         showNotification('Ошибка загрузки объявления', 'error');
@@ -393,14 +317,29 @@ function displayModalAd() {
     
     document.getElementById('modal-title').textContent = currentAd.title;
     
-    const isFavorite = favorites.some(fav => fav.id === currentAd.id);
-    document.getElementById('favorite-btn').textContent = isFavorite ? '❤️' : '🤍';
-    document.getElementById('favorite-btn').classList.toggle('active', isFavorite);
+    // Изображения
+    let imagesHtml = '';
+    if (currentAd.images) {
+        try {
+            const images = JSON.parse(currentAd.images);
+            if (images.length > 0) {
+                imagesHtml = `
+                    <div class="ad-images-full">
+                        ${images.map(img => 
+                            `<img src="${img}" alt="Фото" class="ad-image-full" onclick="window.open('${img}', '_blank')">`
+                        ).join('')}
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error('Ошибка парсинга изображений:', e);
+        }
+    }
     
     document.getElementById('modal-body').innerHTML = `
+        ${imagesHtml}
         <div class="ad-details">
             <div class="ad-price-large">${formatPrice(currentAd.price)}</div>
-            <div class="ad-category-badge">${currentAd.category_name || 'Другое'}</div>
             
             ${currentAd.description ? `
                 <div class="ad-description-full">
@@ -425,26 +364,380 @@ function displayModalAd() {
         </div>
     `;
     
-    // Показываем кнопку назад в Telegram
-    if (tg.BackButton) {
-        tg.BackButton.show();
-    }
-    
     document.getElementById('ad-modal').style.display = 'flex';
 }
 
-// Закрытие модального окна
-function closeModal() {
-    document.getElementById('ad-modal').style.display = 'none';
-    currentAd = null;
-    
-    // Скрываем кнопку назад в Telegram
-    if (tg.BackButton) {
-        tg.BackButton.hide();
+// Увеличение счетчика просмотров
+async function incrementViews(adId) {
+    try {
+        await fetch(`/api/ads/${adId}/views`, { method: 'POST' });
+    } catch (error) {
+        console.error('Ошибка увеличения просмотров:', error);
     }
 }
 
-// Связаться с продавцом
+// Функции фильтров
+function openFilters() {
+    document.getElementById('filters-modal').style.display = 'flex';
+}
+
+function closeFilters() {
+    document.getElementById('filters-modal').style.display = 'none';
+}
+
+function resetFilters() {
+    currentFilters = {
+        category: '',
+        search: '',
+        priceMin: '',
+        priceMax: '',
+        location: '',
+        distance: 10,
+        date: 'today',
+        withPhotos: false
+    };
+    
+    // Сброс формы
+    document.getElementById('price-min').value = '';
+    document.getElementById('price-max').value = '';
+    document.getElementById('location').value = '';
+    document.getElementById('distance').value = 10;
+    document.getElementById('distance-value').textContent = '10';
+    document.getElementById('with-photos').checked = false;
+    document.querySelector('input[name="date"][value="today"]').checked = true;
+    
+    closeFilters();
+    loadAds();
+}
+
+function applyFilters() {
+    currentFilters.priceMin = document.getElementById('price-min').value;
+    currentFilters.priceMax = document.getElementById('price-max').value;
+    currentFilters.location = document.getElementById('location').value;
+    currentFilters.distance = document.getElementById('distance').value;
+    currentFilters.withPhotos = document.getElementById('with-photos').checked;
+    
+    const selectedDate = document.querySelector('input[name="date"]:checked');
+    if (selectedDate) {
+        currentFilters.date = selectedDate.value;
+    }
+    
+    closeFilters();
+    loadAds();
+}
+
+// Функции навигации
+function switchTab(tabName) {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    
+    // Скрываем все вкладки
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Показываем выбранную вкладку
+    const targetTab = document.getElementById(`${tabName}-tab`);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+    
+    // Специальная логика для разных вкладок
+    if (tabName === 'moderator') {
+        loadModeratorPanel();
+    } else if (tabName === 'my-ads') {
+        loadMyAds();
+    }
+    
+    console.log('Переключение на вкладку:', tabName);
+}
+
+function openCreateAd() {
+    if (!currentUser) {
+        showNotification('Please login first', 'error');
+        return;
+    }
+    
+    document.getElementById('create-ad-modal').style.display = 'flex';
+    setupCreateAdForm();
+}
+
+function closeCreateAdModal() {
+    document.getElementById('create-ad-modal').style.display = 'none';
+    resetCreateAdForm();
+}
+
+function setupCreateAdForm() {
+    // Счетчики символов
+    const titleInput = document.getElementById('ad-title-input');
+    const descInput = document.getElementById('ad-description-input');
+    const titleCounter = document.getElementById('title-counter');
+    const descCounter = document.getElementById('desc-counter');
+    
+    titleInput.addEventListener('input', () => {
+        titleCounter.textContent = titleInput.value.length;
+    });
+    
+    descInput.addEventListener('input', () => {
+        descCounter.textContent = descInput.value.length;
+    });
+    
+    // Загрузка изображений
+    const imagesInput = document.getElementById('ad-images-input');
+    imagesInput.addEventListener('change', handleImageUpload);
+}
+
+function resetCreateAdForm() {
+    document.getElementById('create-ad-form').reset();
+    document.getElementById('title-counter').textContent = '0';
+    document.getElementById('desc-counter').textContent = '0';
+    document.getElementById('image-preview-container').innerHTML = '';
+    uploadedImages = [];
+}
+
+let uploadedImages = [];
+
+function handleImageUpload(event) {
+    const files = Array.from(event.target.files);
+    const maxFiles = 5;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (uploadedImages.length + files.length > maxFiles) {
+        showNotification(`Maximum ${maxFiles} photos allowed`, 'error');
+        return;
+    }
+    
+    const previewContainer = document.getElementById('image-preview-container');
+    
+    files.forEach(file => {
+        if (file.size > maxSize) {
+            showNotification(`File ${file.name} is too large (max 5MB)`, 'error');
+            return;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+            showNotification(`File ${file.name} is not an image`, 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <button type="button" class="remove-image" onclick="removeImage(this, '${file.name}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            previewContainer.appendChild(previewItem);
+            
+            uploadedImages.push({
+                file: file,
+                name: file.name,
+                url: e.target.result
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Скрываем placeholder если есть изображения
+    const uploadArea = document.querySelector('.image-upload-area');
+    if (uploadedImages.length > 0) {
+        uploadArea.style.display = 'none';
+    }
+}
+
+function removeImage(button, fileName) {
+    const previewItem = button.parentElement;
+    previewItem.remove();
+    
+    uploadedImages = uploadedImages.filter(img => img.name !== fileName);
+    
+    // Показываем placeholder если нет изображений
+    const uploadArea = document.querySelector('.image-upload-area');
+    if (uploadedImages.length === 0) {
+        uploadArea.style.display = 'block';
+    }
+}
+
+async function publishAd() {
+    if (!currentUser) {
+        showNotification('Please login first', 'error');
+        return;
+    }
+    
+    const form = document.getElementById('create-ad-form');
+    const formData = new FormData(form);
+    
+    // Валидация
+    const title = formData.get('title').trim();
+    const category = formData.get('category');
+    const price = parseFloat(formData.get('price'));
+    const description = formData.get('description').trim();
+    
+    if (!title) {
+        showNotification('Please enter a title', 'error');
+        return;
+    }
+    
+    if (!category) {
+        showNotification('Please select a category', 'error');
+        return;
+    }
+    
+    if (!price || price <= 0) {
+        showNotification('Please enter a valid price', 'error');
+        return;
+    }
+    
+    try {
+        showNotification('Uploading images...', 'info');
+        
+        // Загружаем изображения
+        let imagePaths = [];
+        if (uploadedImages.length > 0) {
+            const imageFormData = new FormData();
+            uploadedImages.forEach(img => {
+                imageFormData.append('images', img.file);
+            });
+            
+            const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: imageFormData
+            });
+            
+            if (uploadResponse.ok) {
+                const uploadResult = await uploadResponse.json();
+                imagePaths = uploadResult.images || [];
+            } else {
+                throw new Error('Failed to upload images');
+            }
+        }
+        
+        showNotification('Creating advertisement...', 'info');
+        
+        // Создаем объявление
+        const adData = {
+            title,
+            description,
+            price,
+            category_id: parseInt(category),
+            user_id: currentUser.id,
+            images: JSON.stringify(imagePaths),
+            location: formData.get('location') || '',
+            contact_info: JSON.stringify({
+                show_phone: document.getElementById('show-phone').checked,
+                allow_messages: document.getElementById('allow-messages').checked
+            })
+        };
+        
+        const response = await fetch('/api/ads', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(adData)
+        });
+        
+        if (response.ok) {
+            const ad = await response.json();
+            showNotification('Advertisement submitted for moderation!', 'success');
+            closeCreateAdModal();
+            loadAds(); // Обновляем список
+            
+            // Если модератор, обновляем статистику
+            if (currentUser.telegram_id === 379036860) {
+                loadModeratorStats();
+            }
+        } else {
+            throw new Error('Failed to create advertisement');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error creating ad:', error);
+        showNotification('Error creating advertisement', 'error');
+    }
+}
+
+function openNotifications() {
+    showNotification('Уведомления в разработке', 'info');
+}
+
+function openMessages() {
+    showNotification('Сообщения в разработке', 'info');
+}
+
+function openProfile() {
+    if (!currentUser) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    showNotification('Профиль в разработке', 'info');
+}
+
+// Функции модального окна
+function closeModal() {
+    document.getElementById('ad-modal').style.display = 'none';
+    currentAd = null;
+}
+
+function shareAd() {
+    if (!currentAd) return;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: currentAd.title,
+            text: `${currentAd.title} - ${formatPrice(currentAd.price)}`,
+            url: window.location.href
+        });
+    } else {
+        // Копируем в буфер обмена
+        const text = `${currentAd.title} - ${formatPrice(currentAd.price)}`;
+        navigator.clipboard.writeText(text);
+        showNotification('Ссылка скопирована', 'success');
+    }
+}
+
+async function toggleFavorite() {
+    if (!currentUser || !currentAd) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                ad_id: currentAd.id
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            const isFavorite = result.success;
+            
+            const btn = document.querySelector('.action-btn.secondary');
+            if (isFavorite) {
+                btn.innerHTML = '<i class="fas fa-heart"></i><span>В избранном</span>';
+                btn.classList.add('favorited');
+            } else {
+                btn.innerHTML = '<i class="fas fa-heart"></i><span>В избранное</span>';
+                btn.classList.remove('favorited');
+            }
+            
+            showNotification(isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка избранного:', error);
+        showNotification('Ошибка операции с избранным', 'error');
+    }
+}
+
 function contactSeller() {
     if (!currentAd || !currentAd.username) {
         showNotification('Не удалось получить данные продавца', 'error');
@@ -453,78 +746,98 @@ function contactSeller() {
     
     const telegramUrl = `https://t.me/${currentAd.username}`;
     
-    // Пытаемся открыть через Telegram WebApp
     try {
         tg.openTelegramLink(telegramUrl);
     } catch (error) {
-        // Fallback - открываем в новой вкладке
         window.open(telegramUrl, '_blank');
     }
     
     showNotification('Открываем чат с продавцом...', 'success');
 }
 
-// Добавление/удаление из избранного
-async function toggleFavorite() {
-    if (!currentUser || !currentAd) return;
+// Загрузка уведомлений
+async function loadNotifications() {
+    if (!currentUser) return;
     
     try {
-        const response = await fetch('/api/favorites', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id: currentUser.id,
-                ad_id: currentAd.id
-            })
-        });
-        
-        if (!response.ok) throw new Error('Ошибка операции с избранным');
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Обновляем список избранных
-            await loadFavorites();
-            
-            // Обновляем кнопку
-            const isFavorite = favorites.some(fav => fav.id === currentAd.id);
-            document.getElementById('favorite-btn').textContent = isFavorite ? '❤️' : '🤍';
-            document.getElementById('favorite-btn').classList.toggle('active', isFavorite);
-            
-            showNotification(isFavorite ? 'Добавлено в избранное' : 'Удалено из избранного', 'success');
+        const response = await fetch(`/api/notifications/${currentUser.id}`);
+        if (response.ok) {
+            notifications = await response.json();
+            updateNotificationBadge();
         }
-        
     } catch (error) {
-        console.error('❌ Ошибка операции с избранным:', error);
-        showNotification('Ошибка операции с избранным', 'error');
+        console.error('❌ Ошибка загрузки уведомлений:', error);
     }
 }
 
-// Показать контент приложения
-function showContent() {
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+// Загрузка сообщений
+async function loadMessages() {
+    if (!currentUser) return;
+    
+    try {
+        const response = await fetch(`/api/messages/${currentUser.id}`);
+        if (response.ok) {
+            messages = await response.json();
+            updateMessageBadge();
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки сообщений:', error);
+    }
 }
 
-// Показать уведомление
+// Обновление бейджей
+function updateNotificationBadge() {
+    const badge = document.getElementById('notification-badge');
+    const unreadCount = notifications.filter(n => !n.read).length;
+    badge.textContent = unreadCount;
+    badge.style.display = unreadCount > 0 ? 'block' : 'none';
+}
+
+function updateMessageBadge() {
+    const badge = document.getElementById('message-badge');
+    const unreadCount = messages.filter(m => !m.read).length;
+    badge.textContent = unreadCount;
+    badge.style.display = unreadCount > 0 ? 'block' : 'none';
+}
+
+// Вспомогательные функции
+function showContent() {
+    const loading = document.getElementById('loading');
+    const content = document.getElementById('content');
+    if (loading) loading.style.display = 'none';
+    if (content) content.style.display = 'block';
+}
+
+function showAdsError() {
+    const container = document.getElementById('ads-list');
+    container.innerHTML = `
+        <div class="error-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Ошибка загрузки</h3>
+            <p>Не удалось загрузить объявления. Попробуйте позже.</p>
+            <button class="btn-primary" onclick="loadAds()">Повторить</button>
+        </div>
+    `;
+}
+
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notifications');
     
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
-    notification.textContent = message;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
     
     container.appendChild(notification);
     
-    // Автоматическое удаление через 3 секунды
     setTimeout(() => {
-        notification.remove();
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Вспомогательные функции
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -553,16 +866,308 @@ function formatDate(dateString) {
     return date.toLocaleDateString('ru-RU');
 }
 
-// Обработка ошибок
-window.addEventListener('error', function(e) {
-    console.error('❌ Ошибка приложения:', e.error);
-    showNotification('Произошла ошибка приложения', 'error');
-});
+// Запуск приложения
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
+}
 
-// Обработка необработанных промисов
-window.addEventListener('unhandledrejection', function(e) {
-    console.error('❌ Необработанный промис:', e.reason);
-    showNotification('Произошла ошибка сети', 'error');
-});
+// Модераторские функции
+async function loadModeratorPanel() {
+    if (!currentUser || currentUser.telegram_id !== 379036860) {
+        showNotification('Access denied', 'error');
+        return;
+    }
+    
+    await Promise.all([
+        loadModeratorStats(),
+        loadPendingAds(),
+        loadReports()
+    ]);
+}
 
-console.log('🎉 Lavka26 Mini App готов к работе!');
+async function loadModeratorStats() {
+    try {
+        const response = await fetch(`/api/moderator/stats?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const stats = await response.json();
+            
+            document.getElementById('total-ads').textContent = stats.total_ads || 0;
+            document.getElementById('pending-ads').textContent = stats.pending_ads || 0;
+            document.getElementById('active-ads').textContent = stats.active_ads || 0;
+            document.getElementById('total-reports').textContent = stats.total_reports || 0;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки статистики:', error);
+    }
+}
+
+async function loadPendingAds() {
+    try {
+        const response = await fetch(`/api/moderator/ads?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const ads = await response.json();
+            displayPendingAds(ads);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки объявлений:', error);
+        document.getElementById('pending-ads-list').innerHTML = '<div class="loading-placeholder">Error loading ads</div>';
+    }
+}
+
+function displayPendingAds(ads) {
+    const container = document.getElementById('pending-ads-list');
+    
+    if (!ads || ads.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">No pending ads</div>';
+        return;
+    }
+    
+    container.innerHTML = ads.map(ad => `
+        <div class="pending-ad-card">
+            <div class="pending-ad-header">
+                <div>
+                    <div class="pending-ad-title">${escapeHtml(ad.title)}</div>
+                    <div class="pending-ad-meta">
+                        💰 ${formatPrice(ad.price)} • 👤 ${escapeHtml(ad.first_name)} • 📅 ${formatDate(ad.created_at)}
+                    </div>
+                </div>
+            </div>
+            ${ad.description ? `<div class="pending-ad-description">${escapeHtml(ad.description.substring(0, 200))}${ad.description.length > 200 ? '...' : ''}</div>` : ''}
+            <div class="pending-ad-actions">
+                <button class="btn-approve" onclick="approveAd(${ad.id})">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-reject" onclick="rejectAd(${ad.id})">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadReports() {
+    try {
+        const response = await fetch(`/api/moderator/reports?telegram_id=${currentUser.telegram_id}`);
+        if (response.ok) {
+            const reports = await response.json();
+            displayReports(reports);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки жалоб:', error);
+        document.getElementById('reports-list').innerHTML = '<div class="loading-placeholder">Error loading reports</div>';
+    }
+}
+
+function displayReports(reports) {
+    const container = document.getElementById('reports-list');
+    
+    if (!reports || reports.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">No reports</div>';
+        return;
+    }
+    
+    container.innerHTML = reports.map(report => `
+        <div class="report-card">
+            <div class="report-header">
+                <div>
+                    <div class="report-title">${escapeHtml(report.ad_title)}</div>
+                    <div class="report-meta">
+                        👤 ${escapeHtml(report.reporter_name)} • 📅 ${formatDate(report.created_at)}
+                    </div>
+                </div>
+            </div>
+            <div class="report-reason">
+                <strong>Reason:</strong> ${escapeHtml(report.reason)}
+            </div>
+            ${report.description ? `<div class="report-description">${escapeHtml(report.description)}</div>` : ''}
+            <div class="report-actions">
+                <button class="btn-approve" onclick="viewReportedAd(${report.ad_id})">
+                    <i class="fas fa-eye"></i> View Ad
+                </button>
+                <button class="btn-reject" onclick="dismissReport(${report.id})">
+                    <i class="fas fa-check"></i> Dismiss
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function approveAd(adId) {
+    try {
+        const response = await fetch(`/api/moderator/approve-ad/${adId}?telegram_id=${currentUser.telegram_id}`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            showNotification('Advertisement approved', 'success');
+            await loadPendingAds();
+            await loadModeratorStats();
+        } else {
+            showNotification('Error approving ad', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка одобрения:', error);
+        showNotification('Error approving ad', 'error');
+    }
+}
+
+async function rejectAd(adId) {
+    const reason = prompt('Enter rejection reason (optional):');
+    
+    try {
+        const response = await fetch(`/api/moderator/reject-ad/${adId}?telegram_id=${currentUser.telegram_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason || '' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            showNotification('Advertisement rejected', 'success');
+            await loadPendingAds();
+            await loadModeratorStats();
+        } else {
+            showNotification('Error rejecting ad', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка отклонения:', error);
+        showNotification('Error rejecting ad', 'error');
+    }
+}
+
+async function viewReportedAd(adId) {
+    await openAd(adId);
+}
+
+async function dismissReport(reportId) {
+    try {
+        // Здесь можно добавить API для отклонения жалобы
+        showNotification('Report dismissed', 'success');
+        await loadReports();
+    } catch (error) {
+        console.error('❌ Ошибка отклонения жалобы:', error);
+        showNotification('Error dismissing report', 'error');
+    }
+}
+
+function refreshPendingAds() {
+    loadPendingAds();
+}
+
+function refreshReports() {
+    loadReports();
+}
+
+// Функции для "Моих объявлений"
+let currentStatusFilter = 'all';
+
+async function loadMyAds() {
+    if (!currentUser) {
+        document.getElementById('my-ads-list').innerHTML = '<div class="loading-placeholder">Please login to view your advertisements</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/ads?user_id=${currentUser.id}`);
+        if (response.ok) {
+            const ads = await response.json();
+            displayMyAds(ads);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки моих объявлений:', error);
+        document.getElementById('my-ads-list').innerHTML = '<div class="loading-placeholder">Error loading advertisements</div>';
+    }
+}
+
+function displayMyAds(ads) {
+    const container = document.getElementById('my-ads-list');
+    
+    if (!ads || ads.length === 0) {
+        container.innerHTML = '<div class="loading-placeholder">You have no advertisements yet</div>';
+        return;
+    }
+    
+    // Фильтруем по статусу
+    const filteredAds = currentStatusFilter === 'all' 
+        ? ads 
+        : ads.filter(ad => ad.status === currentStatusFilter);
+    
+    if (filteredAds.length === 0) {
+        container.innerHTML = `<div class="loading-placeholder">No ${currentStatusFilter} advertisements</div>`;
+        return;
+    }
+    
+    container.innerHTML = filteredAds.map(ad => `
+        <div class="my-ad-card ${ad.status}">
+            <div class="my-ad-header">
+                <div>
+                    <div class="my-ad-title" onclick="openAd(${ad.id})">${escapeHtml(ad.title)}</div>
+                    <div class="my-ad-meta">
+                        <span>💰 ${formatPrice(ad.price)}</span>
+                        <span>👁 ${ad.views || 0} views</span>
+                        <span>📅 ${formatDate(ad.created_at)}</span>
+                    </div>
+                </div>
+                <div class="my-ad-status ${ad.status}">${ad.status}</div>
+            </div>
+            ${ad.description ? `<div class="my-ad-description">${escapeHtml(ad.description.substring(0, 150))}${ad.description.length > 150 ? '...' : ''}</div>` : ''}
+            <div class="my-ad-actions">
+                <button class="my-ad-btn" onclick="openAd(${ad.id})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="my-ad-btn edit" onclick="editAd(${ad.id})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="my-ad-btn delete" onclick="deleteAd(${ad.id})">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Добавляем обработчики для фильтров
+    setupStatusFilters();
+}
+
+function setupStatusFilters() {
+    document.querySelectorAll('.status-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+            document.querySelectorAll('.status-filter').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            currentStatusFilter = this.dataset.status;
+            loadMyAds();
+        });
+    });
+}
+
+function editAd(adId) {
+    showNotification('Edit functionality coming soon', 'info');
+}
+
+async function deleteAd(adId) {
+    if (!confirm('Are you sure you want to delete this advertisement?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/ads/${adId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showNotification('Advertisement deleted', 'success');
+            await loadMyAds();
+            await loadAds(); // Обновляем основной список
+        } else {
+            showNotification('Error deleting advertisement', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка удаления объявления:', error);
+        showNotification('Error deleting advertisement', 'error');
+    }
+}
+
+console.log('🎉 Lavka26 готов к работе!');

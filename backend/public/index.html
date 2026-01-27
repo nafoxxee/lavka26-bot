@@ -3,106 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lavka26 - Маркетплейс в Telegram</title>
+    <title>Lavka26 - Marketplace</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div id="app">
-        <!-- Загрузка -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Загрузка Lavka26...</p>
+        <!-- Loading -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
         </div>
 
         <!-- Основной контент -->
-        <div class="content" id="content" style="display: none;">
-            <!-- Шапка -->
+        <div class="content" id="content">
+            <!-- Шапка с поиском -->
             <header class="header">
-                <h1>🛍️ Lavka26</h1>
-                <div class="user-header">
-                    <span id="user-name-display">Гость</span>
+                <div class="header-top">
+                    <div class="logo">
+                        <i class="fas fa-store"></i>
+                        <span>Lavka26</span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn" onclick="openNotifications()">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge" id="notification-badge">0</span>
+                        </button>
+                        <button class="icon-btn" onclick="openMessages()">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge" id="message-badge">0</span>
+                        </button>
+                        <button class="icon-btn" onclick="openProfile()">
+                            <i class="fas fa-user"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Поисковая строка -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search ads...">
+                        <button class="filter-btn" onclick="openFilters()">
+                            <i class="fas fa-sliders-h"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Категории -->
+                <div class="categories-scroll">
+                    <div class="category-item active" data-category="">
+                        <i class="fas fa-th"></i>
+                        <span>All</span>
+                    </div>
+                    <div class="category-item" data-category="1">
+                        <i class="fas fa-car"></i>
+                        <span>Transport</span>
+                    </div>
+                    <div class="category-item" data-category="2">
+                        <i class="fas fa-home"></i>
+                        <span>Real Estate</span>
+                    </div>
+                    <div class="category-item" data-category="3">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Electronics</span>
+                    </div>
+                    <div class="category-item" data-category="4">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Clothing</span>
+                    </div>
+                    <div class="category-item" data-category="5">
+                        <i class="fas fa-tools"></i>
+                        <span>Services</span>
+                    </div>
+                    <div class="category-item" data-category="6">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Jobs</span>
+                    </div>
                 </div>
             </header>
 
-            <!-- Навигация -->
-            <nav class="nav-tabs">
-                <button class="nav-tab active" data-tab="feed">📦 Лента</button>
-                <button class="nav-tab" data-tab="create">➕ Создать</button>
-                <button class="nav-tab" data-tab="my-ads">📱 Мои</button>
-                <button class="nav-tab" data-tab="favorites">❤️ Избранное</button>
-            </nav>
-
-            <!-- Лента объявлений -->
-            <div class="tab-content active" id="feed-tab">
-                <!-- Поиск и фильтры -->
-                <div class="search-section">
-                    <div class="search-bar">
-                        <input type="text" id="search-input" placeholder="🔍 Поиск товаров...">
-                        <button onclick="searchAds()">Найти</button>
+            <!-- Основной контент -->
+            <main class="main-content">
+                <!-- Панель сортировки и фильтров -->
+                <div class="sort-bar">
+                    <div class="sort-options">
+                        <button class="sort-btn active" data-sort="date">By Date</button>
+                        <button class="sort-btn" data-sort="price-asc">Price Low</button>
+                        <button class="sort-btn" data-sort="price-desc">Price High</button>
                     </div>
-                    <div class="filters">
-                        <select id="category-filter" onchange="filterByCategory()">
-                            <option value="">📂 Все категории</option>
-                        </select>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Список объявлений -->
-                <div class="ads-list" id="ads-list">
-                    <div class="loading-placeholder">Загрузка объявлений...</div>
+                <div class="ads-container" id="ads-list">
+                    <div class="loading-placeholder">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                </div>
+
+                <!-- Кнопка создания объявления -->
+                <button class="fab" onclick="openCreateAd()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </main>
+
+            <!-- Нижняя навигация -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-tab="feed">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </button>
+                <button class="nav-item" data-tab="search">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+                <button class="nav-item" data-tab="favorites">
+                    <i class="fas fa-heart"></i>
+                    <span>Favorites</span>
+                </button>
+                <button class="nav-item" data-tab="messages">
+                    <i class="fas fa-comment"></i>
+                    <span>Messages</span>
+                </button>
+                <button class="nav-item" data-tab="my-ads">
+                    <i class="fas fa-list-alt"></i>
+                    <span>My Ads</span>
+                </button>
+                <button class="nav-item" data-tab="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </button>
+                <button class="nav-item" id="moderator-tab" data-tab="moderator" style="display: none;">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Moderator</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Модераторская панель -->
+        <div class="tab-content" id="moderator-tab" style="display: none;">
+            <div class="moderator-content">
+                <h2>🛡️ Moderator Panel</h2>
+                
+                <!-- Статистика -->
+                <div class="mod-stats">
+                    <h3>📊 Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-ads">0</div>
+                            <div class="stat-label">Total Ads</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="pending-ads">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="active-ads">0</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-reports">0</div>
+                            <div class="stat-label">Reports</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Объявления на модерации -->
+                <div class="mod-section">
+                    <h3>📋 Pending Ads</h3>
+                    <div class="mod-controls">
+                        <button class="btn-secondary" onclick="refreshPendingAds()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="pending-ads-list" id="pending-ads-list">
+                        <div class="loading-placeholder">Loading pending ads...</div>
+                    </div>
+                </div>
+
+                <!-- Жалобы -->
+                <div class="mod-section">
+                    <h3>🚨 Reports</h3>
+                    <div class="mod-controls">
+                        <button class="btn-secondary" onclick="refreshReports()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="reports-list" id="reports-list">
+                        <div class="loading-placeholder">Loading reports...</div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Создание объявления -->
-            <div class="tab-content" id="create-tab">
-                <div class="create-form">
-                    <h2>➕ Создать объявление</h2>
-                    <form id="ad-form">
+        <!-- Мои объявления -->
+        <div class="tab-content" id="my-ads-tab" style="display: none;">
+            <div class="my-ads-content">
+                <div class="my-ads-header">
+                    <h2>My Advertisements</h2>
+                    <button class="btn-primary" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i> Create Ad
+                    </button>
+                </div>
+                
+                <!-- Фильтры статусов -->
+                <div class="status-filters">
+                    <button class="status-filter active" data-status="all">All</button>
+                    <button class="status-filter" data-status="pending">Pending</button>
+                    <button class="status-filter" data-status="active">Active</button>
+                    <button class="status-filter" data-status="rejected">Rejected</button>
+                </div>
+                
+                <!-- Список объявлений -->
+                <div class="my-ads-list" id="my-ads-list">
+                    <div class="loading-placeholder">Loading your advertisements...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания объявления -->
+        <div class="modal" id="create-ad-modal" style="display: none;">
+            <div class="modal-content create-ad-modal">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeCreateAdModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>Create Advertisement</h3>
+                    <button class="publish-btn" onclick="publishAd()">
+                        <i class="fas fa-paper-plane"></i> Publish
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-ad-form">
+                        <!-- Заголовок -->
                         <div class="form-group">
-                            <label>Название товара *</label>
-                            <input type="text" id="ad-title" required placeholder="Например: iPhone 13 Pro">
+                            <label for="ad-title-input">Title *</label>
+                            <input type="text" id="ad-title-input" name="title" required 
+                                   placeholder="What are you selling?" maxlength="100">
+                            <div class="char-counter">
+                                <span id="title-counter">0</span>/100
+                            </div>
                         </div>
-                        
+
+                        <!-- Категория -->
                         <div class="form-group">
-                            <label>Категория *</label>
-                            <select id="ad-category" required>
-                                <option value="">Выберите категорию</option>
+                            <label for="ad-category-input">Category *</label>
+                            <select id="ad-category-input" name="category" required>
+                                <option value="">Select category</option>
+                                <option value="1">Transport</option>
+                                <option value="2">Real Estate</option>
+                                <option value="3">Electronics</option>
+                                <option value="4">Clothing</option>
+                                <option value="5">Services</option>
+                                <option value="6">Jobs</option>
                             </select>
                         </div>
-                        
+
+                        <!-- Цена -->
                         <div class="form-group">
-                            <label>Цена *</label>
-                            <input type="number" id="ad-price" required placeholder="0" min="0">
+                            <label for="ad-price-input">Price (₽) *</label>
+                            <input type="number" id="ad-price-input" name="price" required 
+                                   placeholder="0" min="0" step="1">
                         </div>
-                        
+
+                        <!-- Описание -->
                         <div class="form-group">
-                            <label>Описание</label>
-                            <textarea id="ad-description" rows="4" placeholder="Опишите товар, состояние, особенности..."></textarea>
+                            <label for="ad-description-input">Description</label>
+                            <textarea id="ad-description-input" name="description" 
+                                      placeholder="Describe your item..." rows="4" maxlength="1000"></textarea>
+                            <div class="char-counter">
+                                <span id="desc-counter">0</span>/1000
+                            </div>
                         </div>
-                        
-                        <button type="submit" class="btn-primary">🚀 Опубликовать</button>
+
+                        <!-- Изображения -->
+                        <div class="form-group">
+                            <label>Photos</label>
+                            <div class="image-upload-area" onclick="document.getElementById('ad-images-input').click()">
+                                <input type="file" id="ad-images-input" accept="image/*" multiple style="display: none;">
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-camera"></i>
+                                    <p>Click to add photos</p>
+                                    <small>Up to 5 photos, max 5MB each</small>
+                                </div>
+                            </div>
+                            <div class="image-preview-container" id="image-preview-container"></div>
+                        </div>
+
+                        <!-- Расположение -->
+                        <div class="form-group">
+                            <label for="ad-location-input">Location</label>
+                            <div class="location-input">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="ad-location-input" name="location" 
+                                       placeholder="City or area">
+                            </div>
+                        </div>
+
+                        <!-- Контактная информация -->
+                        <div class="form-group">
+                            <label>Contact Information</label>
+                            <div class="contact-options">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="show-phone" checked>
+                                    <span class="checkmark"></span>
+                                    Show phone number
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="allow-messages" checked>
+                                    <span class="checkmark"></span>
+                                    Allow messages
+                                </label>
+                            </div>
+                        </div>
                     </form>
-                </div>
-            </div>
-
-            <!-- Мои объявления -->
-            <div class="tab-content" id="my-ads-tab">
-                <div class="my-ads-content">
-                    <h2>📱 Мои объявления</h2>
-                    <div class="ads-list" id="my-ads-list">
-                        <div class="loading-placeholder">Загрузка...</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Избранное -->
-            <div class="tab-content" id="favorites-tab">
-                <div class="favorites-content">
-                    <h2>❤️ Избранное</h2>
-                    <div class="ads-list" id="favorites-list">
-                        <div class="loading-placeholder">Загрузка...</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -111,16 +336,83 @@
         <div class="modal" id="ad-modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modal-title">Загрузка...</h3>
-                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                    <button class="back-btn" onclick="closeModal()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h3 id="modal-title">Advertisement</h3>
+                    <button class="share-btn" onclick="shareAd()">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
                 </div>
                 <div class="modal-body" id="modal-body">
                     <!-- Контент объявления -->
                 </div>
+                <div class="modal-actions">
+                    <button class="action-btn secondary" onclick="toggleFavorite()">
+                        <i class="fas fa-heart"></i>
+                        <span>Add to Favorites</span>
+                    </button>
+                    <button class="action-btn primary" onclick="contactSeller()">
+                        <i class="fas fa-phone"></i>
+                        <span>Contact</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно фильтров -->
+        <div class="modal" id="filters-modal" style="display: none;">
+            <div class="modal-content filters-modal">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeFilters()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>Filters</h3>
+                    <button class="reset-btn" onclick="resetFilters()">Reset</button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-section">
+                        <h4>Price</h4>
+                        <div class="price-range">
+                            <input type="number" id="price-min" placeholder="From">
+                            <span>-</span>
+                            <input type="number" id="price-max" placeholder="To">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h4>Location</h4>
+                        <div class="location-input">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="location" placeholder="City or area">
+                        </div>
+                        <div class="distance-slider">
+                            <label>Radius: <span id="distance-value">10</span> km</label>
+                            <input type="range" id="distance" min="1" max="100" value="10">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h4>Publication Date</h4>
+                        <div class="date-options">
+                            <label><input type="radio" name="date" value="today" checked> Today</label>
+                            <label><input type="radio" name="date" value="week"> This Week</label>
+                            <label><input type="radio" name="date" value="month"> This Month</label>
+                            <label><input type="radio" name="date" value="all"> All Time</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h4>With Photos Only</h4>
+                        <label class="switch">
+                            <input type="checkbox" id="with-photos">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
                 <div class="modal-footer">
-                    <button class="btn-secondary" onclick="closeModal()">Закрыть</button>
-                    <button class="btn-primary" id="contact-btn" onclick="contactSeller()">Связаться</button>
-                    <button class="btn-favorite" id="favorite-btn" onclick="toggleFavorite()">❤️</button>
+                    <button class="btn-secondary" onclick="closeFilters()">Cancel</button>
+                    <button class="btn-primary" onclick="applyFilters()">Apply</button>
                 </div>
             </div>
         </div>
@@ -130,5 +422,13 @@
     </div>
 
     <script src="app.js"></script>
+    <script>
+        // Show content immediately
+        console.log('🚀 Lavka26 starting...');
+        const loading = document.getElementById('loading');
+        const content = document.getElementById('content');
+        if (loading) loading.style.display = 'none';
+        if (content) content.style.display = 'block';
+    </script>
 </body>
 </html>
