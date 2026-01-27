@@ -351,64 +351,43 @@
                     <button class="close-btn" onclick="closeCreateAdModal()">
                         <i class="fas fa-times"></i>
                     </button>
-                    <h3>Создать объявление</h3>
-                    <button class="publish-btn" onclick="publishAd()">
-                        <i class="fas fa-paper-plane"></i> Опубликовать
-                    </button>
                 </div>
                 <div class="modal-body">
                     <form id="create-ad-form">
-                        <!-- Заголовок -->
                         <div class="form-group">
-                            <label for="ad-title-input">Заголовок *</label>
-                            <input type="text" id="ad-title-input" name="title" required 
-                                   placeholder="Что вы продаете?" maxlength="100">
-                            <div class="char-counter">
-                                <span id="title-counter">0</span>/100
-                            </div>
+                            <label>Название объявления *</label>
+                            <input type="text" id="ad-title" placeholder="Например: iPhone 13 Pro" required>
                         </div>
-
-                        <!-- Категория -->
+                        
                         <div class="form-group">
-                            <label for="ad-category-input">Категория *</label>
-                            <select id="ad-category-input" name="category" required>
+                            <label>Категория *</label>
+                            <select id="ad-category" required>
                                 <option value="">Выберите категорию</option>
-                                <option value="1">Транспорт</option>
-                                <option value="2">Недвижимость</option>
-                                <option value="3">Электроника</option>
-                                <option value="4">Одежда</option>
-                                <option value="5">Услуги</option>
-                                <option value="6">Работа</option>
+                                <option value="electronics">Электроника</option>
+                                <option value="clothing">Одежда</option>
+                                <option value="home">Дом и сад</option>
+                                <option value="auto">Авто</option>
+                                <option value="services">Услуги</option>
+                                <option value="other">Другое</option>
                             </select>
                         </div>
-
-                        <!-- Цена -->
+                        
                         <div class="form-group">
-                            <label for="ad-price-input">Цена (₽) *</label>
-                            <input type="number" id="ad-price-input" name="price" required 
-                                   placeholder="0" min="0" step="1">
+                            <label>Цена (₽) *</label>
+                            <input type="number" id="ad-price" placeholder="10000" required>
                         </div>
-
-                        <!-- Описание -->
+                        
                         <div class="form-group">
-                            <label for="ad-description-input">Описание</label>
-                            <textarea id="ad-description-input" name="description" 
-                                      placeholder="Опишите ваш товар..." rows="4" maxlength="1000"></textarea>
-                            <div class="char-counter">
-                                <span id="desc-counter">0</span>/1000
-                            </div>
+                            <label>Описание *</label>
+                            <textarea id="ad-description" rows="4" placeholder="Опишите товар подробно..." required></textarea>
                         </div>
-
-                        <!-- Изображения -->
+                        
                         <div class="form-group">
                             <label>Фотографии</label>
-                            <div class="image-upload-area" onclick="document.getElementById('ad-images-input').click()">
-                                <input type="file" id="ad-images-input" accept="image/*" multiple style="display: none;">
-                                <div class="upload-placeholder">
-                                    <i class="fas fa-camera"></i>
-                                    <p>Нажмите чтобы добавить фото</p>
-                                    <small>До 5 фото, максимум 5МБ каждое</small>
-                                </div>
+                            <div class="image-upload-area" onclick="document.getElementById('ad-images').click()">
+                                <i class="fas fa-camera"></i>
+                                <span>Нажмите для добавления фото</span>
+                                <input type="file" id="ad-images" multiple accept="image/*" style="display: none;">
                             </div>
                             <div class="image-preview-container" id="image-preview-container"></div>
                         </div>
@@ -553,6 +532,110 @@
             }
         };
         
+        window.closeCreateAdModal = function() {
+            const modal = document.getElementById('create-ad-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Очищаем форму
+                document.getElementById('create-ad-form').reset();
+                document.getElementById('image-preview-container').innerHTML = '';
+            }
+        };
+        
+        window.publishAd = async function() {
+            const title = document.getElementById('ad-title').value;
+            const category = document.getElementById('ad-category').value;
+            const price = document.getElementById('ad-price').value;
+            const description = document.getElementById('ad-description').value;
+            const location = document.getElementById('ad-location-input').value;
+            
+            // Валидация
+            if (!title || !category || !price || !description) {
+                showNotification('Заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            try {
+                // Получаем данные пользователя из Telegram WebApp
+                const tg = window.Telegram?.WebApp;
+                const user = tg?.initDataUnsafe?.user;
+                
+                if (!user) {
+                    showNotification('Ошибка: данные пользователя не найдены', 'error');
+                    return;
+                }
+                
+                // Создаем объявление
+                const adData = {
+                    title: title,
+                    category: category,
+                    price: parseInt(price),
+                    description: description,
+                    location: location || 'Москва',
+                    contact_info: user.username ? `@${user.username}` : '',
+                    user_id: user.id,
+                    user_name: `${user.first_name} ${user.last_name || ''}`.trim(),
+                    images: [] // Пока без изображений
+                };
+                
+                const response = await fetch('/api/ads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(adData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification('Объявление отправлено на модерацию!', 'success');
+                    closeCreateAdModal();
+                    
+                    // Переключаем на "Мои объявления"
+                    setTimeout(() => {
+                        switchTab('my-ads');
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Ошибка создания объявления', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating ad:', error);
+                showNotification('Ошибка подключения к серверу', 'error');
+            }
+        };
+        
+        // Загрузка изображений
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('ad-images');
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const files = e.target.files;
+                    const preview = document.getElementById('image-preview-container');
+                    
+                    preview.innerHTML = '';
+                    
+                    Array.from(files).forEach(file => {
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const imgDiv = document.createElement('div');
+                                imgDiv.className = 'image-preview-item';
+                                imgDiv.innerHTML = `
+                                    <img src="${e.target.result}" alt="Preview">
+                                    <button type="button" onclick="this.parentElement.remove()" class="remove-image">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                `;
+                                preview.appendChild(imgDiv);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                });
+            }
+        });
+        
         window.switchTab = function(tabName) {
             console.log('switchTab вызвана с:', tabName);
             
@@ -582,6 +665,8 @@
                     loadModerator();
                 } else if (tabName === 'messages') {
                     loadMessages();
+                } else if (tabName === 'feed') {
+                    loadAds(); // Загружаем ленту объявлений
                 }
             }
             
@@ -593,6 +678,52 @@
         };
         
         // Функции загрузки контента
+        async function loadAds() {
+            const adsContainer = document.getElementById('ads-container');
+            if (!adsContainer) return;
+            
+            try {
+                const response = await fetch('/api/ads?status=active&limit=20');
+                const ads = await response.json();
+                
+                if (ads.length === 0) {
+                    adsContainer.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-search" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Объявления не найдены</h3>
+                            <p style="color: var(--text-muted);">Будьте первым, кто создаст объявление!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const adsHTML = ads.map(ad => `
+                    <div class="ad-card" onclick="openAd(${ad.id})">
+                        <div class="ad-image">
+                            ${ad.images && ad.images.length > 0 
+                                ? `<img src="${ad.images[0]}" alt="${ad.title}">` 
+                                : `<div class="no-image"><i class="fas fa-image"></i></div>`
+                            }
+                        </div>
+                        <div class="ad-content">
+                            <div class="ad-title">${escapeHtml(ad.title)}</div>
+                            <div class="ad-price">${formatPrice(ad.price)} ₽</div>
+                            <div class="ad-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${ad.location || 'Москва'}
+                            </div>
+                            <div class="ad-date">${formatDate(ad.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                adsContainer.innerHTML = adsHTML;
+            } catch (error) {
+                console.error('Error loading ads:', error);
+                adsContainer.innerHTML = '<div class="error-message">Ошибка загрузки объявлений</div>';
+            }
+        }
+        
         function loadFavorites() {
             const favoritesList = document.getElementById('favorites-list');
             if (favoritesList) {
@@ -606,28 +737,122 @@
             }
         }
         
-        function loadMyAds() {
+        async function loadMyAds() {
             const myAdsList = document.getElementById('my-ads-list');
-            if (myAdsList) {
-                myAdsList.innerHTML = `
-                    <div class="empty-state" style="text-align: center; padding: 40px;">
-                        <i class="fas fa-ad" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
-                        <h3 style="color: var(--text-secondary); margin-bottom: 8px;">У вас пока нет объявлений</h3>
-                        <p style="color: var(--text-muted);">Создайте свое первое объявление</p>
-                        <button class="btn-primary" onclick="openCreateAd()" style="margin-top: 16px;">
-                            <i class="fas fa-plus"></i> Создать объявление
-                        </button>
+            if (!myAdsList) return;
+            
+            try {
+                // Получаем данные пользователя
+                const tg = window.Telegram?.WebApp;
+                const user = tg?.initDataUnsafe?.user;
+                
+                if (!user) {
+                    myAdsList.innerHTML = '<div class="error-message">Ошибка: данные пользователя не найдены</div>';
+                    return;
+                }
+                
+                const response = await fetch(`/api/ads/user/${user.id}`);
+                const myAds = await response.json();
+                
+                if (myAds.length === 0) {
+                    myAdsList.innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-ad" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">У вас пока нет объявлений</h3>
+                            <p style="color: var(--text-muted);">Создайте свое первое объявление</p>
+                            <button class="btn-primary" onclick="openCreateAd()" style="margin-top: 16px;">
+                                <i class="fas fa-plus"></i> Создать объявление
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const adsHTML = myAds.map(ad => `
+                    <div class="my-ad-card">
+                        <div class="my-ad-image">
+                            ${ad.images && ad.images.length > 0 
+                                ? `<img src="${ad.images[0]}" alt="${ad.title}">` 
+                                : `<div class="no-image"><i class="fas fa-image"></i></div>`
+                            }
+                        </div>
+                        <div class="my-ad-content">
+                            <div class="my-ad-header">
+                                <h4>${escapeHtml(ad.title)}</h4>
+                                <span class="status-badge status-${ad.status}">${getStatusText(ad.status)}</span>
+                            </div>
+                            <div class="my-ad-price">${formatPrice(ad.price)} ₽</div>
+                            <div class="my-ad-meta">
+                                <span class="ad-views">
+                                    <i class="fas fa-eye"></i>
+                                    ${ad.views || 0} просмотров
+                                </span>
+                                <span class="ad-date">${formatDate(ad.created_at)}</span>
+                            </div>
+                            <div class="my-ad-actions">
+                                ${ad.status === 'pending' ? '<span class="pending-text">На модерации</span>' : ''}
+                                ${ad.status === 'rejected' ? '<span class="rejected-text">Отклонено</span>' : ''}
+                            </div>
+                        </div>
                     </div>
-                `;
+                `).join('');
+                
+                myAdsList.innerHTML = adsHTML;
+            } catch (error) {
+                console.error('Error loading my ads:', error);
+                myAdsList.innerHTML = '<div class="error-message">Ошибка загрузки объявлений</div>';
             }
         }
         
-        function loadProfile() {
-            showNotification('Профиль пользователя', 'info');
-        }
-        
-        function loadModerator() {
-            showNotification('Панель модератора', 'info');
+        async function loadModerator() {
+            const moderatorContent = document.querySelector('.moderator-content');
+            if (!moderatorContent) return;
+            
+            try {
+                // Загружаем статистику
+                const statsResponse = await fetch('/api/moderator/stats');
+                const stats = await statsResponse.json();
+                
+                // Загружаем объявления на модерации
+                const pendingResponse = await fetch('/api/ads/pending');
+                const pendingAds = await pendingResponse.json();
+                
+                // Обновляем статистику
+                document.getElementById('total-ads').textContent = stats.total_ads || 0;
+                document.getElementById('pending-ads').textContent = stats.pending_ads || 0;
+                document.getElementById('active-ads').textContent = stats.active_ads || 0;
+                document.getElementById('total-reports').textContent = stats.total_reports || 0;
+                
+                // Отображаем объявления на модерации
+                const pendingAdsList = document.getElementById('pending-ads-list');
+                if (pendingAds.length === 0) {
+                    pendingAdsList.innerHTML = '<div class="empty-state">Нет объявлений на модерации</div>';
+                } else {
+                    const adsHTML = pendingAds.map(ad => `
+                        <div class="pending-ad-card">
+                            <div class="pending-ad-header">
+                                <h4>${escapeHtml(ad.title)}</h4>
+                                <span class="price">${formatPrice(ad.price)} ₽</span>
+                            </div>
+                            <p>${escapeHtml(ad.description)}</p>
+                            <div class="pending-ad-actions">
+                                <button class="btn-success" onclick="approveAd(${ad.id})">
+                                    <i class="fas fa-check"></i> Одобрить
+                                </button>
+                                <button class="btn-danger" onclick="rejectAd(${ad.id})">
+                                    <i class="fas fa-times"></i> Отклонить
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    pendingAdsList.innerHTML = adsHTML;
+                }
+                
+                showNotification('Панель модератора загружена', 'success');
+            } catch (error) {
+                console.error('Error loading moderator panel:', error);
+                showNotification('Ошибка загрузки панели модератора', 'error');
+            }
         }
         
         function loadMessages() {
@@ -641,6 +866,88 @@
                     </div>
                 `;
             }
+        }
+        
+        function loadProfile() {
+            showNotification('Профиль пользователя', 'info');
+        }
+        
+        // Функции модерации
+        window.approveAd = async function(adId) {
+            try {
+                const response = await fetch(`/api/moderator/approve-ad/${adId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    showNotification('Объявление одобрено', 'success');
+                    loadModerator(); // Перезагружаем список
+                } else {
+                    showNotification('Ошибка одобрения объявления', 'error');
+                }
+            } catch (error) {
+                console.error('Error approving ad:', error);
+                showNotification('Ошибка подключения', 'error');
+            }
+        };
+        
+        window.rejectAd = async function(adId) {
+            const reason = prompt('Укажите причину отклонения:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`/api/moderator/reject-ad/${adId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason })
+                });
+                
+                if (response.ok) {
+                    showNotification('Объявление отклонено', 'success');
+                    loadModerator(); // Перезагружаем список
+                } else {
+                    showNotification('Ошибка отклонения объявления', 'error');
+                }
+            } catch (error) {
+                console.error('Error rejecting ad:', error);
+                showNotification('Ошибка подключения', 'error');
+            }
+        };
+        
+        // Утилиты
+        function formatPrice(price) {
+            return new Intl.NumberFormat('ru-RU').format(price);
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'только что';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)} д назад`;
+            
+            return date.toLocaleDateString('ru-RU');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getStatusText(status) {
+            const statuses = {
+                'pending': 'На модерации',
+                'active': 'Активно',
+                'rejected': 'Отклонено',
+                'sold': 'Продано'
+            };
+            return statuses[status] || status;
         }
         
         function showNotification(message, type = 'info') {
