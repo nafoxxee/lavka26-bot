@@ -451,6 +451,8 @@ function switchTab(tabName) {
         loadMyAds();
     } else if (tabName === 'favorites') {
         loadFavorites();
+    } else if (tabName === 'profile') {
+        loadProfile();
     }
     
     console.log('Переключение на вкладку:', tabName);
@@ -665,7 +667,146 @@ async function publishAd() {
 }
 
 function openNotifications() {
-    showNotification('Уведомления в разработке', 'info');
+    // Создаем модальное окно уведомлений
+    const modalHtml = `
+        <div class="modal" id="notifications-modal" style="display: flex;">
+            <div class="modal-content notifications-modal">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeNotificationsModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>Уведомления</h3>
+                    <button class="clear-btn" onclick="clearAllNotifications()">
+                        <i class="fas fa-trash"></i> Очистить
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="notifications-list" id="notifications-list">
+                        <div class="loading-placeholder">Загрузка уведомлений...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Добавляем модальное окно в body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Загружаем уведомления
+    loadNotificationsList();
+}
+
+function closeNotificationsModal() {
+    const modal = document.getElementById('notifications-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function loadNotificationsList() {
+    if (!currentUser) {
+        document.getElementById('notifications-list').innerHTML = 
+            '<div class="empty-notifications">Пожалуйста авторизуйтесь</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/notifications/${currentUser.id}`);
+        if (response.ok) {
+            const notifications = await response.json();
+            displayNotificationsList(notifications);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки уведомлений:', error);
+        document.getElementById('notifications-list').innerHTML = 
+            '<div class="empty-notifications">Ошибка загрузки</div>';
+    }
+}
+
+function displayNotificationsList(notifications) {
+    const container = document.getElementById('notifications-list');
+    
+    if (!notifications || notifications.length === 0) {
+        container.innerHTML = `
+            <div class="empty-notifications">
+                <i class="fas fa-bell-slash"></i>
+                <p>У вас нет уведомлений</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = notifications.map(notification => `
+        <div class="notification-item ${notification.read ? 'read' : 'unread'}" onclick="markAsRead(${notification.id})">
+            <div class="notification-icon">
+                <i class="fas ${getNotificationIcon(notification.type)}"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">${escapeHtml(notification.title)}</div>
+                <div class="notification-message">${escapeHtml(notification.message)}</div>
+                <div class="notification-time">${formatDate(notification.created_at)}</div>
+            </div>
+            <div class="notification-actions">
+                <button class="notification-delete" onclick="event.stopPropagation(); deleteNotification(${notification.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getNotificationIcon(type) {
+    const icons = {
+        'ad_approved': 'fa-check-circle',
+        'ad_rejected': 'fa-times-circle',
+        'new_message': 'fa-comment',
+        'new_favorite': 'fa-heart',
+        'system': 'fa-info-circle'
+    };
+    return icons[type] || 'fa-bell';
+}
+
+async function markAsRead(notificationId) {
+    try {
+        const response = await fetch(`/api/notifications/${notificationId}/read`, {
+            method: 'PUT'
+        });
+        if (response.ok) {
+            loadNotificationsList();
+        }
+    } catch (error) {
+        console.error('❌ Ошибка отметки как прочитанное:', error);
+    }
+}
+
+async function deleteNotification(notificationId) {
+    try {
+        const response = await fetch(`/api/notifications/${notificationId}`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            loadNotificationsList();
+            showNotification('Уведомление удалено', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка удаления уведомления:', error);
+    }
+}
+
+async function clearAllNotifications() {
+    if (!confirm('Удалить все уведомления?')) return;
+    
+    try {
+        const response = await fetch(`/api/notifications/${currentUser.id}/clear`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            loadNotificationsList();
+            showNotification('Все уведомления удалены', 'success');
+        }
+    } catch (error) {
+        console.error('❌ Ошибка очистки уведомлений:', error);
+    }
 }
 
 function openMessages() {
@@ -677,7 +818,85 @@ function openProfile() {
         showNotification('Сначала авторизуйтесь', 'error');
         return;
     }
-    showNotification('Профиль в разработке', 'info');
+    switchTab('profile');
+}
+
+async function loadProfile() {
+    if (!currentUser) {
+        showNotification('Сначала авторизуйтесь', 'error');
+        return;
+    }
+    
+    try {
+        // Загружаем данные профиля
+        document.getElementById('profile-name').textContent = 
+            currentUser.first_name + (currentUser.last_name ? ' ' + currentUser.last_name : '');
+        document.getElementById('profile-username').textContent = 
+            currentUser.username ? '@' + currentUser.username : 'Без username';
+        
+        // Загружаем статистику
+        const adsResponse = await fetch(`/api/ads?user_id=${currentUser.id}`);
+        if (adsResponse.ok) {
+            const ads = await adsResponse.json();
+            document.getElementById('profile-ads-count').textContent = ads.length || 0;
+            
+            // Показываем превью объявлений
+            const previewContainer = document.getElementById('profile-ads-preview');
+            if (ads.length > 0) {
+                const recentAds = ads.slice(0, 3);
+                previewContainer.innerHTML = recentAds.map(ad => `
+                    <div class="ad-card" onclick="openAd(${ad.id})">
+                        ${ad.images && ad.images.length > 0 ? 
+                            `<img src="${ad.images[0]}" alt="${escapeHtml(ad.title)}" class="ad-image">` :
+                            `<div class="ad-image-placeholder"><i class="fas fa-image"></i></div>`
+                        }
+                        <div class="ad-content">
+                            <h3 class="ad-title">${escapeHtml(ad.title)}</h3>
+                            <div class="ad-price">${formatPrice(ad.price)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                previewContainer.innerHTML = '<div class="empty-preview">Нет объявлений</div>';
+            }
+        }
+        
+        // Загружаем избранное
+        await loadFavorites();
+        const favoritesContainer = document.getElementById('profile-favorites-preview');
+        if (favorites.length > 0) {
+            const recentFavorites = favorites.slice(0, 3);
+            favoritesContainer.innerHTML = recentFavorites.map(ad => `
+                <div class="ad-card" onclick="openAd(${ad.id})">
+                    ${ad.images && ad.images.length > 0 ? 
+                        `<img src="${ad.images[0]}" alt="${escapeHtml(ad.title)}" class="ad-image">` :
+                        `<div class="ad-image-placeholder"><i class="fas fa-image"></i></div>`
+                    }
+                    <div class="ad-content">
+                        <h3 class="ad-title">${escapeHtml(ad.title)}</h3>
+                        <div class="ad-price">${formatPrice(ad.price)}</div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            favoritesContainer.innerHTML = '<div class="empty-preview">Нет избранного</div>';
+        }
+        
+        // Устанавливаем рейтинг (пока заглушка)
+        document.getElementById('profile-rating').textContent = '4.8';
+        
+        // Дата регистрации
+        const joinDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date();
+        document.getElementById('profile-joined').textContent = formatDate(joinDate);
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки профиля:', error);
+        showNotification('Ошибка загрузки профиля', 'error');
+    }
+}
+
+function editProfile() {
+    showNotification('Редактирование профиля в разработке', 'info');
 }
 
 // Функции модального окна

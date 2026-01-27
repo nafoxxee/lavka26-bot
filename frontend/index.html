@@ -232,6 +232,93 @@
             </div>
         </div>
 
+        <!-- Профиль -->
+        <div class="tab-content" id="profile-tab" style="display: none;">
+            <div class="profile-content">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Пользователь</h2>
+                        <p id="profile-username">@username</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span id="profile-ads-count">0</span>
+                                <span>Объявлений</span>
+                            </div>
+                            <div class="stat-item">
+                                <span id="profile-rating">0.0</span>
+                                <span>Рейтинг</span>
+                            </div>
+                            <div class="stat-item">
+                                <span id="profile-joined">Сегодня</span>
+                                <span>На сайте</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="btn-primary" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i> Создать объявление
+                    </button>
+                    <button class="btn-secondary" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Редактировать профиль
+                    </button>
+                </div>
+                
+                <div class="profile-sections">
+                    <div class="profile-section">
+                        <h3>Мои объявления</h3>
+                        <div class="profile-ads-preview" id="profile-ads-preview">
+                            <div class="loading-placeholder">Загрузка...</div>
+                        </div>
+                        <button class="btn-link" onclick="switchTab('my-ads')">
+                            Все объявления <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>Избранное</h3>
+                        <div class="profile-favorites-preview" id="profile-favorites-preview">
+                            <div class="loading-placeholder">Загрузка...</div>
+                        </div>
+                        <button class="btn-link" onclick="switchTab('favorites')">
+                            Все избранное <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>Настройки</h3>
+                        <div class="settings-list">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="notifications-enabled" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Уведомления</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="location-enabled">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Геолокация</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="messages-enabled" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Сообщения</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Избранное -->
         <div class="tab-content" id="favorites-tab" style="display: none;">
             <div class="favorites-content">
