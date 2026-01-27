@@ -112,20 +112,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
-    min-height: 80px;
+    padding: 16px 20px;
+    min-height: 60px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 24px;
+    gap: 8px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--avito-blue);
-    height: 100%;
     text-decoration: none;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     transition: var(--transition);
 }
@@ -140,41 +139,40 @@ body {
 }
 
 .logo i {
-    font-size: 28px;
-    margin-bottom: 2px;
+    font-size: 22px;
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
-    padding: 8px 16px;
+    padding: 6px 12px;
     background: var(--background);
     border-radius: 8px;
-    margin: 0 8px;
+    margin: 0 6px;
 }
 
 #user-name-display {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 120px;
     line-height: 1.2;
 }
 
 .header-actions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
 
 .icon-btn {
     position: relative;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     border: none;
     background: transparent;
     border-radius: 50%;
@@ -187,9 +185,6 @@ body {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
 
 .icon-btn:hover {
@@ -206,28 +201,27 @@ body {
 }
 
 .icon-btn i {
-    font-size: 18px;
+    font-size: 16px;
     pointer-events: none;
 }
 
-
 .badge {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    background: var(--error-color);
+    top: 4px;
+    right: 4px;
+    background: var(--avito-red);
     color: var(--white);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    padding: 2px 5px;
-    border-radius: 10px;
-    min-width: 16px;
+    padding: 2px 4px;
+    border-radius: 8px;
+    min-width: 14px;
     text-align: center;
 }
 
 /* Поиск в стиле Авито */
 .search-container {
-    padding: 16px 24px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border);
     background: var(--white);
 }
@@ -238,37 +232,34 @@ body {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 0 20px;
-    gap: 12px;
-    height: 52px;
+    padding: 0 16px;
+    gap: 10px;
+    height: 44px;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
 }
 
 .search-box:focus-within {
     border-color: var(--avito-blue);
-    background: var(--white);
+    box-shadow: 0 0 0 2px rgba(0, 137, 209, 0.1);
 }
 
 .search-box i {
     color: var(--text-muted);
     font-size: 16px;
-    pointer-events: none;
 }
 
-.search-box input {
+#search-input {
     flex: 1;
     border: none;
-    outline: none;
     background: transparent;
-    font-size: 16px;
+    outline: none;
+    font-size: 15px;
     color: var(--text-primary);
-    line-height: 1.4;
 }
 
-.search-box input::placeholder {
+#search-input::placeholder {
     color: var(--text-muted);
-    font-size: 15px;
 }
 
 .filter-btn {
@@ -276,35 +267,243 @@ body {
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    padding: 10px;
-    border-radius: 8px;
+    padding: 4px;
+    border-radius: 6px;
     transition: var(--transition);
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .filter-btn:hover {
-    background: var(--border-color);
-    color: var(--primary-color);
+    background: var(--border-light);
+    color: var(--avito-blue);
 }
 
 /* Категории в стиле Авито */
 .categories-scroll {
     display: flex;
     gap: 12px;
-    padding: 16px 16px 12px;
+    padding: 16px 20px;
     overflow-x: auto;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-    background: var(--white);
 }
 
 .categories-scroll::-webkit-scrollbar {
     display: none;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 70px;
+    max-width: 80px;
+    padding: 12px 8px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.category-item:hover {
+    background: var(--white);
+    border-color: var(--avito-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.category-item.active {
+    background: var(--avito-blue);
+    border-color: var(--avito-blue);
+    color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.category-item i {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+.category-item.active i {
+    color: var(--white);
+}
+
+.category-item span {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text-secondary);
+}
+
+.category-item.active span {
+    color: var(--white);
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--background);
+}
+
+/* Панель сортировки */
+.sort-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+}
+
+.sort-options {
+    display: flex;
+    gap: 8px;
+}
+
+.sort-btn {
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sort-btn:hover {
+    border-color: var(--avito-blue);
+    color: var(--avito-blue);
+}
+
+.sort-btn.active {
+    background: var(--avito-blue);
+    border-color: var(--avito-blue);
+    color: var(--white);
+}
+
+.view-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--background);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.view-btn:hover {
+    background: var(--border-light);
+}
+
+.view-btn.active {
+    background: var(--white);
+    color: var(--avito-blue);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-btn i {
+    font-size: 14px;
+}
+
+/* Нижняя навигация */
+.bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 60px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-secondary);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.nav-item:hover {
+    color: var(--avito-blue);
+}
+
+.nav-item.active {
+    color: var(--avito-blue);
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.nav-item span {
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* Стили для объявлений */
+.ads-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px 20px;
+}
+
+.ads-container.list-view {
+    grid-template-columns: 1fr;
+}
+
+/* Карточки объявлений */
+.ad-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid var(--border);
+}
+
+.ad-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .category-item {
