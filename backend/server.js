@@ -139,6 +139,29 @@ function initTables() {
             UNIQUE(user_id, ad_id)
         )`);
 
+        // Таблица уведомлений
+        db.run(`CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT,
+            data TEXT,
+            read BOOLEAN DEFAULT FALSE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // Таблица сообщений
+        db.run(`CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER NOT NULL,
+            receiver_id INTEGER NOT NULL,
+            ad_id INTEGER,
+            text TEXT NOT NULL,
+            read BOOLEAN DEFAULT FALSE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         console.log('✅ Все таблицы созданы успешно');
     });
 }
@@ -211,9 +234,19 @@ app.post('/api/upload', upload.array('images', 5), (req, res) => {
     }
 });
 
-// Получение объявлений
+// Получение объявлений с расширенными фильтрами
 app.get('/api/ads', (req, res) => {
-    const { category_id, search, limit = 20, offset = 0, status = 'active' } = req.query;
+    const { 
+        category_id, 
+        search, 
+        limit = 20, 
+        offset = 0, 
+        status = 'active',
+        sort = 'date',
+        price_min,
+        price_max,
+        with_photos
+    } = req.query;
     
     let query = `
         SELECT a.*, u.first_name, u.username, c.name as category_name 
@@ -234,8 +267,36 @@ app.get('/api/ads', (req, res) => {
         params.push(`%${search}%`, `%${search}%`);
     }
     
-    query += ' ORDER BY a.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    if (price_min) {
+        query += ' AND a.price >= ?';
+        params.push(parseFloat(price_min));
+    }
+    
+    if (price_max) {
+        query += ' AND a.price <= ?';
+        params.push(parseFloat(price_max));
+    }
+    
+    if (with_photos === 'true') {
+        query += ' AND a.images IS NOT NULL AND a.images != "[]"';
+    }
+    
+    // Сортировка
+    switch (sort) {
+        case 'price-asc':
+            query += ' ORDER BY a.price ASC';
+            break;
+        case 'price-desc':
+            query += ' ORDER BY a.price DESC';
+            break;
+        case 'date':
+        default:
+            query += ' ORDER BY a.created_at DESC';
+            break;
+    }
+    
+    query += ' LIMIT ? OFFSET ?';
+    params.push(parseInt(limit), parseInt(offset));
     
     db.all(query, params, (err, rows) => {
         if (err) {
@@ -430,6 +491,61 @@ app.get('/api/ads/pending', (req, res) => {
     `;
     
     db.all(query, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Увеличение счетчика просмотров
+app.post('/api/ads/:id/views', (req, res) => {
+    const adId = req.params.id;
+    
+    db.run('UPDATE ads SET views = views + 1 WHERE id = ?', [adId], function(err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ success: true, views: this.changes });
+    });
+});
+
+// Получение уведомлений пользователя
+app.get('/api/notifications/:userId', (req, res) => {
+    const userId = req.params.userId;
+    
+    const query = `
+        SELECT * FROM notifications 
+        WHERE user_id = ? 
+        ORDER BY created_at DESC 
+        LIMIT 50
+    `;
+    
+    db.all(query, [userId], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Получение сообщений пользователя
+app.get('/api/messages/:userId', (req, res) => {
+    const userId = req.params.userId;
+    
+    const query = `
+        SELECT m.*, u.first_name, u.username 
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id OR m.receiver_id = u.id
+        WHERE (m.sender_id = ? OR m.receiver_id = ?) AND u.id != ?
+        ORDER BY m.created_at DESC
+        LIMIT 50
+    `;
+    
+    db.all(query, [userId, userId, userId], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
