@@ -92,29 +92,32 @@
 
             <!-- Основной контент -->
             <main class="main-content">
-                <!-- Панель сортировки и фильтров -->
-                <div class="sort-bar">
-                    <div class="sort-options">
-                        <button class="sort-btn active" data-sort="date">По дате</button>
-                        <button class="sort-btn" data-sort="price-asc">Дешевле</button>
-                        <button class="sort-btn" data-sort="price-desc">Дороже</button>
+                <!-- Главная: Лента объявлений -->
+                <div class="tab-content" id="feed-tab">
+                    <!-- Панель сортировки и фильтров -->
+                    <div class="sort-bar">
+                        <div class="sort-options">
+                            <button class="sort-btn active" data-sort="date">По дате</button>
+                            <button class="sort-btn" data-sort="price-asc">Дешевле</button>
+                            <button class="sort-btn" data-sort="price-desc">Дороже</button>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="view-toggle">
-                        <button class="view-btn active" data-view="grid">
-                            <i class="fas fa-th"></i>
-                        </button>
-                        <button class="view-btn" data-view="list">
-                            <i class="fas fa-list"></i>
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Список объявлений -->
-                <div class="ads-container" id="ads-list">
-                    <div class="loading-placeholder">
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
+                    <!-- Список объявлений -->
+                    <div class="ads-container" id="ads-container">
+                        <div class="loading-placeholder">
+                            <div class="skeleton-card"></div>
+                            <div class="skeleton-card"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -123,6 +126,88 @@
                     <i class="fas fa-plus"></i>
                 </button>
             </main>
+
+            <!-- Избранное -->
+            <div class="tab-content" id="favorites-tab" style="display: none;">
+                <div class="favorites-content">
+                    <h2>⭐ Избранное</h2>
+                    <div class="favorites-list" id="favorites-list">
+                        <div class="loading-placeholder">Загрузка избранных...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Мои объявления -->
+            <div class="tab-content" id="my-ads-tab" style="display: none;">
+                <div class="my-ads-content">
+                    <div class="my-ads-header">
+                        <h2>Мои объявления</h2>
+                        <button class="btn-primary" onclick="openCreateAd()">
+                            <i class="fas fa-plus"></i> Создать объявление
+                        </button>
+                    </div>
+                    
+                    <!-- Фильтры статусов -->
+                    <div class="status-filters">
+                        <button class="status-filter active" data-status="all">Все</button>
+                        <button class="status-filter" data-status="pending">На модерации</button>
+                        <button class="status-filter" data-status="active">Активные</button>
+                        <button class="status-filter" data-status="rejected">Отклоненные</button>
+                    </div>
+                    
+                    <!-- Список объявлений -->
+                    <div class="my-ads-list" id="my-ads-list">
+                        <div class="loading-placeholder">Загрузка объявлений...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщения -->
+            <div class="tab-content" id="messages-tab" style="display: none;">
+                <div class="messages-content">
+                    <h2>💬 Сообщения</h2>
+                    <div class="messages-list" id="messages-list">
+                        <div class="loading-placeholder">Загрузка сообщений...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Профиль -->
+            <div class="tab-content" id="profile-tab" style="display: none;">
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name">Пользователь</h2>
+                            <p id="profile-username">@username</p>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span id="profile-ads-count">0</span>
+                                    <span>Объявлений</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span id="profile-rating">0.0</span>
+                                    <span>Рейтинг</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span id="profile-joined">Сегодня</span>
+                                    <span>На сайте</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="btn-secondary" onclick="editProfile()">
+                            <i class="fas fa-edit"></i> Редактировать профиль
+                        </button>
+                        <button class="btn-secondary" onclick="showSettings()">
+                            <i class="fas fa-cog"></i> Настройки
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Нижняя навигация в стиле Авито -->
             <nav class="bottom-nav">
@@ -989,6 +1074,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM загружен, добавляем обработчики...');
             
+            // Инициализация - загружаем ленту объявлений
+            loadAds();
+            
             // Навигация
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function() {
@@ -1002,7 +1090,10 @@
                 item.addEventListener('click', function() {
                     document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
                     this.classList.add('active');
-                    alert('Категория выбрана: ' + this.dataset.category);
+                    
+                    // Фильтруем объявления по категории
+                    const category = this.dataset.category;
+                    filterAdsByCategory(category);
                 });
             });
             
@@ -1012,8 +1103,50 @@
                 fab.addEventListener('click', window.openCreateAd);
             }
             
+            // Сортировка
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    sortAds(this.dataset.sort);
+                });
+            });
+            
+            // Поиск
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    searchAds(this.value);
+                });
+            }
+            
             console.log('Обработчики добавлены!');
         });
+        
+        // Дополнительные функции
+        function filterAdsByCategory(category) {
+            console.log('Фильтр по категории:', category);
+            // Здесь можно добавить фильтрацию объявлений
+            showNotification(`Категория: ${category}`, 'info');
+        }
+        
+        function sortAds(sortBy) {
+            console.log('Сортировка:', sortBy);
+            showNotification(`Сортировка: ${sortBy}`, 'info');
+        }
+        
+        function searchAds(query) {
+            console.log('Поиск:', query);
+            // Здесь можно добавить поиск
+        }
+        
+        window.editProfile = function() {
+            showNotification('Редактирование профиля в разработке', 'info');
+        };
+        
+        window.showSettings = function() {
+            showNotification('Настройки в разработке', 'info');
+        };
     </script>
 </body>
 </html>
