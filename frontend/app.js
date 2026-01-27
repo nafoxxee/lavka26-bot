@@ -1,13 +1,14 @@
 // Lavka26 - Полный функционал как у Авито
 let tg = window.Telegram.WebApp;
+
+// Глобальные переменные
 let currentUser = null;
 let currentAd = null;
+let ads = [];
 let categories = [];
-let favorites = [];
-let messages = [];
 let notifications = [];
-let currentView = 'grid';
-let currentSort = 'date';
+let messages = [];
+let favorites = [];
 let currentFilters = {
     category: '',
     search: '',
@@ -379,11 +380,63 @@ async function incrementViews(adId) {
 // Функции фильтров
 function openFilters() {
     document.getElementById('filters-modal').style.display = 'flex';
+    // Загружаем текущие значения фильтров
+    loadFilterValues();
 }
 
 function closeFilters() {
     document.getElementById('filters-modal').style.display = 'none';
 }
+
+function loadFilterValues() {
+    // Восстанавливаем сохраненные значения фильтров
+    const savedFilters = localStorage.getItem('filters');
+    if (savedFilters) {
+        const filters = JSON.parse(savedFilters);
+        document.getElementById('filter-category').value = filters.category || '';
+        document.getElementById('filter-min-price').value = filters.minPrice || '';
+        document.getElementById('filter-max-price').value = filters.maxPrice || '';
+        document.getElementById('filter-condition').value = filters.condition || '';
+        document.getElementById('filter-sort').value = filters.sort || 'newest';
+    }
+}
+
+function applyFilters() {
+    const filters = {
+        category: document.getElementById('filter-category').value,
+        minPrice: document.getElementById('filter-min-price').value,
+        maxPrice: document.getElementById('filter-max-price').value,
+        condition: document.getElementById('filter-condition').value,
+        sort: document.getElementById('filter-sort').value
+    };
+    
+    // Сохраняем фильтры
+    localStorage.setItem('filters', JSON.stringify(filters));
+    
+    // Применяем фильтры к загрузке объявлений
+    currentFilters = filters;
+    
+    // Перезагружаем объявления с новыми фильтрами
+    loadAds();
+    
+    closeFilters();
+    showNotification('Фильтры применены', 'success');
+}
+
+function resetFilters() {
+    // Очищаем форму
+    document.getElementById('filter-category').value = '';
+    document.getElementById('filter-min-price').value = '';
+    document.getElementById('filter-max-price').value = '';
+    document.getElementById('filter-condition').value = '';
+    document.getElementById('filter-sort').value = 'newest';
+    
+    // Очищаем сохраненные фильтры
+    localStorage.removeItem('filters');
+    currentFilters = {};
+    
+    // Перезагружаем объявления
+    loadAds();
 
 function resetFilters() {
     currentFilters = {
@@ -410,20 +463,33 @@ function resetFilters() {
     loadAds();
 }
 
-function applyFilters() {
-    currentFilters.priceMin = document.getElementById('price-min').value;
-    currentFilters.priceMax = document.getElementById('price-max').value;
-    currentFilters.location = document.getElementById('location').value;
-    currentFilters.distance = document.getElementById('distance').value;
-    currentFilters.withPhotos = document.getElementById('with-photos').checked;
+function loadAds() {
+    const container = document.getElementById('ads-container');
+    container.innerHTML = '<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>';
     
-    const selectedDate = document.querySelector('input[name="date"]:checked');
-    if (selectedDate) {
-        currentFilters.date = selectedDate.value;
+    let url = '/api/ads';
+    const params = new URLSearchParams();
+    
+    // Добавляем фильтры к URL
+    if (currentFilters.category) params.append('category', currentFilters.category);
+    if (currentFilters.minPrice) params.append('min_price', currentFilters.minPrice);
+    if (currentFilters.maxPrice) params.append('max_price', currentFilters.maxPrice);
+    if (currentFilters.condition) params.append('condition', currentFilters.condition);
+    if (currentFilters.sort) params.append('sort', currentFilters.sort);
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
     }
     
-    closeFilters();
-    loadAds();
+    fetch(url)
+        .then(response => response.json())
+        .then(ads => {
+            displayAds(ads);
+        })
+        .catch(error => {
+            console.error('❌ Ошибка загрузки объявлений:', error);
+            container.innerHTML = '<div class="error-message">Ошибка загрузки объявлений</div>';
+        });
 }
 
 // Функции навигации
@@ -810,7 +876,136 @@ async function clearAllNotifications() {
 }
 
 function openMessages() {
-    showNotification('Сообщения в разработке', 'info');
+    // Создаем модальное окно сообщений
+    const modalHtml = `
+        <div class="modal" id="messages-modal" style="display: flex;">
+            <div class="modal-content messages-modal">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeMessagesModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>Сообщения</h3>
+                    <button class="new-chat-btn" onclick="startNewChat()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="messages-list" id="messages-list">
+                        <div class="loading-placeholder">Загрузка сообщений...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Добавляем модальное окно в body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Загружаем сообщения
+    loadMessagesList();
+}
+
+function closeMessagesModal() {
+    const modal = document.getElementById('messages-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function loadMessagesList() {
+    if (!currentUser) {
+        document.getElementById('messages-list').innerHTML = 
+            '<div class="empty-messages">Пожалуйста авторизуйтесь</div>';
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/messages/${currentUser.id}`);
+        if (response.ok) {
+            const messages = await response.json();
+            displayMessagesList(messages);
+        } else {
+            // Если API еще не готов, показываем демо-данные
+            displayDemoMessages();
+        }
+    } catch (error) {
+        console.error('❌ Ошибка загрузки сообщений:', error);
+        displayDemoMessages();
+    }
+}
+
+function displayDemoMessages() {
+    const demoMessages = [
+        {
+            id: 1,
+            user_name: 'Александр',
+            last_message: 'Здравствуйте! Товар еще доступен?',
+            time: '5 мин назад',
+            unread: true,
+            avatar: 'A'
+        },
+        {
+            id: 2,
+            user_name: 'Мария',
+            last_message: 'Можно договориться о цене?',
+            time: '1 час назад',
+            unread: true,
+            avatar: 'М'
+        },
+        {
+            id: 3,
+            user_name: 'Дмитрий',
+            last_message: 'Спасибо за покупку!',
+            time: 'вчера',
+            unread: false,
+            avatar: 'Д'
+        }
+    ];
+    
+    displayMessagesList(demoMessages);
+}
+
+function displayMessagesList(messages) {
+    const container = document.getElementById('messages-list');
+    
+    if (!messages || messages.length === 0) {
+        container.innerHTML = `
+            <div class="empty-messages">
+                <i class="fas fa-comments"></i>
+                <p>У вас нет сообщений</p>
+                <button class="btn-primary" onclick="startNewChat()">
+                    <i class="fas fa-plus"></i> Начать чат
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = messages.map(message => `
+        <div class="message-item ${message.unread ? 'unread' : ''}" onclick="openChat(${message.id})">
+            <div class="message-avatar">
+                <span>${message.avatar || message.user_name[0]}</span>
+            </div>
+            <div class="message-content">
+                <div class="message-header">
+                    <div class="message-name">${escapeHtml(message.user_name)}</div>
+                    <div class="message-time">${message.time}</div>
+                </div>
+                <div class="message-text">${escapeHtml(message.last_message)}</div>
+            </div>
+            ${message.unread ? '<div class="unread-indicator"></div>' : ''}
+        </div>
+    `).join('');
+}
+
+function openChat(chatId) {
+    showNotification('Открытие чата...', 'info');
+    // Здесь можно добавить логику открытия конкретного чата
+}
+
+function startNewChat() {
+    showNotification('Создание нового чата...', 'info');
+    // Здесь можно добавить логику создания нового чата
 }
 
 function openProfile() {
