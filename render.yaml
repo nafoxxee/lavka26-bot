@@ -15,6 +15,20 @@ services:
         value: production
 
   - type: web
+    name: lavka26-frontend
+    env: static
+    plan: free
+    rootDir: ./frontend
+    buildCommand: "echo 'Static files ready'"
+    staticPublishPath: ./
+    healthCheckPath: /
+    healthCheckGracePeriod: 30
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+
+  - type: web
     name: lavka26-bot
     env: node
     plan: free
