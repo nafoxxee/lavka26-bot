@@ -93,7 +93,7 @@
             <!-- Основной контент -->
             <main class="main-content">
                 <!-- Главная: Лента объявлений -->
-                <div class="tab-content" id="feed-tab">
+                <div class="tab-content" id="feed-tab" style="display: block;">
                     <!-- Панель сортировки и фильтров -->
                     <div class="sort-bar">
                         <div class="sort-options">
@@ -729,13 +729,8 @@
                 tab.style.display = 'none';
             });
             
-            // Убираем активный класс
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
             // Показываем выбранную вкладку
-            const tabElement = document.getElementById(tabName + '-tab');
+            const tabElement = document.getElementById(`${tabName}-tab`);
             if (tabElement) {
                 tabElement.style.display = 'block';
                 
@@ -754,6 +749,11 @@
                     loadAds(); // Загружаем ленту объявлений
                 }
             }
+            
+            // Убираем активный класс у всех кнопок
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
             
             // Активируем кнопку
             const activeBtn = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
@@ -1075,12 +1075,14 @@
             console.log('DOM загружен, добавляем обработчики...');
             
             // Инициализация - загружаем ленту объявлений
+            console.log('Начинаю загрузку объявлений...');
             loadAds();
             
             // Навигация
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const tabName = this.dataset.tab;
+                    console.log('Клик по кнопке:', tabName);
                     window.switchTab(tabName);
                 });
             });
@@ -1121,6 +1123,8 @@
             }
             
             console.log('Обработчики добавлены!');
+            console.log('Все вкладки:', document.querySelectorAll('.tab-content'));
+            console.log('Все кнопки навигации:', document.querySelectorAll('.nav-item'));
         });
         
         // Дополнительные функции
