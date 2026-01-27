@@ -9,6 +9,23 @@ let favorites = [];
 function initializeApp() {
     console.log('🚀 Запуск Lavka26 Mini App...');
     console.log('📱 Telegram WebApp доступен:', typeof window.Telegram !== 'undefined');
+    console.log('📄 DOM готов:', document.readyState);
+    console.log('🔍 Проверяем элементы...');
+    
+    // Проверяем существование элементов
+    const loadingEl = document.getElementById('loading');
+    const contentEl = document.getElementById('content');
+    const appEl = document.getElementById('app');
+    
+    console.log('📦 Элемент app:', appEl);
+    console.log('📦 Элемент loading:', loadingEl);
+    console.log('📦 Элемент content:', contentEl);
+    
+    if (!loadingEl || !contentEl) {
+        console.error('❌ Элементы не найдены! Пробуем через таймаут...');
+        setTimeout(initializeApp, 1000);
+        return;
+    }
 
     // Показываем контент сразу для отладки
     showContent();
