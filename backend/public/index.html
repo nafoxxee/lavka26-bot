@@ -368,7 +368,7 @@
                                 <div class="upload-placeholder" id="upload-placeholder">
                                     <i class="fas fa-camera"></i>
                                     <p>Добавить фотографии</p>
-                                    <small>До 5 фото, не более 5 МБ каждое</small>
+                                    <small>До 5 фото, не более 10 МБ каждое</small>
                                 </div>
                                 <div class="image-preview" id="image-preview"></div>
                                 <input type="file" id="ad-images" multiple accept="image/*" style="display: none;">
@@ -683,8 +683,8 @@
                             return;
                         }
                         
-                        if (file.size > 5 * 1024 * 1024) {
-                            showNotification(`${file.name} слишком большой (максимум 5 МБ)`, 'error');
+                        if (file.size > 10 * 1024 * 1024) {
+                            showNotification(`${file.name} слишком большой (максимум 10 МБ)`, 'error');
                             return;
                         }
                         
