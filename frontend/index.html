@@ -129,6 +129,16 @@
         <div class="notifications" id="notifications"></div>
     </div>
 
-    <script src="app.js" defer></script>
+    <script src="app.js"></script>
+    <script>
+        // Простая инициализация после загрузки скрипта
+        setTimeout(() => {
+            console.log('🚀 Принудительный запуск...');
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('content');
+            if (loading) loading.style.display = 'none';
+            if (content) content.style.display = 'block';
+        }, 100);
+    </script>
 </body>
 </html>
