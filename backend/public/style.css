@@ -2039,166 +2039,316 @@ input:checked + .slider:before {
     transform: scale(0.9);
 }
 
+/* Стили для модераторской панели */
+.moderator-content {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.moderator-content h2 {
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.mod-stats {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+}
+
+.mod-stats h3 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--background);
+    padding: 20px;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--avito-blue);
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.pending-ads-section,
+.reports-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+}
+
+.pending-ads-section h3,
+.reports-section h3 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.pending-ad-card,
+.report-card {
+    background: var(--background);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.pending-ad-info,
+.report-info {
+    flex: 1;
+}
+
+.pending-ad-info h4,
+.report-info h4 {
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pending-ad-info .price {
+    color: var(--avito-blue);
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.pending-ad-info .author,
+.report-info .reporter {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.report-info .reason {
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.pending-ad-info .date,
+.report-info .date {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.pending-ad-actions,
+.report-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-success {
+    background: var(--avito-green);
+    color: var(--white);
+}
+
+.btn-danger {
+    background: var(--avito-red);
+    color: var(--white);
+}
+
+.btn-primary {
+    background: var(--avito-blue);
+    color: var(--white);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
-    html {
-        font-size: 14px;
-    }
-    
     .header-top {
-        padding: 8px 12px;
+        padding: 16px 20px;
     }
     
-    .logo span {
-        font-size: 16px;
+    .logo {
+        font-size: 22px;
     }
     
-    .user-header {
-        font-size: 12px;
+    .logo i {
+        font-size: 24px;
     }
     
     .search-container {
-        padding: 0 12px 8px;
+        padding: 16px 20px;
     }
     
     .search-box {
-        height: 40px;
+        height: 52px;
+        padding: 0 16px;
+        gap: 12px;
     }
     
     .search-box input {
-        font-size: 14px;
-    }
-    
-    .categories-scroll {
-        padding: 0 12px 8px;
-        gap: 6px;
-    }
-    
-    .category-item {
-        min-width: 70px;
-        padding: 6px 8px;
-        font-size: 11px;
-    }
-    
-    .category-item i {
         font-size: 16px;
     }
     
-    .main-content {
-        padding: 8px 12px;
-        padding-bottom: 70px;
-    }
-    
-    .sort-bar {
-        padding: 8px 12px;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .sort-btn {
-        padding: 4px 8px;
-        font-size: 11px;
-    }
-    
-    .ads-container {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 8px;
-    }
-    
-    .ad-card {
-        padding: 8px;
-    }
-    
-    .ad-image {
-        height: 100px;
-    }
-    
-    .ad-title {
-        font-size: 12px;
-        line-height: 1.2;
-    }
-    
-    .ad-price {
-        font-size: 13px;
-    }
-    
-    .modal {
-        padding: 0;
-    }
-    
-    .modal-content {
-        margin: 0;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 0;
-        width: 100%;
-    }
-    
-    .create-ad-modal {
-        max-width: 100%;
-        margin: 0;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 0;
-    }
-    
-    .form-group {
-        margin-bottom: 12px;
-    }
-    
-    .form-group label {
-        font-size: 13px;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 10px;
-        font-size: 13px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .stat-card {
-        padding: 10px;
-    }
-    
-    .stat-number {
+    .filter-btn {
+        width: 48px;
+        height: 48px;
         font-size: 18px;
     }
     
-    .stat-label {
-        font-size: 10px;
+    .categories-scroll {
+        padding: 16px 20px 12px;
+        gap: 16px;
     }
     
-    .bottom-nav {
-        padding: 6px 0;
-        gap: 2px;
-        height: 60px;
+    .category-item {
+        padding: 12px 16px;
+        font-size: 13px;
+        min-width: 80px;
+        border-radius: var(--radius-lg);
     }
     
-    .nav-item {
-        padding: 6px 2px;
-        min-width: 50px;
+    .category-item i {
+        font-size: 24px;
+        margin-bottom: 4px;
     }
     
-    .nav-item i {
+    .main-content {
+        padding: 20px;
+        padding-bottom: 90px;
+    }
+    
+    .sort-bar {
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+    
+    .sort-btn {
+        padding: 10px 16px;
         font-size: 14px;
-        margin-bottom: 2px;
+        border-radius: var(--radius-lg);
     }
     
-    .nav-item span {
-        font-size: 9px;
+    .ads-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+    
+    .ad-card {
+        border-radius: var(--radius-lg);
+    }
+    
+    .ad-image {
+        height: 200px;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    
+    .ad-content {
+        padding: 16px;
+    }
+    
+    .ad-title {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .ad-price {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    
+    .ad-location {
+        font-size: 13px;
     }
     
     .fab {
+        width: 60px;
+        height: 60px;
+        bottom: 85px;
+        right: 20px;
+        font-size: 22px;
+    }
+    
+    .bottom-nav {
+        height: 70px;
+        padding: 10px 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+    
+    .nav-item {
+        padding: 8px 16px;
+        min-width: 70px;
+        font-size: 12px;
+        border-radius: var(--radius);
+    }
+    
+    .nav-item i {
+        font-size: 24px;
+        margin-bottom: 2px;
+    }
+    
+    .icon-btn {
         width: 48px;
         height: 48px;
-        bottom: 70px;
-        right: 12px;
+    }
+    
+    .icon-btn i {
+        font-size: 20px;
     }
     
     .fab i {
