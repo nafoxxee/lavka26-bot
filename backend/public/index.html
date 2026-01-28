@@ -12,17 +12,28 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ (fixed) -->
         <header class="app-header">
-            <div class="header-content">
-                <div class="app-title">LAVKA26</div>
+            <div class="header-left">
+                <div class="app-title">Lavka26</div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="switchTab('messages')">
+                    <i class="fas fa-comment"></i>
+                </button>
+                <button class="header-btn" onclick="switchTab('favorites')">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <button class="header-btn" onclick="switchTab('profile')">
+                    <i class="fas fa-user"></i>
+                </button>
             </div>
         </header>
 
-        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <!-- ОСНОВНОЙ КОНТЕНТ (scroll) -->
         <main class="app-content">
-            <!-- Главная страница -->
-            <div class="tab-content active" id="home-tab">
+            <!-- Главная: Лента объявлений -->
+            <div class="tab-content active" id="feed-tab">
                 <!-- Поисковая строка -->
                 <div class="search-section">
                     <div class="search-bar">
@@ -36,187 +47,105 @@
 
                 <!-- Категории -->
                 <div class="categories-section">
-                    <div class="categories-scroll">
+                    <div class="categories-grid">
                         <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-mobile-alt"></i>
-                            </div>
-                            <span>Электроника</span>
-                        </div>
-                        <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-car"></i>
-                            </div>
+                            <i class="fas fa-car"></i>
                             <span>Транспорт</span>
                         </div>
                         <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-home"></i>
-                            </div>
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Электроника</span>
+                        </div>
+                        <div class="category-item">
+                            <i class="fas fa-home"></i>
                             <span>Недвижимость</span>
                         </div>
                         <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-tshirt"></i>
-                            </div>
+                            <i class="fas fa-tshirt"></i>
                             <span>Одежда</span>
                         </div>
                         <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-couch"></i>
-                            </div>
-                            <span>Для дома</span>
-                        </div>
-                        <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-briefcase"></i>
-                            </div>
+                            <i class="fas fa-briefcase"></i>
                             <span>Работа</span>
                         </div>
                         <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
+                            <i class="fas fa-dumbbell"></i>
                             <span>Спорт</span>
-                        </div>
-                        <div class="category-item">
-                            <div class="category-icon">
-                                <i class="fas fa-paw"></i>
-                            </div>
-                            <span>Животные</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Список объявлений -->
                 <div class="ads-section">
+                    <div class="section-header">
+                        <h2>Все объявления</h2>
+                        <button class="sort-btn">
+                            <i class="fas fa-sort"></i>
+                            По дате
+                        </button>
+                    </div>
                     <div class="ads-grid" id="ads-container">
-                        <!-- Примеры объявлений -->
-                        <div class="ad-card">
-                            <div class="ad-image">
-                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=iPhone" alt="iPhone 13">
-                                <div class="ad-favorite">
-                                    <i class="far fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="ad-content">
-                                <div class="ad-title">iPhone 13 Pro 128 ГБ</div>
-                                <div class="ad-price">65 000 ₽</div>
-                                <div class="ad-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Москва
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="ad-card">
-                            <div class="ad-image">
-                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=MacBook" alt="MacBook">
-                                <div class="ad-favorite">
-                                    <i class="far fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="ad-content">
-                                <div class="ad-title">MacBook Air M1</div>
-                                <div class="ad-price">85 000 ₽</div>
-                                <div class="ad-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Санкт-Петербург
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ad-card">
-                            <div class="ad-image">
-                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=BMW" alt="BMW">
-                                <div class="ad-favorite">
-                                    <i class="far fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="ad-content">
-                                <div class="ad-title">BMW X5 2020</div>
-                                <div class="ad-price">3 500 000 ₽</div>
-                                <div class="ad-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Казань
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ad-card">
-                            <div class="ad-image">
-                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=Квартира" alt="Квартира">
-                                <div class="ad-favorite">
-                                    <i class="far fa-heart"></i>
-                                </div>
-                            </div>
-                            <div class="ad-content">
-                                <div class="ad-title">1-комнатная квартира</div>
-                                <div class="ad-price">5 200 000 ₽</div>
-                                <div class="ad-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Екатеринбург
-                                </div>
-                            </div>
+                        <!-- Объявления будут загружены здесь -->
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>Объявления не найдены</h3>
+                            <p>Будьте первым, кто создаст объявление!</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Другие вкладки -->
-            <div class="tab-content" id="categories-tab">
-                <div class="categories-full">
-                    <h2>Категории</h2>
-                    <div class="categories-grid-full">
-                        <div class="category-card">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>Электроника</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-car"></i>
-                            <span>Транспорт</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-home"></i>
-                            <span>Недвижимость</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-tshirt"></i>
-                            <span>Одежда</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-couch"></i>
-                            <span>Для дома</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Работа</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-dumbbell"></i>
-                            <span>Спорт</span>
-                        </div>
-                        <div class="category-card">
-                            <i class="fas fa-paw"></i>
-                            <span>Животные</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Избранное -->
             <div class="tab-content" id="favorites-tab">
-                <div class="favorites-content">
-                    <h2>Избранное</h2>
-                    <div class="empty-state">
-                        <i class="far fa-heart"></i>
-                        <h3>Нет избранных</h3>
-                        <p>Добавляйте понравившиеся объявления</p>
+                <div class="favorites-section">
+                    <div class="section-header">
+                        <h2>Избранное</h2>
+                    </div>
+                    <div class="favorites-list" id="favorites-list">
+                        <div class="empty-state">
+                            <i class="fas fa-heart"></i>
+                            <h3>У вас пока нет избранных</h3>
+                            <p>Добавляйте понравившиеся объявления</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Мои объявления -->
+            <div class="tab-content" id="my-ads-tab">
+                <div class="my-ads-section">
+                    <div class="section-header">
+                        <h2>Мои объявления</h2>
+                    </div>
+                    <div class="my-ads-list" id="my-ads-list">
+                        <div class="empty-state">
+                            <i class="fas fa-ad"></i>
+                            <h3>У вас пока нет объявлений</h3>
+                            <p>Создайте свое первое объявление</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщения -->
+            <div class="tab-content" id="messages-tab">
+                <div class="messages-section">
+                    <div class="section-header">
+                        <h2>Сообщения</h2>
+                    </div>
+                    <div class="messages-list" id="messages-list">
+                        <div class="empty-state">
+                            <i class="fas fa-comment"></i>
+                            <h3>У вас пока нет сообщений</h3>
+                            <p>Начните общение с продавцами</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Профиль -->
             <div class="tab-content" id="profile-tab">
-                <div class="profile-content">
+                <div class="profile-section">
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
@@ -230,79 +159,198 @@
                         <div class="stat-item">
                             <span>0</span>
                             <span>Объявлений</span>
+                
+                <!-- Статистика -->
+                <div class="mod-stats">
+                    <h3>📊 Статистика</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-ads">0</div>
+                            <div class="stat-label">Всего объявлений</div>
                         </div>
-                        <div class="stat-item">
-                            <span>0.0</span>
-                            <span>Рейтинг</span>
+                        <div class="stat-card">
+                            <div class="stat-number" id="pending-ads">0</div>
+                            <div class="stat-label">На модерации</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="active-ads">0</div>
+                            <div class="stat-label">Активных</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-reports">0</div>
+                            <div class="stat-label">Жалоб</div>
                         </div>
                     </div>
-                    <div class="profile-menu">
-                        <button class="menu-item">
-                            <i class="fas fa-plus"></i>
-                            <span>Создать объявление</span>
+                </div>
+
+                <!-- Объявления на модерации -->
+                <div class="mod-section">
+                    <h3>📋 Объявления на модерации</h3>
+                    <div class="mod-controls">
+                        <button class="btn-secondary" onclick="refreshPendingAds()">
+                            <i class="fas fa-sync"></i> Обновить
                         </button>
-                        <button class="menu-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Настройки</span>
+                    </div>
+                    <div class="pending-ads-list" id="pending-ads-list">
+                        <div class="loading-placeholder">Загрузка объявлений...</div>
+                    </div>
+                </div>
+
+                <!-- Жалобы -->
+                <div class="mod-section">
+                    <h3>🚨 Жалобы</h3>
+                    <div class="mod-controls">
+                        <button class="btn-secondary" onclick="refreshReports()">
+                            <i class="fas fa-sync"></i> Обновить
                         </button>
+                    </div>
+                    <div class="reports-list" id="reports-list">
+                        <div class="loading-placeholder">Загрузка жалоб...</div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
 
-        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-        <nav class="tabbar">
-            <button class="tabbar-item active" data-tab="home" onclick="switchTab('home')">
-                <i class="fas fa-home"></i>
-                <span>Главная</span>
-            </button>
-            <button class="tabbar-item" data-tab="categories" onclick="switchTab('categories')">
-                <i class="fas fa-th-large"></i>
-                <span>Категории</span>
-            </button>
-            <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
-                <i class="fas fa-heart"></i>
-                <span>Избранное</span>
-            </button>
-            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
-            </button>
-        </nav>
-    </div>
+        <!-- Мои объявления -->
+        <div class="tab-content" id="my-ads-tab" style="display: none;">
+            <div class="my-ads-content">
+                <div class="my-ads-header">
+                    <h2>Мои объявления</h2>
+                    <button class="btn-primary" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i> Создать объявление
+                    </button>
+                </div>
+                
+                <!-- Фильтры статусов -->
+                <div class="status-filters">
+                    <button class="status-filter active" data-status="all">Все</button>
+                    <button class="status-filter" data-status="pending">На модерации</button>
+                    <button class="status-filter" data-status="active">Активные</button>
+                    <button class="status-filter" data-status="rejected">Отклоненные</button>
+                </div>
+                
+                <!-- Список объявлений -->
+                <div class="my-ads-list" id="my-ads-list">
+                    <div class="loading-placeholder">Загрузка объявлений...</div>
+                </div>
+            </div>
+        </div>
 
-    <script src="app.js"></script>
-    <script>
-        // Функция переключения вкладок
-        window.switchTab = function(tabName) {
-            // Скрываем все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Показываем выбранную вкладку
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            // Убираем активный класс у всех кнопок
-            document.querySelectorAll('.tabbar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Активируем кнопку
-            document.querySelector(`.tabbar-item[data-tab="${tabName}"]`).classList.add('active');
-        };
+        <!-- Профиль -->
+        <div class="tab-content" id="profile-tab" style="display: none;">
+            <div class="profile-content">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">Пользователь</h2>
+                        <p id="profile-username">@username</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span id="profile-ads-count">0</span>
+                                <span>Объявлений</span>
+                            </div>
+                            <div class="stat-item">
+                                <span id="profile-rating">0.0</span>
+                                <span>Рейтинг</span>
+                            </div>
+                            <div class="stat-item">
+                                <span id="profile-joined">Сегодня</span>
+                                <span>На сайте</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="btn-primary" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i> Создать объявление
+                    </button>
+                    <button class="btn-secondary" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Редактировать профиль
+                    </button>
+                </div>
+                
+                <div class="profile-sections">
+                    <div class="profile-section">
+                        <h3>Мои объявления</h3>
+                        <div class="profile-ads-preview" id="profile-ads-preview">
+                            <div class="loading-placeholder">Загрузка...</div>
+                        </div>
+                        <button class="btn-link" onclick="switchTab('my-ads')">
+                            Все объявления <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>Избранное</h3>
+                        <div class="profile-favorites-preview" id="profile-favorites-preview">
+                            <div class="loading-placeholder">Загрузка...</div>
+                        </div>
+                        <button class="btn-link" onclick="switchTab('favorites')">
+                            Все избранное <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>Настройки</h3>
+                        <div class="settings-list">
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="notifications-enabled" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Уведомления</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="location-enabled">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Геолокация</span>
+                            </div>
+                            <div class="setting-item">
+                                <label class="switch">
+                                    <input type="checkbox" id="messages-enabled" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Сообщения</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        // Инициализация Telegram WebApp
-        document.addEventListener('DOMContentLoaded', function() {
-            const tg = window.Telegram?.WebApp;
-            if (tg) {
-                tg.ready();
-                tg.expand();
-            }
-        });
-    </script>
-</body>
-</html>
+        <!-- Избранное -->
+        <div class="tab-content" id="favorites-tab" style="display: none;">
+            <div class="favorites-content">
+                <div class="favorites-header">
+                    <h2>Избранное</h2>
+                    <div class="favorites-count">
+                        <span id="favorites-count">0</span> объявлений
+                    </div>
+                </div>
+                
+                <!-- Список избранных объявлений -->
+                <div class="favorites-list" id="favorites-list">
+                    <div class="loading-placeholder">Загрузка избранного...</div>
+                </div>
+                
+                <!-- Пустое состояние -->
+                <div class="empty-state" id="empty-favorites" style="display: none;">
+                    <i class="fas fa-heart"></i>
+                    <h3>Нет избранных объявлений</h3>
+                    <p>Добавляйте понравившиеся объявления в избранное, чтобы не потерять их</p>
+                    <button class="btn-primary" onclick="switchTab('feed')">
+                        <i class="fas fa-search"></i> Найти объявления
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания объявления -->
         <div class="modal" id="create-ad-modal">
             <div class="modal-content create-ad-modal">
                 <div class="modal-header">
@@ -320,7 +368,7 @@
                                 <div class="upload-placeholder" id="upload-placeholder">
                                     <i class="fas fa-camera"></i>
                                     <p>Добавить фотографии</p>
-                                    <small>До 5 фото, не более 10 МБ каждое</small>
+                                    <small>До 5 фото, не более 5 МБ каждое</small>
                                 </div>
                                 <div class="image-preview" id="image-preview"></div>
                                 <input type="file" id="ad-images" multiple accept="image/*" style="display: none;">
@@ -481,28 +529,28 @@
             </div>
         </div>
 
-        <!-- Уведомления -->
-        <div class="notifications" id="notifications"></div>
-
-        <!-- НИЖНЯЯ НАВИГАЦИЯ (fixed) -->
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
         <nav class="tabbar">
-            <button class="tabbar-item active" data-tab="feed" onclick="switchTab('feed')">
+            <button class="tabbar-item active" onclick="switchTab('feed')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="tabbar-item" data-tab="categories" onclick="switchTab('categories')">
+            <button class="tabbar-item" onclick="switchTab('categories')">
                 <i class="fas fa-th-large"></i>
                 <span>Категории</span>
             </button>
-            <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
+            <button class="tabbar-item" onclick="switchTab('favorites')">
                 <i class="fas fa-heart"></i>
                 <span>Избранное</span>
             </button>
-            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
+            <button class="tabbar-item" onclick="switchTab('profile')">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </button>
         </nav>
+
+        <!-- Уведомления -->
+        <div class="notifications" id="notifications"></div>
     </div>
 
     <script src="app.js"></script>
@@ -655,8 +703,8 @@
                             return;
                         }
                         
-                        if (file.size > 10 * 1024 * 1024) {
-                            showNotification(`${file.name} слишком большой (максимум 10 МБ)`, 'error');
+                        if (file.size > 5 * 1024 * 1024) {
+                            showNotification(`${file.name} слишком большой (максимум 5 МБ)`, 'error');
                             return;
                         }
                         
@@ -703,588 +751,6 @@
             }
         };
         
-        // Функции загрузки контента
-        async function loadAds() {
-            const adsContainer = document.getElementById('ads-container');
-            if (!adsContainer) return;
-            
-            try {
-                const response = await fetch('/api/ads?status=active&limit=20');
-                const ads = await response.json();
-                
-                if (ads.ads.length === 0) {
-                    adsContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>Объявления не найдены</h3>
-                            <p>Будьте первым, кто создаст объявление!</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const adsHTML = ads.ads.map(ad => createAdCard(ad)).join('');
-                adsContainer.innerHTML = adsHTML;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки объявлений:', error);
-                adsContainer.innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Ошибка загрузки</h3>
-                        <p>Попробуйте обновить страницу</p>
-                    </div>
-                `;
-            }
-        }
-
-        function createAdCard(ad) {
-            const user = getCurrentUser();
-            const isOwner = user && ad.user_id === user.id;
-            const isFavorite = checkIfFavorite(ad.id);
-            
-            return `
-                <div class="ad-card" onclick="openAdDetail('${ad.id}')">
-                    <div class="ad-image">
-                        ${ad.images && ad.images.length > 0 
-                            ? `<img src="${ad.images[0]}" alt="${escapeHtml(ad.title)}" loading="lazy">`
-                            : `<div class="no-image"><i class="fas fa-image"></i></div>`
-                        }
-                        ${isOwner ? '<div class="ad-owner-badge">Моё</div>' : ''}
-                        <button class="ad-favorite ${isFavorite ? 'active' : ''}" 
-                                onclick="event.stopPropagation(); toggleFavorite('${ad.id}')">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                    <div class="ad-content">
-                        <div class="ad-title">${escapeHtml(ad.title)}</div>
-                        <div class="ad-price">${formatPrice(ad.price)} ₽</div>
-                        <div class="ad-meta">
-                            <span class="ad-location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                ${escapeHtml(ad.city || 'Не указано')}
-                            </span>
-                            <span class="ad-date">${formatDate(ad.created_at)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Открытие категории
-        window.openCategory = function(category) {
-            loadCategoryAds(category);
-        };
-
-        async function loadCategoryAds(category) {
-            const adsContainer = document.getElementById('ads-container');
-            if (!adsContainer) return;
-            
-            try {
-                const response = await fetch(`/api/ads?category=${category}&status=active&limit=20`);
-                const ads = await response.json();
-                
-                if (ads.ads.length === 0) {
-                    adsContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open"></i>
-                            <h3>Нет объявлений в категории</h3>
-                            <p>Попробуйте другую категорию</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const adsHTML = ads.ads.map(ad => createAdCard(ad)).join('');
-                adsContainer.innerHTML = adsHTML;
-                
-                // Переключаем на главную
-                switchTab('feed');
-                
-            } catch (error) {
-                console.error('Ошибка загрузки категории:', error);
-            }
-        }
-
-        // Загрузка избранного
-        window.loadFavorites = async function() {
-            const container = document.getElementById('favorites-list');
-            if (!container) return;
-            
-            const favorites = getFavorites();
-            
-            if (favorites.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-heart"></i>
-                        <h3>У вас пока нет избранных</h3>
-                        <p>Добавляйте понравившиеся объявления ❤️</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const adsHTML = favorites.map(ad => createAdCard(ad)).join('');
-                container.innerHTML = adsHTML;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки избранного:', error);
-            }
-        };
-
-        // Управление избранным
-        function getFavorites() {
-            return JSON.parse(localStorage.getItem('favorites') || '[]');
-        }
-
-        function saveFavorites(favorites) {
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            updateFavoritesBadge();
-        }
-
-        function checkIfFavorite(adId) {
-            const favorites = getFavorites();
-            return favorites.some(ad => ad.id === adId);
-        }
-
-        window.toggleFavorite = async function(adId) {
-            const favorites = getFavorites();
-            const index = favorites.findIndex(ad => ad.id === adId);
-            
-            if (index === -1) {
-                // Добавляем в избранное
-                try {
-                    const response = await fetch(`/api/ads/${adId}`);
-                    const ad = await response.json();
-                    favorites.push(ad);
-                    showNotification('Добавлено в избранное', 'success');
-                } catch (error) {
-                    console.error('Ошибка добавления в избранное:', error);
-                }
-            } else {
-                // Удаляем из избранного
-                favorites.splice(index, 1);
-                showNotification('Удалено из избранного', 'info');
-            }
-            
-            saveFavorites(favorites);
-            
-            // Обновляем UI если нужно
-            if (document.querySelector('.tab-content.active').id === 'favorites-tab') {
-                loadFavorites();
-            }
-        };
-
-        window.clearFavorites = function() {
-            if (confirm('Очистить все избранные объявления?')) {
-                localStorage.removeItem('favorites');
-                loadFavorites();
-                showNotification('Избранное очищено', 'info');
-            }
-        };
-
-        function updateFavoritesBadge() {
-            const favorites = getFavorites();
-            const badge = document.getElementById('favorites-badge');
-            if (badge) {
-                if (favorites.length > 0) {
-                    badge.textContent = favorites.length > 9 ? '9+' : favorites.length;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            }
-        }
-
-        // Загрузка моих объявлений
-        window.loadMyAds = async function() {
-            const container = document.getElementById('my-ads-list');
-            if (!container) return;
-            
-            const user = getCurrentUser();
-            if (!user.id) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-user"></i>
-                        <h3>Авторизация требуется</h3>
-                        <p>Войдите через Telegram</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/ads?user_id=${user.id}&limit=50`);
-                const ads = await response.json();
-                
-                if (ads.ads.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-ad"></i>
-                            <h3>У вас пока нет объявлений</h3>
-                            <p>Создайте свое первое объявление</p>
-                            <button class="btn btn-primary" onclick="openCreateAd()">
-                                <i class="fas fa-plus"></i>
-                                Создать объявление
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const adsHTML = ads.ads.map(ad => createMyAdCard(ad)).join('');
-                container.innerHTML = adsHTML;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки моих объявлений:', error);
-            }
-        };
-
-        function createMyAdCard(ad) {
-            const statusClass = `status-${ad.status}`;
-            const statusText = {
-                'pending': 'На модерации',
-                'active': 'Активно',
-                'rejected': 'Отклонено'
-            }[ad.status] || 'Неизвестно';
-            
-            return `
-                <div class="my-ad-card">
-                    <div class="my-ad-header">
-                        <h4>${escapeHtml(ad.title)}</h4>
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </div>
-                    <div class="my-ad-content">
-                        <div class="my-ad-price">${formatPrice(ad.price)} ₽</div>
-                        <div class="my-ad-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(ad.city || 'Не указано')}</span>
-                            <span><i class="fas fa-clock"></i> ${formatDate(ad.created_at)}</span>
-                        </div>
-                        ${ad.description ? `<div class="my-ad-description">${escapeHtml(ad.description)}</div>` : ''}
-                    </div>
-                    <div class="my-ad-actions">
-                        <button class="btn btn-secondary" onclick="editAd('${ad.id}')">
-                            <i class="fas fa-edit"></i> Редактировать
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteMyAd('${ad.id}')">
-                            <i class="fas fa-trash"></i> Удалить
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Фильтрация моих объявлений
-        window.filterMyAds = async function(status) {
-            const user = getCurrentUser();
-            if (!user.id) return;
-            
-            // Обновляем активный фильтр
-            document.querySelectorAll('.status-filter').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            try {
-                const response = await fetch(`/api/ads?user_id=${user.id}&status=${status}&limit=50`);
-                const ads = await response.json();
-                
-                const container = document.getElementById('my-ads-list');
-                
-                if (ads.ads.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-filter"></i>
-                            <h3>Нет объявлений</h3>
-                            <p>В выбранной категории нет объявлений</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const adsHTML = ads.ads.map(ad => createMyAdCard(ad)).join('');
-                container.innerHTML = adsHTML;
-                
-            } catch (error) {
-                console.error('Ошибка фильтрации:', error);
-            }
-        };
-
-        // Редактирование объявления
-        window.editAd = function(adId) {
-            showNotification('Редактирование в разработке', 'info');
-        };
-
-        // Удаление моего объявления
-        window.deleteMyAd = async function(adId) {
-            if (!confirm('Удалить это объявление?')) return;
-            
-            try {
-                const response = await fetch(`/api/ads/${adId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser()
-                    })
-                });
-                
-                if (response.ok) {
-                    showNotification('Объявление удалено', 'success');
-                    await loadMyAds();
-                } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Ошибка', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка удаления:', error);
-                showNotification('Ошибка подключения', 'error');
-            }
-        };
-
-        // Загрузка категорий
-        window.loadCategories = async function() {
-            // Категории уже в HTML, можно добавить динамическую загрузку если нужно
-            console.log('Категории загружены');
-        };
-
-        // Загрузка сообщений
-        window.loadMessages = async function() {
-            const container = document.getElementById('messages-list');
-            if (!container) return;
-            
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-comment"></i>
-                    <h3>У вас пока нет сообщений</h3>
-                    <p>Начните общение с продавцами</p>
-                </div>
-            `;
-        };
-
-        // Открытие деталей объявления
-        window.openAdDetail = async function(adId) {
-            try {
-                const response = await fetch(`/api/ads/${adId}`);
-                const ad = await response.json();
-                
-                // Сохраняем текущее объявление для чата
-                window.currentAd = ad;
-                
-                const content = document.getElementById('ad-detail-content');
-                content.innerHTML = `
-                    <div class="ad-gallery">
-                        ${ad.images && ad.images.length > 0 
-                            ? ad.images.map(img => `
-                                <div class="gallery-item">
-                                    <img src="${img}" alt="${escapeHtml(ad.title)}">
-                                </div>
-                            `).join('')
-                            : `<div class="no-image-large"><i class="fas fa-image"></i></div>`
-                        }
-                    </div>
-                    
-                    <div class="ad-details">
-                        <div class="ad-price-large">${formatPrice(ad.price)} ₽</div>
-                        
-                        <div class="ad-meta-info">
-                            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(ad.city || 'Не указано')}</span>
-                            <span><i class="fas fa-clock"></i> ${formatDate(ad.created_at)}</span>
-                        </div>
-                        
-                        <div class="ad-description-full">
-                            <h4>${escapeHtml(ad.title)}</h4>
-                            <p>${escapeHtml(ad.description || 'Описание отсутствует')}</p>
-                        </div>
-                        
-                        <div class="ad-seller-info">
-                            <h4>Продавец</h4>
-                            <div class="seller-card">
-                                <div class="seller-avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="seller-details">
-                                    <div class="seller-name">${escapeHtml(ad.user_name || 'Продавец')}</div>
-                                    <div class="seller-rating">⭐ 5.0</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button class="action-btn secondary" onclick="addToFavorites('${ad.id}')">
-                            <i class="fas fa-heart"></i>
-                            В избранное
-                        </button>
-                        <button class="action-btn primary" onclick="openChat('${ad.id}')">
-                            <i class="fas fa-comment"></i>
-                            Написать продавцу
-                        </button>
-                    </div>
-                `;
-                
-                switchTab('ad-detail');
-                
-            } catch (error) {
-                console.error('Ошибка загрузки объявления:', error);
-                showNotification('Ошибка загрузки объявления', 'error');
-            }
-        };
-
-        // Добавление в избранное из деталей
-        window.addToFavorites = function(adId) {
-            toggleFavorite(adId);
-        };
-
-        // Открытие чата
-        window.openChat = async function(adId) {
-            if (!window.currentAd || window.currentAd.id !== adId) {
-                await openAdDetail(adId);
-            }
-            
-            // Создаем или получаем чат
-            try {
-                const response = await fetch(`/api/chats/${adId}`);
-                const chat = await response.json();
-                
-                // Настраиваем информацию о чате
-                document.getElementById('chat-user-name').textContent = window.currentAd.user_name || 'Продавец';
-                document.getElementById('chat-ad-title').textContent = window.currentAd.title;
-                
-                // Подключаемся к чату
-                await fetch(`/api/chats/${chat.id}/join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser()
-                    })
-                });
-                
-                // Загружаем сообщения
-                await loadChatMessages(chat.id);
-                
-                switchTab('chat');
-                
-            } catch (error) {
-                console.error('Ошибка открытия чата:', error);
-                showNotification('Ошибка открытия чата', 'error');
-            }
-        };
-
-        // Загрузка сообщений чата
-        async function loadChatMessages(chatId) {
-            const container = document.getElementById('chat-messages');
-            
-            try {
-                const response = await fetch(`/api/chats/${chatId}`);
-                const chat = await response.json();
-                
-                if (!chat.messages || chat.messages.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-comment"></i>
-                            <h3>Нет сообщений</h3>
-                            <p>Начните общение с продавцом</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const messagesHTML = chat.messages.map(msg => createMessageHTML(msg)).join('');
-                container.innerHTML = messagesHTML;
-                container.scrollTop = container.scrollHeight;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки сообщений:', error);
-            }
-        }
-
-        function createMessageHTML(message) {
-            const isOwn = message.user_id === getCurrentUser().id;
-            const time = formatDate(message.timestamp);
-            
-            return `
-                <div class="message ${isOwn ? 'own' : 'other'}">
-                    <div class="message-content">
-                        <div class="message-text">${escapeHtml(message.text)}</div>
-                        <div class="message-time">${time}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Отправка сообщения
-        window.sendMessage = async function() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            
-            if (!text) return;
-            
-            if (!window.currentAd) {
-                showNotification('Объявление не найдено', 'error');
-                return;
-            }
-            
-            try {
-                // Сначала создаем/получаем чат
-                const chatResponse = await fetch(`/api/chats/${window.currentAd.id}`);
-                const chat = await chatResponse.json();
-                
-                // Отправляем сообщение
-                const messageData = {
-                    user_id: getCurrentUser().id,
-                    text: text,
-                    chat_id: chat.id
-                };
-                
-                const response = await fetch(`/api/chats/${chat.id}/join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser()
-                    })
-                });
-                
-                // Очищаем поле ввода
-                input.value = '';
-                
-                // Перезагружаем сообщения
-                await loadChatMessages(chat.id);
-                
-            } catch (error) {
-                console.error('Ошибка отправки сообщения:', error);
-                showNotification('Ошибка отправки сообщения', 'error');
-            }
-        };
-
-        // Поделиться объявлением
-        window.shareAd = function() {
-            if (!window.currentAd) return;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: window.currentAd.title,
-                    text: `${window.currentAd.title} - ${formatPrice(window.currentAd.price)} ₽`,
-                    url: window.location.href
-                });
-            } else {
-                // Копируем ссылку в буфер обмена
-                navigator.clipboard.writeText(window.location.href);
-                showNotification('Ссылка скопирована', 'success');
-            }
-        };
-
-        // Настройки
-        window.openSettings = function() {
-            showNotification('Настройки в разработке', 'info');
-        };
-
         // Функция переключения вкладок
         window.switchTab = function(tabName) {
             console.log('switchTab вызвана с:', tabName);
@@ -1306,10 +772,6 @@
                     loadMyAds();
                 } else if (tabName === 'profile') {
                     loadProfile();
-                } else if (tabName === 'moderator') {
-                    loadModeratorPanel();
-                } else if (tabName === 'categories') {
-                    loadCategories();
                 } else if (tabName === 'messages') {
                     loadMessages();
                 } else if (tabName === 'feed') {
@@ -1328,243 +790,6 @@
                 activeBtn.classList.add('active');
             }
         };
-
-        // Загрузка профиля с проверкой роли
-        window.loadProfile = async function() {
-            try {
-                const tg = window.Telegram?.WebApp;
-                const user = tg?.initDataUnsafe?.user;
-                
-                if (!user) {
-                    console.error('Пользователь не найден');
-                    return;
-                }
-
-                const response = await fetch(`/api/users/${user.id}`);
-                const userData = await response.json();
-                
-                // Обновляем информацию в профиле
-                document.getElementById('profile-name').textContent = 
-                    `${userData.first_name} ${userData.last_name || ''}`.trim();
-                document.getElementById('profile-username').textContent = 
-                    userData.username ? `@${userData.username}` : '';
-                
-                // Показываем кнопку модератора если нужно
-                const moderatorBtn = document.getElementById('moderator-panel-btn');
-                if (userData.role === 'MODERATOR') {
-                    moderatorBtn.style.display = 'flex';
-                } else {
-                    moderatorBtn.style.display = 'none';
-                }
-                
-                // Проверяем заблокирован ли пользователь
-                if (userData.blocked) {
-                    showNotification('Ваш аккаунт временно ограничен модерацией', 'error');
-                }
-                
-            } catch (error) {
-                console.error('Ошибка загрузки профиля:', error);
-            }
-        };
-
-        // Открытие панели модератора
-        window.openModeratorPanel = function() {
-            switchTab('moderator');
-        };
-
-        // Загрузка панели модератора
-        window.loadModeratorPanel = async function() {
-            await loadModeratorStats();
-            await loadPendingAds();
-        };
-
-        // Загрузка статистики модерации
-        window.loadModeratorStats = async function() {
-            try {
-                const response = await fetch('/api/moderation/stats');
-                const stats = await response.json();
-                
-                document.getElementById('total-ads').textContent = stats.total_ads;
-                document.getElementById('pending-ads').textContent = stats.pending_ads;
-                document.getElementById('active-ads').textContent = stats.active_ads;
-                document.getElementById('blocked-users').textContent = stats.blocked_users;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки статистики:', error);
-                showNotification('Ошибка загрузки статистики', 'error');
-            }
-        };
-
-        // Загрузка объявлений на модерации
-        window.loadPendingAds = async function() {
-            try {
-                const response = await fetch('/api/moderation/pending');
-                const ads = await response.json();
-                
-                const container = document.getElementById('pending-ads-list');
-                
-                if (ads.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-clock"></i>
-                            <h3>Нет объявлений на модерации</h3>
-                            <p>Все объявления проверены</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                const adsHTML = ads.map(ad => `
-                    <div class="pending-ad-card">
-                        <div class="pending-ad-header">
-                            <div class="pending-ad-title">${escapeHtml(ad.title)}</div>
-                            <div class="pending-ad-price">${formatPrice(ad.price)} ₽</div>
-                        </div>
-                        <div class="pending-ad-meta">
-                            <span><i class="fas fa-user"></i> ${escapeHtml(ad.user_name || 'Unknown')}</span>
-                            <span><i class="fas fa-clock"></i> ${formatDate(ad.created_at)}</span>
-                        </div>
-                        <div class="pending-ad-description">${escapeHtml(ad.description)}</div>
-                        <div class="pending-ad-actions">
-                            <button class="btn btn-success" onclick="approveAd('${ad.id}')">
-                                <i class="fas fa-check"></i> Одобрить
-                            </button>
-                            <button class="btn btn-danger" onclick="rejectAd('${ad.id}')">
-                                <i class="fas fa-times"></i> Отклонить
-                            </button>
-                            <button class="btn btn-secondary" onclick="deleteAd('${ad.id}')">
-                                <i class="fas fa-trash"></i> Удалить
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-                
-                container.innerHTML = adsHTML;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки объявлений на модерации:', error);
-                showNotification('Ошибка загрузки объявлений', 'error');
-            }
-        };
-
-        // Одобрение объявления
-        window.approveAd = async function(adId) {
-            try {
-                const response = await fetch(`/api/moderation/approve/${adId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser()
-                    })
-                });
-                
-                if (response.ok) {
-                    showNotification('Объявление одобрено', 'success');
-                    await loadPendingAds();
-                    await loadModeratorStats();
-                } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Ошибка', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка одобрения:', error);
-                showNotification('Ошибка подключения', 'error');
-            }
-        };
-
-        // Отклонение объявления
-        window.rejectAd = async function(adId) {
-            const reason = prompt('Причина отклонения:');
-            if (!reason) return;
-            
-            try {
-                const response = await fetch(`/api/moderation/reject/${adId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser(),
-                        reason: reason
-                    })
-                });
-                
-                if (response.ok) {
-                    showNotification('Объявление отклонено', 'success');
-                    await loadPendingAds();
-                    await loadModeratorStats();
-                } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Ошибка', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка отклонения:', error);
-                showNotification('Ошибка подключения', 'error');
-            }
-        };
-
-        // Удаление объявления
-        window.deleteAd = async function(adId) {
-            if (!confirm('Удалить это объявление?')) return;
-            
-            try {
-                const response = await fetch(`/api/moderation/delete/${adId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user: getCurrentUser()
-                    })
-                });
-                
-                if (response.ok) {
-                    showNotification('Объявление удалено', 'success');
-                    await loadPendingAds();
-                    await loadModeratorStats();
-                } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Ошибка', 'error');
-                }
-            } catch (error) {
-                console.error('Ошибка удаления:', error);
-                showNotification('Ошибка подключения', 'error');
-            }
-        };
-
-        // Получение текущего пользователя
-        function getCurrentUser() {
-            const tg = window.Telegram?.WebApp;
-            return tg?.initDataUnsafe?.user || {};
-        }
-
-        // Форматирование цены
-        function formatPrice(price) {
-            return new Intl.NumberFormat('ru-RU').format(price);
-        }
-
-        // Форматирование даты
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
-            const now = new Date();
-            const diff = now - date;
-            
-            if (diff < 60000) return 'только что';
-            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
-            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
-            if (diff < 604800000) return `${Math.floor(diff / 86400000)} д назад`;
-            
-            return date.toLocaleDateString('ru-RU');
-        }
-
-        // Экранирование HTML
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
         
         // Функции загрузки контента
         async function loadAds() {
