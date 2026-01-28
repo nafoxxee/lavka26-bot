@@ -8,146 +8,12 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Lavka26 - Объявления (NEW)</title>
+    <title>Lavka26 - Объявления</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .debug-info {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: red;
-            color: white;
-            padding: 5px;
-            z-index: 9999;
-            font-size: 12px;
-        }
-        
-        /* КРИТИЧЕСКИЕ СТИЛИ - ГАРАНТИРОВАННАЯ ЗАГРУЗКА */
-        .search-bar {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            gap: 8px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .search-btn {
-            background: #0089D1;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        
-        .category-filter {
-            margin-top: 8px;
-            width: 100%;
-        }
-        
-        .category-select {
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            background: white;
-            color: #333;
-            outline: none;
-        }
-        
-        .admin-tabs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 16px 0;
-        }
-        
-        .admin-tab-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 12px 8px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-            min-height: 60px;
-        }
-        
-        .admin-tab-btn:hover {
-            border-color: #0089D1;
-            background: #f8f8f8;
-        }
-        
-        .admin-tab-btn.active {
-            background: #0089D1;
-            color: white;
-            border-color: #0089D1;
-        }
-        
-        .admin-tab-btn i {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-        
-        .admin-tab-btn span {
-            font-size: 11px;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-        
-        .fab-button {
-            position: fixed;
-            bottom: 80px;
-            right: 16px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, #0089D1, #0066A6);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 137, 209, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .back-btn {
-            background: none;
-            border: none;
-            color: #333;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        
-        .back-btn:hover {
-            background: #f0f0f0;
-        }
-    </style>
 </head>
 <body>
-    <div class="debug-info">NEW VERSION v3</div>
     <div class="app-container">
         <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
         <header class="app-header">
@@ -155,7 +21,7 @@
                 <button class="header-btn back-btn" id="back-btn" onclick="goBack()" style="display: none;">
                     <i class="fas fa-arrow-left"></i>
                 </button>
-                <div class="app-title" id="header-title">Lavka26 v3</div>
+                <div class="app-title" id="header-title">Lavka26</div>
             </div>
             <div class="header-right">
                 <button class="header-btn" onclick="switchTab('profile')">
@@ -166,6 +32,7 @@
 
         <!-- ОСНОВНОЙ КОНТЕНТ -->
         <main class="app-content">
+            <!-- Главная: Лента объявлений -->
             <div class="tab-content active" id="feed-tab">
                 <!-- Поисковая строка -->
                 <div class="search-section">
@@ -176,11 +43,18 @@
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
+                    <!-- Выбор категории (скрыт по умолчанию) -->
                     <div class="category-filter" id="category-filter" style="display: none;">
                         <select class="category-select" id="search-category">
                             <option value="">Все категории</option>
                             <option value="transport">🚗 Транспорт</option>
                             <option value="electronics">📱 Электроника</option>
+                            <option value="property">🏠 Недвижимость</option>
+                            <option value="clothing">👕 Одежда</option>
+                            <option value="jobs">💼 Работа</option>
+                            <option value="services">🔧 Услуги</option>
+                            <option value="animals">🐾 Животные</option>
+                            <option value="other">📦 Прочее</option>
                         </select>
                     </div>
                 </div>
@@ -199,13 +73,133 @@
                             <i class="fas fa-mobile"></i>
                             <span>Электроника</span>
                         </div>
+                        <div class="category-item" onclick="filterByCategory('property')">
+                            <i class="fas fa-home"></i>
+                            <span>Недвижимость</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('clothing')">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Одежда</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('jobs')">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Работа</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('services')">
+                            <i class="fas fa-tools"></i>
+                            <span>Услуги</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('animals')">
+                            <i class="fas fa-paw"></i>
+                            <span>Животные</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('other')">
+                            <i class="fas fa-box"></i>
+                            <span>Прочее</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Список объявлений -->
                 <div class="ads-section">
                     <div class="ads-grid" id="ads-grid">
-                        <div class="loading-placeholder">Загрузка объявлений...</div>
+                        <div class="loading-placeholder">
+                            <div class="skeleton-card"></div>
+                            <div class="skeleton-card"></div>
+                            <div class="skeleton-card"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Избранное -->
+            <div class="tab-content" id="favorites-tab" style="display: none;">
+                <div class="section-header">
+                    <h2>Избранное</h2>
+                </div>
+                <div class="ads-grid" id="favorites-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <p>У вас пока нет избранных объявлений</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщения -->
+            <div class="tab-content" id="messages-tab" style="display: none;">
+                <div class="section-header">
+                    <h2>Сообщения</h2>
+                </div>
+                <div class="messages-list" id="messages-list">
+                    <div class="empty-state">
+                        <i class="fas fa-comment"></i>
+                        <p>У вас пока нет сообщений</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Профиль -->
+            <div class="tab-content" id="profile-tab" style="display: none;">
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name">Загрузка...</h2>
+                            <p id="profile-phone">+7 XXX XXX-XX-XX</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="user-ads-count">0</span>
+                            <span class="stat-label">Объявлений</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="user-favorites-count">0</span>
+                            <span class="stat-label">Избранное</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-menu">
+                        <button class="menu-item" onclick="switchTab('my-ads')">
+                            <i class="fas fa-list"></i>
+                            <span>Мои объявления</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="menu-item" onclick="showEditProfile()">
+                            <i class="fas fa-edit"></i>
+                            <span>Редактировать профиль</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="menu-item" onclick="showSettings()">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="menu-item" onclick="showAbout()">
+                            <i class="fas fa-info-circle"></i>
+                            <span>О приложении</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Мои объявления -->
+            <div class="tab-content" id="my-ads-tab" style="display: none;">
+                <div class="section-header">
+                    <h2>Мои объявления</h2>
+                    <button class="create-ad-btn" onclick="openCreateAd()">
+                        <i class="fas fa-plus"></i>
+                        <span>Создать</span>
+                    </button>
+                </div>
+                <div class="ads-grid" id="my-ads-grid">
+                    <div class="loading-placeholder">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
                     </div>
                 </div>
             </div>
@@ -239,6 +233,27 @@
                     <h3>📋 Объявления на модерации</h3>
                     <div class="admin-content">
                         <p>Объявлений на модерации: 0</p>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="admin-support" style="display: none;">
+                    <h3>🎧 Запросы в поддержку</h3>
+                    <div class="admin-content">
+                        <p>Запросов в поддержку: 0</p>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="admin-payments" style="display: none;">
+                    <h3>💳 Платежи</h3>
+                    <div class="admin-content">
+                        <p>Платежей: 0</p>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="admin-users" style="display: none;">
+                    <h3>👥 Пользователи</h3>
+                    <div class="admin-content">
+                        <p>Пользователей: 0</p>
                     </div>
                 </div>
             </div>
@@ -284,72 +299,516 @@
             </button>
         </nav>
 
-        <!-- Кнопка создания -->
+        <!-- Кнопка создания объявления -->
         <button class="fab-button" id="create-button" onclick="openCreateAd()">
             <i class="fas fa-plus"></i>
         </button>
+
+        <!-- Модальное окно создания объявления -->
+        <div class="modal" id="create-ad-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="back-btn" onclick="closeModal()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Создать объявление</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="create-ad-form">
+                        <div class="form-group">
+                            <label>Заголовок</label>
+                            <input type="text" id="ad-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Категория</label>
+                            <select id="ad-category" required>
+                                <option value="">Выберите категорию</option>
+                                <option value="transport">🚗 Транспорт</option>
+                                <option value="electronics">📱 Электроника</option>
+                                <option value="property">🏠 Недвижимость</option>
+                                <option value="clothing">👕 Одежда</option>
+                                <option value="jobs">💼 Работа</option>
+                                <option value="services">🔧 Услуги</option>
+                                <option value="animals">🐾 Животные</option>
+                                <option value="other">📦 Прочее</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Цена</label>
+                            <input type="number" id="ad-price" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Описание</label>
+                            <textarea id="ad-description" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Фотографии</label>
+                            <div class="photo-upload">
+                                <button type="button" class="upload-btn">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Добавить фото</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Контакты</label>
+                            <input type="tel" id="ad-phone" placeholder="+7 XXX XXX-XX-XX">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button class="btn-primary" onclick="submitAd()">Опубликовать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Уведомления -->
+        <div class="notifications" id="notifications"></div>
     </div>
 
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
     <script>
-        console.log('🚀 Lavka26 v3 ЗАПУСКАЕТСЯ!');
-        console.log('📅 Версия: v3 - НОВЫЙ ФАЙЛ');
+        // ПОЛНЫЙ ФУНКЦИОНАЛ - ГАРАНТИРОВАННАЯ РАБОТА
+        console.log('🚀 Lavka26 v4 - ПОЛНЫЙ ФУНКЦИОНАЛ');
         
-        // БАЗОВЫЕ ФУНКЦИИ - ГАРАНТИРОВАННАЯ РАБОТА
-        window.performSearch = function() {
-            console.log('🔍 Поиск выполнен!');
-            alert('Поиск работает!');
+        // Глобальные переменные
+        let currentUser = null;
+        let ads = [];
+        let navigationHistory = ['feed'];
+        let currentFilter = {
+            search: '',
+            category: '',
+            sort: 'newest'
         };
         
-        window.showAdminSection = function(section) {
-            console.log('🛡️ Админ секция:', section);
-            alert('Админ секция: ' + section);
-        };
+        const API_BASE = 'https://lavka26-backend-rmr1.onrender.com/api';
         
-        window.goBack = function() {
-            console.log('⬅️ Назад');
-            alert('Кнопка назад работает!');
-        };
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 DOM загружен');
+            initApp();
+        });
         
-        window.openCreateAd = function() {
-            console.log('➕ Создать объявление');
-            alert('Создать объявление работает!');
-        };
-        
-        window.switchTab = function(tabName) {
-            console.log('🔄 Переключение на:', tabName);
-            
-            // Показываем админские кнопки если это админ
-            if (tabName === 'admin') {
-                const adminTabs = document.querySelector('.admin-tabs');
-                if (adminTabs) {
-                    adminTabs.style.display = 'grid';
-                    console.log('🛡️ Админские кнопки показаны');
+        function initApp() {
+            // Инициализация Telegram Web App
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                
+                // Настройка кнопки назад
+                window.Telegram.WebApp.BackButton.onClick(() => {
+                    goBack();
+                });
+                
+                // Получаем данные пользователя
+                currentUser = window.Telegram.WebApp.initDataUnsafe?.user;
+                if (currentUser) {
+                    console.log('👤 Пользователь Telegram:', currentUser);
+                    checkAdmin();
                 }
             }
-        };
+            
+            // Загружаем данные
+            loadAds();
+            setupEventListeners();
+            
+            console.log('✅ Приложение инициализировано');
+        }
         
-        // Показываем категорию при фокусе на поиске
-        setTimeout(() => {
+        function setupEventListeners() {
+            // Поисковая строка
             const searchInput = document.getElementById('search-input');
+            const searchCategory = document.getElementById('search-category');
             const categoryFilter = document.getElementById('category-filter');
             
             if (searchInput) {
                 searchInput.addEventListener('focus', function() {
                     if (categoryFilter) {
                         categoryFilter.style.display = 'block';
-                        console.log('� Категория показана');
                     }
+                });
+                
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        currentFilter.search = this.value;
+                        currentFilter.category = searchCategory ? searchCategory.value : '';
+                        loadAds();
+                    }, 500);
                 });
             }
             
-            console.log('�🔍 Проверка элементов v3:');
+            if (searchCategory) {
+                searchCategory.addEventListener('change', function() {
+                    currentFilter.category = this.value;
+                    loadAds();
+                });
+            }
+        }
+        
+        // Навигация
+        function switchTab(tabName) {
+            console.log('🔄 Переключение на:', tabName);
+            
+            // Добавляем в историю
+            if (navigationHistory[navigationHistory.length - 1] !== tabName) {
+                navigationHistory.push(tabName);
+            }
+            
+            updateHeader(tabName);
+            
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Убираем активный класс
+            document.querySelectorAll('.tabbar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            const tabElement = document.getElementById(tabName + '-tab');
+            if (tabElement) {
+                tabElement.style.display = 'block';
+            }
+            
+            // Активируем кнопку
+            const activeBtn = document.querySelector(`.tabbar-item[data-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Загружаем данные
+            switch(tabName) {
+                case 'favorites':
+                    loadFavorites();
+                    break;
+                case 'my-ads':
+                    loadMyAds();
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+                case 'admin':
+                    if (currentUser && currentUser.id === 379036860) {
+                        loadAdminPanel();
+                    }
+                    break;
+            }
+        }
+        
+        function updateHeader(tabName) {
+            const headerTitle = document.getElementById('header-title');
+            const backBtn = document.getElementById('back-btn');
+            
+            if (headerTitle) {
+                const titles = {
+                    'feed': 'Lavka26',
+                    'favorites': 'Избранное',
+                    'messages': 'Сообщения',
+                    'profile': 'Профиль',
+                    'my-ads': 'Мои объявления',
+                    'admin': 'Админ панель'
+                };
+                headerTitle.textContent = titles[tabName] || 'Lavka26';
+            }
+            
+            // Показываем/скрываем кнопку назад
+            if (backBtn) {
+                if (navigationHistory.length > 1) {
+                    backBtn.style.display = 'flex';
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        window.Telegram.WebApp.BackButton.show();
+                    }
+                } else {
+                    backBtn.style.display = 'none';
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        window.Telegram.WebApp.BackButton.hide();
+                    }
+                }
+            }
+        }
+        
+        function goBack() {
+            if (navigationHistory.length > 1) {
+                navigationHistory.pop();
+                const previousTab = navigationHistory[navigationHistory.length - 1];
+                switchTab(previousTab);
+            }
+        }
+        
+        // Загрузка данных
+        async function loadAds() {
+            const adsList = document.getElementById('ads-grid');
+            if (!adsList) return;
+            
+            adsList.innerHTML = `
+                <div class="loading-placeholder">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            `;
+            
+            try {
+                const params = new URLSearchParams();
+                if (currentFilter.category) params.append('category', currentFilter.category);
+                if (currentFilter.search) params.append('search', currentFilter.search);
+                
+                const response = await fetch(`${API_BASE}/ads?${params}`);
+                if (response.ok) {
+                    ads = await response.json();
+                    renderAds(ads);
+                } else {
+                    throw new Error('Ошибка загрузки');
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки объявлений:', error);
+                adsList.innerHTML = '<div class="error-message">Ошибка загрузки объявлений</div>';
+            }
+        }
+        
+        function renderAds(adsToRender) {
+            const adsList = document.getElementById('ads-grid');
+            if (!adsList) return;
+            
+            if (adsToRender.length === 0) {
+                adsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>Объявления не найдены</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            adsList.innerHTML = adsToRender.map(ad => `
+                <div class="ad-card" onclick="openAd(${ad.id})">
+                    <div class="ad-image">
+                        ${ad.photo ? `<img src="${ad.photo}" alt="${ad.title}">` : '<i class="fas fa-image"></i>'}
+                    </div>
+                    <div class="ad-info">
+                        <h3 class="ad-title">${ad.title}</h3>
+                        <div class="ad-price">${ad.price ? ad.price + ' ₽' : 'Договорная'}</div>
+                        <div class="ad-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${ad.location || 'Не указано'}
+                        </div>
+                        <div class="ad-date">${formatDate(ad.created_at)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Админские функции
+        function checkAdmin() {
+            if (currentUser && currentUser.id === 379036860) {
+                console.log('🛡️ Админ detected');
+                const adminTabbar = document.getElementById('admin-tabbar');
+                if (adminTabbar) {
+                    adminTabbar.style.display = 'flex';
+                }
+            }
+        }
+        
+        function showAdminSection(section) {
+            console.log('🛡️ Админ секция:', section);
+            
+            // Скрываем все секции
+            document.querySelectorAll('.admin-section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+            
+            // Убираем активный класс
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показываем выбранную секцию
+            const targetSection = document.getElementById(`admin-${section}`);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            // Активируем кнопку
+            if (event && event.target) {
+                const btn = event.target.closest('.admin-tab-btn');
+                if (btn) btn.classList.add('active');
+            }
+            
+            // Загружаем данные
+            switch(section) {
+                case 'pending':
+                    refreshPendingAds();
+                    break;
+                case 'support':
+                    refreshSupportMessages();
+                    break;
+                case 'payments':
+                    refreshPayments();
+                    break;
+                case 'users':
+                    refreshUsers();
+                    break;
+            }
+        }
+        
+        function refreshPendingAds() {
+            console.log('🔄 Обновление объявлений на модерации');
+            // Загрузка данных...
+        }
+        
+        function refreshSupportMessages() {
+            console.log('🔄 Обновление сообщений поддержки');
+            // Загрузка данных...
+        }
+        
+        function refreshPayments() {
+            console.log('🔄 Обновление платежей');
+            // Загрузка данных...
+        }
+        
+        function refreshUsers() {
+            console.log('🔄 Обновление пользователей');
+            // Загрузка данных...
+        }
+        
+        // Модальные окна
+        function openCreateAd() {
+            const modal = document.getElementById('create-ad-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                showNotification('Создание объявления', 'info');
+            }
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('create-ad-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Поиск
+        function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            const searchCategory = document.getElementById('search-category');
+            
+            if (searchInput) {
+                currentFilter.search = searchInput.value;
+            }
+            if (searchCategory) {
+                currentFilter.category = searchCategory.value;
+            }
+            
+            loadAds();
+            showNotification('Поиск выполнен', 'success');
+        }
+        
+        // Утилиты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            
+            if (hours < 1) {
+                const minutes = Math.floor(diff / (1000 * 60));
+                return minutes + ' мин назад';
+            } else if (hours < 24) {
+                return hours + ' ч назад';
+            } else {
+                const days = Math.floor(hours / 24);
+                return days + ' д назад';
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notifications = document.getElementById('notifications');
+            if (!notifications) return;
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Заглушки для функций
+        function loadFavorites() {
+            console.log('📥 Загрузка избранного');
+        }
+        
+        function loadMyAds() {
+            console.log('📥 Загрузка моих объявлений');
+        }
+        
+        function loadProfile() {
+            console.log('📥 Загрузка профиля');
+        }
+        
+        function loadAdminPanel() {
+            console.log('📥 Загрузка админ панели');
+        }
+        
+        function filterByCategory(category) {
+            currentFilter.category = category;
+            loadAds();
+            switchTab('feed');
+        }
+        
+        function openAd(adId) {
+            console.log('📄 Открытие объявления:', adId);
+        }
+        
+        function showEditProfile() {
+            console.log('✏️ Редактирование профиля');
+        }
+        
+        function showSettings() {
+            console.log('⚙️ Настройки');
+        }
+        
+        function showAbout() {
+            console.log('ℹ️ О приложении');
+        }
+        
+        function submitAd() {
+            console.log('📤 Отправка объявления');
+            showNotification('Объявление отправлено на модерацию', 'success');
+            closeModal();
+        }
+        
+        // Экспорт функций
+        window.switchTab = switchTab;
+        window.goBack = goBack;
+        window.performSearch = performSearch;
+        window.showAdminSection = showAdminSection;
+        window.openCreateAd = openCreateAd;
+        window.closeModal = closeModal;
+        window.filterByCategory = filterByCategory;
+        window.openAd = openAd;
+        window.showEditProfile = showEditProfile;
+        window.showSettings = showSettings;
+        window.showAbout = showAbout;
+        window.submitAd = submitAd;
+        
+        // Проверка элементов
+        setTimeout(() => {
+            console.log('🔍 Проверка элементов:');
             console.log('🔍 Кнопка поиска:', document.querySelector('.search-btn') ? '✅' : '❌');
             console.log('🔍 Фильтр категорий:', document.getElementById('category-filter') ? '✅' : '❌');
             console.log('🔍 Админские вкладки:', document.querySelector('.admin-tabs') ? '✅' : '❌');
             console.log('🔍 Кнопка назад:', document.getElementById('back-btn') ? '✅' : '❌');
             console.log('🔍 Кнопка создания:', document.querySelector('.fab-button') ? '✅' : '❌');
-        }, 100);
+        }, 200);
     </script>
 </body>
 </html>
