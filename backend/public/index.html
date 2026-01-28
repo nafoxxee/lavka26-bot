@@ -35,8 +35,19 @@
                 <div class="search-section">
                     <div class="search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Поиск товаров и услуг">
-                        <button class="filter-btn">
+                        <input type="text" id="search-input" placeholder="Поиск товаров и услуг">
+                        <select class="category-select" id="search-category">
+                            <option value="">Все категории</option>
+                            <option value="transport">🚗 Транспорт</option>
+                            <option value="electronics">📱 Электроника</option>
+                            <option value="property">🏠 Недвижимость</option>
+                            <option value="clothing">👕 Одежда</option>
+                            <option value="jobs">💼 Работа</option>
+                            <option value="services">🔧 Услуги</option>
+                            <option value="animals">🐾 Животные</option>
+                            <option value="other">📦 Прочее</option>
+                        </select>
+                        <button class="filter-btn" onclick="openFilters()">
                             <i class="fas fa-sliders-h"></i>
                         </button>
                     </div>
@@ -919,10 +930,6 @@
             <button class="tabbar-item" data-tab="admin" onclick="switchTab('admin')">
                 <i class="fas fa-shield-alt"></i>
                 <span>Модерация</span>
-            </button>
-            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
             </button>
         </nav>
 

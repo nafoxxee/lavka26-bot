@@ -180,8 +180,23 @@
     border: none;
     outline: none;
     font-size: 14px;
-    color: var(--text-primary);
-    background: none;
+    background: transparent;
+}
+
+.category-select {
+    border: none;
+    outline: none;
+    font-size: 12px;
+    background: var(--background);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    min-width: 120px;
+}
+
+.category-select:focus {
+    background: var(--white);
+    border: 1px solid var(--avito-blue);
 }
 
 .search-bar input::placeholder {

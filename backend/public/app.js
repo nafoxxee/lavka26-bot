@@ -61,6 +61,17 @@ function setupTelegramWebApp() {
     tg.MainButton.textColor = '#ffffff';
     tg.MainButton.onClick(() => openCreateAd());
     tg.MainButton.hide();
+    
+    // Добавляем обработчик жеста "назад"
+    tg.onEvent('backButtonClicked', () => {
+        goBack();
+    });
+    
+    // Показываем кнопку назад если нужно
+    tg.BackButton.onClick(() => {
+        goBack();
+    });
+    tg.BackButton.hide();
 }
 
 // Установка обработчиков событий
@@ -106,14 +117,24 @@ function setupEventListeners() {
 
     // Поиск
     const searchInput = document.getElementById('search-input');
+    const searchCategory = document.getElementById('search-category');
+    
     if (searchInput) {
         let searchTimeout;
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 currentFilter.search = this.value;
+                currentFilter.category = searchCategory ? searchCategory.value : '';
                 loadAds();
             }, 500);
+        });
+    }
+    
+    if (searchCategory) {
+        searchCategory.addEventListener('change', function() {
+            currentFilter.category = this.value;
+            loadAds();
         });
     }
 
@@ -211,7 +232,8 @@ function updateHeader(tabName) {
         'favorites': 'Избранное',
         'profile': 'Профиль',
         'messages': 'Сообщения',
-        'my-ads': 'Мои объявления'
+        'my-ads': 'Мои объявления',
+        'admin': 'Панель администратора'
     };
     
     if (headerTitle) {
@@ -219,8 +241,18 @@ function updateHeader(tabName) {
     }
     
     // Показываем/скрываем кнопку назад
+    const showBack = navigationHistory.length > 1;
     if (backBtn) {
-        backBtn.style.display = navigationHistory.length > 1 ? 'flex' : 'none';
+        backBtn.style.display = showBack ? 'flex' : 'none';
+    }
+    
+    // Показываем/скрываем кнопку назад в Telegram
+    if (tg && tg.BackButton) {
+        if (showBack) {
+            tg.BackButton.show();
+        } else {
+            tg.BackButton.hide();
+        }
     }
 }
 
