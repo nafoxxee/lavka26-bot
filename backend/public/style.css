@@ -638,8 +638,8 @@
     }
 }
 
-/* Темная тема (если понадобится) */
-@media (prefers-color-scheme: dark) {
+/* Темная тема отключена */
+/* @media (prefers-color-scheme: dark) {
     :root {
         --background: #1A1A1A;
         --white: #2A2A2A;
@@ -649,9 +649,7 @@
         --border: #333333;
         --border-light: #404040;
     }
-}
-    z-index: 9999;
-}
+} */
 
 /* Загрузка */
 .loading {
@@ -5206,8 +5204,6 @@ input:checked + .slider:before {
     
     .modal-content {
         margin-top: max(16px, env(safe-area-inset-top));
-    }
-}
     }
     
     .user-header {
