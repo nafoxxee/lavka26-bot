@@ -1179,4 +1179,5 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
     initializeApp();
-}
+}/ /   F o r c e   r e b u i l d   0 1 / 2 8 / 2 0 2 6   1 5 : 3 0 : 0 4  
+ 
