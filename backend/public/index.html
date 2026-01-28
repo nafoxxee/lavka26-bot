@@ -239,15 +239,124 @@
 
             <!-- Сообщения -->
             <div class="tab-content" id="messages-tab">
-                <div class="messages-section">
-                    <div class="section-header">
-                        <h2>Сообщения</h2>
-                    </div>
-                    <div class="messages-list" id="messages-list">
+                <div class="messages-container">
+                    <div class="chat-list" id="chat-list">
                         <div class="empty-state">
-                            <i class="fas fa-comment"></i>
-                            <h3>У вас пока нет сообщений</h3>
+                            <i class="fas fa-comments"></i>
+                            <h3>Нет сообщений</h3>
                             <p>Начните общение с продавцами</p>
+                        </div>
+                    </div>
+                    <div class="chat-window" id="chat-window" style="display: none;">
+                        <div class="chat-header">
+                            <button class="back-btn" onclick="closeChat()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="chat-user-info">
+                                <div class="chat-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="chat-user-details">
+                                    <div class="chat-user-name">Пользователь</div>
+                                    <div class="chat-user-status">В сети</div>
+                                </div>
+                            </div>
+                            <button class="chat-options">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Сообщения будут добавляться динамически -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" placeholder="Введите сообщение..." id="message-input">
+                            <button onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Админская панель -->
+            <div class="tab-content" id="admin-tab">
+                <div class="admin-container">
+                    <div class="admin-header">
+                        <h1>Панель модерации</h1>
+                        <div class="admin-stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="pending-ads-count">0</div>
+                                <div class="stat-label">На модерации</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="support-messages-count">0</div>
+                                <div class="stat-label">Запросов поддержки</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="payments-count">0</div>
+                                <div class="stat-label">Оплат</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-tabs">
+                        <button class="admin-tab-btn active" onclick="showAdminSection('pending')">
+                            <i class="fas fa-clock"></i>
+                            Объявления на модерации
+                        </button>
+                        <button class="admin-tab-btn" onclick="showAdminSection('support')">
+                            <i class="fas fa-headset"></i>
+                            Поддержка
+                        </button>
+                        <button class="admin-tab-btn" onclick="showAdminSection('payments')">
+                            <i class="fas fa-credit-card"></i>
+                            Платежи
+                        </button>
+                        <button class="admin-tab-btn" onclick="showAdminSection('users')">
+                            <i class="fas fa-users"></i>
+                            Пользователи
+                        </button>
+                    </div>
+
+                    <div class="admin-content">
+                        <!-- Объявления на модерации -->
+                        <div class="admin-section" id="admin-pending">
+                            <div class="pending-ads" id="pending-ads">
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle"></i>
+                                    <h3>Нет объявлений на модерации</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Поддержка -->
+                        <div class="admin-section" id="admin-support" style="display: none;">
+                            <div class="support-messages" id="support-messages">
+                                <div class="empty-state">
+                                    <i class="fas fa-headset"></i>
+                                    <h3>Нет запросов поддержки</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Платежи -->
+                        <div class="admin-section" id="admin-payments" style="display: none;">
+                            <div class="payments-list" id="payments-list">
+                                <div class="empty-state">
+                                    <i class="fas fa-credit-card"></i>
+                                    <h3>Нет платежей</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Пользователи -->
+                        <div class="admin-section" id="admin-users" style="display: none;">
+                            <div class="users-list" id="users-list">
+                                <div class="empty-state">
+                                    <i class="fas fa-users"></i>
+                                    <h3>Загрузка пользователей...</h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -669,7 +778,7 @@
         </div>
 
         <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-        <nav class="tabbar">
+        <nav class="tabbar" id="main-tabbar">
             <button class="tabbar-item active" data-tab="feed" onclick="switchTab('feed')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
@@ -688,9 +797,38 @@
             </button>
         </nav>
 
+        <!-- АДМИНСКАЯ НАВИГАЦИЯ (скрыта по умолчанию) -->
+        <nav class="tabbar admin-tabbar" id="admin-tabbar" style="display: none;">
+            <button class="tabbar-item active" data-tab="feed" onclick="switchTab('feed')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
+                <i class="fas fa-heart"></i>
+                <span>Избранное</span>
+            </button>
+            <button class="tabbar-item" data-tab="messages" onclick="switchTab('messages')">
+                <i class="fas fa-comment"></i>
+                <span>Сообщения</span>
+            </button>
+            <button class="tabbar-item" data-tab="admin" onclick="switchTab('admin')">
+                <i class="fas fa-shield-alt"></i>
+                <span>Модерация</span>
+            </button>
+            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+
         <!-- КНОПКА СОЗДАНИЯ ОБЪЯВЛЕНИЯ -->
-        <button class="fab-button" onclick="openCreateAd()">
+        <button class="fab-button" id="create-button" onclick="openCreateAd()">
             <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- АДМИНСКАЯ КНОПКА -->
+        <button class="fab-button admin" id="admin-button" style="display: none;" onclick="openAdminPanel()">
+            <i class="fas fa-cog"></i>
         </button>
 
         <!-- Уведомления -->

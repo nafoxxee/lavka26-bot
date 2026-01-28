@@ -32,6 +32,8 @@ function initializeApp() {
     getUserDataWithTimeout();
     loadCategories();
     loadAds();
+    checkAdminAccess();
+    setupGeolocation();
     console.log('✅ Инициализация завершена');
 }
 
@@ -975,6 +977,181 @@ window.closeCreateAdModal = closeCreateAdModal;
 window.publishAd = publishAd;
 window.openAd = openAd;
 window.closeModal = closeModal;
+// Проверка доступа админа
+function checkAdminAccess() {
+    const tgUser = tg.initDataUnsafe.user;
+    if (tgUser && tgUser.id === 379036860) {
+        currentUser.isAdmin = true;
+        showAdminInterface();
+    }
+}
+
+// Показать админский интерфейс
+function showAdminInterface() {
+    // Показываем админскую навигацию
+    const mainTabbar = document.getElementById('main-tabbar');
+    const adminTabbar = document.getElementById('admin-tabbar');
+    const adminButton = document.getElementById('admin-button');
+    
+    if (mainTabbar) mainTabbar.style.display = 'none';
+    if (adminTabbar) adminTabbar.style.display = 'flex';
+    if (adminButton) adminButton.style.display = 'flex';
+    
+    // Загружаем админские данные
+    loadAdminStats();
+}
+
+// Загрузка админской статистики
+async function loadAdminStats() {
+    try {
+        updateAdminStats(0, 0, 0); // Временно ставим нули
+    } catch (error) {
+        console.error('Ошибка загрузки админской статистики:', error);
+    }
+}
+
+// Обновление админской статистики
+function updateAdminStats(pending, support, payments) {
+    const pendingCount = document.getElementById('pending-ads-count');
+    const supportCount = document.getElementById('support-messages-count');
+    const paymentsCount = document.getElementById('payments-count');
+    
+    if (pendingCount) pendingCount.textContent = pending;
+    if (supportCount) supportCount.textContent = support;
+    if (paymentsCount) paymentsCount.textContent = payments;
+}
+
+// Открытие админской панели
+function openAdminPanel() {
+    switchTab('admin');
+}
+
+// Показать секцию админки
+function showAdminSection(section) {
+    // Скрываем все секции
+    document.querySelectorAll('.admin-section').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    
+    // Убираем активный класс с кнопок
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Показываем выбранную секцию
+    const targetSection = document.getElementById(`admin-${section}`);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
+    
+    // Активируем кнопку
+    const activeBtn = event.target;
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+}
+
+// Настройка геолокации
+function setupGeolocation() {
+    if (tg && tg.requestLocation) {
+        tg.requestLocation();
+    }
+}
+
+// ЧАТЫ
+let currentChat = null;
+
+// Открыть чат
+function openChat(userId, userName) {
+    currentChat = { userId, userName };
+    
+    const chatList = document.getElementById('chat-list');
+    const chatWindow = document.getElementById('chat-window');
+    
+    if (chatList) chatList.style.display = 'none';
+    if (chatWindow) chatWindow.style.display = 'flex';
+    
+    // Обновляем информацию о пользователе в чате
+    const chatUserName = document.querySelector('.chat-user-name');
+    if (chatUserName) chatUserName.textContent = userName;
+}
+
+// Закрыть чат
+function closeChat() {
+    currentChat = null;
+    
+    const chatList = document.getElementById('chat-list');
+    const chatWindow = document.getElementById('chat-window');
+    
+    if (chatList) chatList.style.display = 'block';
+    if (chatWindow) chatWindow.style.display = 'none';
+}
+
+// Отправить сообщение
+function sendMessage() {
+    const input = document.getElementById('message-input');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Временно просто очищаем поле
+    input.value = '';
+    showNotification('Сообщение отправлено', 'success');
+}
+
+// УЛУЧЧЕННАЯ ЗАГРУЗКА ФОТО (до 20мб)
+function handleImageUpload(event) {
+    const files = event.target.files;
+    const container = document.getElementById('image-preview-container');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    Array.from(files).forEach((file, index) => {
+        if (index >= 10) return; // Максимум 10 фото
+        
+        // Проверяем размер файла (20мб)
+        if (file.size > 20 * 1024 * 1024) {
+            showNotification(`Файл ${file.name} слишком большой (макс. 20мб)`, 'error');
+            return;
+        }
+        
+        // Проверяем тип файла
+        if (!file.type.startsWith('image/')) {
+            showNotification(`Файл ${file.name} не является изображением`, 'error');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            preview.innerHTML = `
+                <img src="${e.target.result}" alt="Preview ${index + 1}">
+                <div class="image-info">
+                    <span>${formatFileSize(file.size)}</span>
+                </div>
+                <button type="button" class="remove-image" onclick="removeImage(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(preview);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Форматирование размера файла
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Экспорт функций
 window.toggleFavorite = toggleFavorite;
 window.contactSeller = contactSeller;
 window.shareAd = shareAd;
@@ -985,6 +1162,11 @@ window.resetFilters = resetFilters;
 window.removeImage = removeImage;
 window.editProfile = editProfile;
 window.refreshPendingAds = refreshPendingAds;
+window.openChat = openChat;
+window.closeChat = closeChat;
+window.sendMessage = sendMessage;
+window.openAdminPanel = openAdminPanel;
+window.showAdminSection = showAdminSection;
 window.refreshReports = refreshReports;
 window.editAd = editAd;
 window.deleteAd = deleteAd;
