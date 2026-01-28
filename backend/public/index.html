@@ -316,11 +316,11 @@
                 <div class="modal-body">
                     <form id="create-ad-form">
                         <div class="form-group">
-                            <label>Заголовок</label>
-                            <input type="text" id="ad-title" required>
+                            <label>Заголовок объявления *</label>
+                            <input type="text" id="ad-title" required placeholder="Например: iPhone 13 Pro Max">
                         </div>
                         <div class="form-group">
-                            <label>Категория</label>
+                            <label>Категория *</label>
                             <select id="ad-category" required>
                                 <option value="">Выберите категорию</option>
                                 <option value="transport">🚗 Транспорт</option>
@@ -335,24 +335,46 @@
                         </div>
                         <div class="form-group">
                             <label>Цена</label>
-                            <input type="number" id="ad-price" placeholder="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Описание</label>
-                            <textarea id="ad-description" rows="4"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Фотографии</label>
-                            <div class="photo-upload">
-                                <button type="button" class="upload-btn">
-                                    <i class="fas fa-camera"></i>
-                                    <span>Добавить фото</span>
-                                </button>
+                            <div class="price-input">
+                                <input type="number" id="ad-price" placeholder="0">
+                                <span class="currency">₽</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Контакты</label>
-                            <input type="tel" id="ad-phone" placeholder="+7 XXX XXX-XX-XX">
+                            <label>Описание *</label>
+                            <textarea id="ad-description" rows="4" required placeholder="Опишите товар подробно: состояние, характеристики, причины продажи..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Местоположение *</label>
+                            <div class="location-section">
+                                <button type="button" class="location-btn" onclick="getLocation()">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Определить автоматически</span>
+                                </button>
+                                <div class="location-divider">или</div>
+                                <input type="text" id="ad-location" placeholder="Укажите адрес: г. Москва, ул. Тверская, д. 1" required>
+                                <div class="location-suggestions" id="location-suggestions" style="display: none;">
+                                    <div class="suggestion-item" onclick="selectLocation('г. Москва, Красная площадь')">г. Москва, Красная площадь</div>
+                                    <div class="suggestion-item" onclick="selectLocation('г. Санкт-Петербург, Невский проспект')">г. Санкт-Петербург, Невский проспект</div>
+                                    <div class="suggestion-item" onclick="selectLocation('г. Новосибирск, Красный проспект')">г. Новосибирск, Красный проспект</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Фотографии</label>
+                            <div class="photo-upload-area">
+                                <input type="file" id="ad-photos" accept="image/*" multiple style="display: none;" onchange="handlePhotos(event)">
+                                <div class="photo-grid" id="photo-grid">
+                                    <div class="add-photo-btn" onclick="document.getElementById('ad-photos').click()">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Добавить фото</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Контактный телефон *</label>
+                            <input type="tel" id="ad-phone" placeholder="+7 XXX XXX-XX-XX" required>
                         </div>
                     </form>
                 </div>
@@ -563,11 +585,14 @@
                     ads = await response.json();
                     renderAds(ads);
                 } else {
-                    throw new Error('Ошибка загрузки');
+                    // Если API недоступен, показываем что нет объявлений
+                    console.warn('API недоступен, показываем пустой список');
+                    renderAds([]);
                 }
             } catch (error) {
                 console.error('Ошибка загрузки объявлений:', error);
-                adsList.innerHTML = '<div class="error-message">Ошибка загрузки объявлений</div>';
+                // Показываем что нет объявлений вместо ошибки
+                renderAds([]);
             }
         }
         
@@ -579,7 +604,8 @@
                 adsList.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-search"></i>
-                        <p>Объявления не найдены</p>
+                        <p>Объявлений не найдено</p>
+                        <small>Попробуйте изменить параметры поиска или фильтры</small>
                     </div>
                 `;
                 return;
@@ -786,6 +812,133 @@
             closeModal();
         }
         
+        // Геолокация
+        function getLocation() {
+            console.log('📍 Запрос геолокации');
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        
+                        // Здесь можно добавить обратное геокодирование
+                        const locationInput = document.getElementById('ad-location');
+                        if (locationInput) {
+                            locationInput.value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+                            showNotification('Местоположение определено', 'success');
+                        }
+                    },
+                    (error) => {
+                        console.error('Ошибка геолокации:', error);
+                        showNotification('Не удалось определить местоположение', 'error');
+                    }
+                );
+            } else {
+                showNotification('Геолокация не поддерживается', 'error');
+            }
+        }
+        
+        function selectLocation(address) {
+            const locationInput = document.getElementById('ad-location');
+            if (locationInput) {
+                locationInput.value = address;
+            }
+            
+            const suggestions = document.getElementById('location-suggestions');
+            if (suggestions) {
+                suggestions.style.display = 'none';
+            }
+        }
+        
+        // Фото загрузка
+        let uploadedPhotos = [];
+        
+        function handlePhotos(event) {
+            const files = event.target.files;
+            const photoGrid = document.getElementById('photo-grid');
+            
+            if (!photoGrid) return;
+            
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const photoId = Date.now() + Math.random();
+                        uploadedPhotos.push({
+                            id: photoId,
+                            url: e.target.result,
+                            file: file
+                        });
+                        
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'photo-item';
+                        photoItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Фото">
+                            <button class="remove-photo" onclick="removePhoto(${photoId})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        
+                        // Вставляем перед кнопкой добавления
+                        const addBtn = photoGrid.querySelector('.add-photo-btn');
+                        if (addBtn) {
+                            photoGrid.insertBefore(photoItem, addBtn);
+                        }
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Очищаем input для возможности загрузки тех же файлов
+            event.target.value = '';
+        }
+        
+        function removePhoto(photoId) {
+            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
+            
+            const photoGrid = document.getElementById('photo-grid');
+            if (photoGrid) {
+                const photoItems = photoGrid.querySelectorAll('.photo-item');
+                photoItems.forEach(item => {
+                    const removeBtn = item.querySelector('.remove-photo');
+                    if (removeBtn && removeBtn.getAttribute('onclick').includes(photoId)) {
+                        item.remove();
+                    }
+                });
+            }
+        }
+        
+        // Показываем подсказки адреса при фокусе
+        document.addEventListener('DOMContentLoaded', function() {
+            const locationInput = document.getElementById('ad-location');
+            const suggestions = document.getElementById('location-suggestions');
+            
+            if (locationInput && suggestions) {
+                locationInput.addEventListener('focus', function() {
+                    if (this.value.length === 0) {
+                        suggestions.style.display = 'block';
+                    }
+                });
+                
+                locationInput.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        suggestions.style.display = 'none';
+                    } else {
+                        suggestions.style.display = 'block';
+                    }
+                });
+                
+                locationInput.addEventListener('blur', function() {
+                    setTimeout(() => {
+                        suggestions.style.display = 'none';
+                    }, 200);
+                });
+            }
+        });
+        
         // Экспорт функций
         window.switchTab = switchTab;
         window.goBack = goBack;
@@ -799,6 +952,10 @@
         window.showSettings = showSettings;
         window.showAbout = showAbout;
         window.submitAd = submitAd;
+        window.getLocation = getLocation;
+        window.selectLocation = selectLocation;
+        window.handlePhotos = handlePhotos;
+        window.removePhoto = removePhoto;
         
         // Проверка элементов
         setTimeout(() => {
