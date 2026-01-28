@@ -7,6 +7,7 @@ let currentAd = null;
 let ads = [];
 let categories = [];
 let favorites = [];
+let navigationHistory = ['feed']; // История навигации
 let currentFilter = {
     category: '',
     search: '',
@@ -148,13 +149,21 @@ function setupEventListeners() {
 
 // Переключение вкладок
 function switchTab(tabName) {
+    // Добавляем в историю навигации
+    if (navigationHistory[navigationHistory.length - 1] !== tabName) {
+        navigationHistory.push(tabName);
+    }
+    
+    // Обновляем заголовок и кнопку назад
+    updateHeader(tabName);
+    
     // Скрываем все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = 'none';
     });
     
     // Убираем активный класс с навигации
-    document.querySelectorAll('.nav-item').forEach(item => {
+    document.querySelectorAll('.tabbar-item').forEach(item => {
         item.classList.remove('active');
     });
     
@@ -165,7 +174,7 @@ function switchTab(tabName) {
     }
     
     // Активируем кнопку навигации
-    const activeBtn = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+    const activeBtn = document.querySelector(`.tabbar-item[data-tab="${tabName}"]`);
     if (activeBtn) {
         activeBtn.classList.add('active');
     }
@@ -186,6 +195,48 @@ function switchTab(tabName) {
                 loadModeratorPanel();
             }
             break;
+    }
+}
+
+// Обновление заголовка
+function updateHeader(tabName) {
+    const headerTitle = document.getElementById('header-title');
+    const backBtn = document.getElementById('back-btn');
+    
+    const titles = {
+        'feed': 'Lavka26',
+        'categories': 'Категории',
+        'favorites': 'Избранное',
+        'profile': 'Профиль',
+        'messages': 'Сообщения',
+        'my-ads': 'Мои объявления'
+    };
+    
+    if (headerTitle) {
+        headerTitle.textContent = titles[tabName] || 'Lavka26';
+    }
+    
+    // Показываем/скрываем кнопку назад
+    if (backBtn) {
+        backBtn.style.display = navigationHistory.length > 1 ? 'flex' : 'none';
+    }
+}
+
+// Функция возврата назад
+function goBack() {
+    if (navigationHistory.length > 1) {
+        // Удаляем текущую страницу из истории
+        navigationHistory.pop();
+        // Получаем предыдущую страницу
+        const previousTab = navigationHistory[navigationHistory.length - 1];
+        // Переключаемся на неё без добавления в историю
+        navigationHistory.pop(); // Удаляем чтобы не дублировать
+        switchTab(previousTab);
+    } else {
+        // Если история пустая, закрываем приложение
+        if (tg) {
+            tg.close();
+        }
     }
 }
 

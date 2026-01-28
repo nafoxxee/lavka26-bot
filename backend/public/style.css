@@ -75,6 +75,17 @@
     align-items: center;
     flex: 1;
     min-width: 0;
+    gap: 8px;
+}
+
+.back-btn {
+    display: none;
+    color: var(--avito-blue);
+}
+
+.back-btn:hover {
+    background-color: var(--border-light);
+    color: var(--avito-blue-hover);
 }
 
 .app-title {
@@ -84,6 +95,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
 }
 
 .header-right {

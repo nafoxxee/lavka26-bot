@@ -15,7 +15,10 @@
         <!-- ВЕРХНЯЯ ПАНЕЛЬ (fixed) -->
         <header class="app-header">
             <div class="header-left">
-                <div class="app-title">Lavka26</div>
+                <button class="header-btn back-btn" id="back-btn" onclick="goBack()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="app-title" id="header-title">Lavka26</div>
             </div>
             <div class="header-right">
                 <button class="header-btn" onclick="switchTab('messages')">
@@ -531,19 +534,19 @@
 
         <!-- НИЖНЯЯ НАВИГАЦИЯ -->
         <nav class="tabbar">
-            <button class="tabbar-item active" onclick="switchTab('feed')">
+            <button class="tabbar-item active" data-tab="feed" onclick="switchTab('feed')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="tabbar-item" onclick="switchTab('categories')">
+            <button class="tabbar-item" data-tab="categories" onclick="switchTab('categories')">
                 <i class="fas fa-th-large"></i>
                 <span>Категории</span>
             </button>
-            <button class="tabbar-item" onclick="switchTab('favorites')">
+            <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
                 <i class="fas fa-heart"></i>
                 <span>Избранное</span>
             </button>
-            <button class="tabbar-item" onclick="switchTab('profile')">
+            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </button>
