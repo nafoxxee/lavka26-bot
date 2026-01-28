@@ -36,6 +36,12 @@
                     <div class="search-bar">
                         <i class="fas fa-search"></i>
                         <input type="text" id="search-input" placeholder="Поиск товаров и услуг">
+                        <button class="search-btn" onclick="performSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <!-- Выбор категории (скрыт по умолчанию) -->
+                    <div class="category-filter" id="category-filter" style="display: none;">
                         <select class="category-select" id="search-category">
                             <option value="">Все категории</option>
                             <option value="transport">🚗 Транспорт</option>
@@ -47,9 +53,6 @@
                             <option value="animals">🐾 Животные</option>
                             <option value="other">📦 Прочее</option>
                         </select>
-                        <button class="filter-btn" onclick="openFilters()">
-                            <i class="fas fa-sliders-h"></i>
-                        </button>
                     </div>
                 </div>
 
@@ -632,16 +635,20 @@
 
                 <div class="admin-tabs">
                     <button class="admin-tab-btn active" onclick="showAdminSection('pending')">
-                        <i class="fas fa-clock"></i> Модерация
+                        <i class="fas fa-clock"></i>
+                        <span>Модерация</span>
                     </button>
                     <button class="admin-tab-btn" onclick="showAdminSection('support')">
-                        <i class="fas fa-headset"></i> Поддержка
+                        <i class="fas fa-headset"></i>
+                        <span>Поддержка</span>
                     </button>
                     <button class="admin-tab-btn" onclick="showAdminSection('payments')">
-                        <i class="fas fa-credit-card"></i> Платежи
+                        <i class="fas fa-credit-card"></i>
+                        <span>Платежи</span>
                     </button>
                     <button class="admin-tab-btn" onclick="showAdminSection('users')">
-                        <i class="fas fa-users"></i> Пользователи
+                        <i class="fas fa-users"></i>
+                        <span>Пользователи</span>
                     </button>
                 </div>
 

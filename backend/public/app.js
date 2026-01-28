@@ -118,8 +118,16 @@ function setupEventListeners() {
     // Поиск
     const searchInput = document.getElementById('search-input');
     const searchCategory = document.getElementById('search-category');
+    const categoryFilter = document.getElementById('category-filter');
     
     if (searchInput) {
+        // Показываем категорию при фокусе на поиске
+        searchInput.addEventListener('focus', function() {
+            if (categoryFilter) {
+                categoryFilter.style.display = 'block';
+            }
+        });
+        
         let searchTimeout;
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -1080,6 +1088,22 @@ function openAdminPanel() {
     switchTab('admin');
 }
 
+// Выполнить поиск
+function performSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchCategory = document.getElementById('search-category');
+    
+    if (searchInput) {
+        currentFilter.search = searchInput.value;
+    }
+    if (searchCategory) {
+        currentFilter.category = searchCategory.value;
+    }
+    
+    loadAds();
+    showNotification('Поиск выполнен', 'success');
+}
+
 // Показать секцию админки
 function showAdminSection(section) {
     // Скрываем все секции
@@ -1099,9 +1123,22 @@ function showAdminSection(section) {
     }
     
     // Активируем кнопку
-    const activeBtn = event.target;
-    if (activeBtn) {
-        activeBtn.classList.add('active');
+    event.target.closest('.admin-tab-btn').classList.add('active');
+    
+    // Загружаем данные для секции
+    switch(section) {
+        case 'pending':
+            refreshPendingAds();
+            break;
+        case 'support':
+            refreshSupportMessages();
+            break;
+        case 'payments':
+            refreshPayments();
+            break;
+        case 'users':
+            refreshUsers();
+            break;
     }
 }
 
@@ -1200,41 +1237,4 @@ function handleImageUpload(event) {
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Экспорт функций
-window.toggleFavorite = toggleFavorite;
-window.contactSeller = contactSeller;
-window.shareAd = shareAd;
-window.openFilters = openFilters;
-window.closeFilters = closeFilters;
-window.applyFilters = applyFilters;
-window.resetFilters = resetFilters;
-window.removeImage = removeImage;
-window.editProfile = editProfile;
-window.refreshPendingAds = refreshPendingAds;
-window.refreshReports = refreshReports;
-window.refreshSupportMessages = refreshSupportMessages;
-window.refreshPayments = refreshPayments;
-window.refreshUsers = refreshUsers;
-window.openChat = openChat;
-window.closeChat = closeChat;
-window.sendMessage = sendMessage;
-window.openAdminPanel = openAdminPanel;
-window.showAdminSection = showAdminSection;
-window.editAd = editAd;
-window.deleteAd = deleteAd;
-window.approveAd = approveAd;
-window.rejectAd = rejectAd;
-window.testFunction = testFunction;
-window.goBack = goBack;
-
-// Запуск приложения
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-    initializeApp();
 }
