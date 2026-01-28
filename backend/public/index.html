@@ -15,14 +15,16 @@
         <!-- ВЕРХНЯЯ ПАНЕЛЬ (fixed) -->
         <header class="app-header">
             <div class="header-left">
-                <div class="app-title">Lavka26</div>
+                <div class="app-title">LAVKA26</div>
             </div>
             <div class="header-right">
                 <button class="header-btn" onclick="switchTab('messages')">
                     <i class="fas fa-comment"></i>
+                    <span class="badge" id="messages-badge" style="display: none;"></span>
                 </button>
                 <button class="header-btn" onclick="switchTab('favorites')">
                     <i class="fas fa-heart"></i>
+                    <span class="badge" id="favorites-badge" style="display: none;"></span>
                 </button>
                 <button class="header-btn" onclick="switchTab('profile')">
                     <i class="fas fa-user"></i>
@@ -48,27 +50,35 @@
                 <!-- Категории -->
                 <div class="categories-section">
                     <div class="categories-grid">
-                        <div class="category-item">
-                            <i class="fas fa-car"></i>
-                            <span>Транспорт</span>
-                        </div>
-                        <div class="category-item">
+                        <div class="category-item" data-category="electronics">
                             <i class="fas fa-mobile-alt"></i>
                             <span>Электроника</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" data-category="transport">
+                            <i class="fas fa-car"></i>
+                            <span>Автомобили</span>
+                        </div>
+                        <div class="category-item" data-category="realestate">
                             <i class="fas fa-home"></i>
                             <span>Недвижимость</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" data-category="clothing">
                             <i class="fas fa-tshirt"></i>
                             <span>Одежда</span>
                         </div>
-                        <div class="category-item">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Работа</span>
+                        <div class="category-item" data-category="home">
+                            <i class="fas fa-couch"></i>
+                            <span>Для дома</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" data-category="services">
+                            <i class="fas fa-wrench"></i>
+                            <span>Услуги</span>
+                        </div>
+                        <div class="category-item" data-category="kids">
+                            <i class="fas fa-baby"></i>
+                            <span>Детское</span>
+                        </div>
+                        <div class="category-item" data-category="sport">
                             <i class="fas fa-dumbbell"></i>
                             <span>Спорт</span>
                         </div>
@@ -151,19 +161,53 @@
                             <i class="fas fa-user"></i>
                         </div>
                         <div class="profile-info">
-                            <h2>Пользователь</h2>
-                            <p>@username</p>
+                            <h2 id="profile-name">Пользователь</h2>
+                            <p id="profile-username">@username</p>
                         </div>
                     </div>
                     <div class="profile-stats">
                         <div class="stat-item">
                             <span>0</span>
                             <span>Объявлений</span>
-                
-                <!-- Статистика -->
-                <div class="mod-stats">
-                    <h3>📊 Статистика</h3>
-                    <div class="stats-grid">
+                        </div>
+                        <div class="stat-item">
+                            <span>0.0</span>
+                            <span>Рейтинг</span>
+                        </div>
+                    </div>
+                    <div class="profile-menu">
+                        <button class="menu-item" onclick="openCreateAd()">
+                            <i class="fas fa-plus"></i>
+                            <span>Создать объявление</span>
+                        </button>
+                        <button class="menu-item" onclick="loadMyAds()">
+                            <i class="fas fa-ad"></i>
+                            <span>Мои объявления</span>
+                        </button>
+                        <button class="menu-item" onclick="openSettings()">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </button>
+                        <button class="menu-item" id="moderator-panel-btn" style="display: none;" onclick="openModeratorPanel()">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>🛡 Панель модератора</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Панель модератора -->
+            <div class="tab-content" id="moderator-tab">
+                <div class="moderator-section">
+                    <div class="section-header">
+                        <h2>� Панель модератора</h2>
+                        <button class="btn btn-ghost" onclick="loadModeratorStats()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Статистика -->
+                    <div class="stats-grid" id="mod-stats">
                         <div class="stat-card">
                             <div class="stat-number" id="total-ads">0</div>
                             <div class="stat-label">Всего объявлений</div>
@@ -177,11 +221,10 @@
                             <div class="stat-label">Активных</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number" id="total-reports">0</div>
-                            <div class="stat-label">Жалоб</div>
+                            <div class="stat-number" id="blocked-users">0</div>
+                            <div class="stat-label">Заблокировано</div>
                         </div>
                     </div>
-                </div>
 
                 <!-- Объявления на модерации -->
                 <div class="mod-section">
@@ -752,6 +795,8 @@
                     loadMyAds();
                 } else if (tabName === 'profile') {
                     loadProfile();
+                } else if (tabName === 'moderator') {
+                    loadModeratorPanel();
                 } else if (tabName === 'messages') {
                     loadMessages();
                 } else if (tabName === 'feed') {
@@ -770,6 +815,243 @@
                 activeBtn.classList.add('active');
             }
         };
+
+        // Загрузка профиля с проверкой роли
+        window.loadProfile = async function() {
+            try {
+                const tg = window.Telegram?.WebApp;
+                const user = tg?.initDataUnsafe?.user;
+                
+                if (!user) {
+                    console.error('Пользователь не найден');
+                    return;
+                }
+
+                const response = await fetch(`/api/users/${user.id}`);
+                const userData = await response.json();
+                
+                // Обновляем информацию в профиле
+                document.getElementById('profile-name').textContent = 
+                    `${userData.first_name} ${userData.last_name || ''}`.trim();
+                document.getElementById('profile-username').textContent = 
+                    userData.username ? `@${userData.username}` : '';
+                
+                // Показываем кнопку модератора если нужно
+                const moderatorBtn = document.getElementById('moderator-panel-btn');
+                if (userData.role === 'MODERATOR') {
+                    moderatorBtn.style.display = 'flex';
+                } else {
+                    moderatorBtn.style.display = 'none';
+                }
+                
+                // Проверяем заблокирован ли пользователь
+                if (userData.blocked) {
+                    showNotification('Ваш аккаунт временно ограничен модерацией', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+            }
+        };
+
+        // Открытие панели модератора
+        window.openModeratorPanel = function() {
+            switchTab('moderator');
+        };
+
+        // Загрузка панели модератора
+        window.loadModeratorPanel = async function() {
+            await loadModeratorStats();
+            await loadPendingAds();
+        };
+
+        // Загрузка статистики модерации
+        window.loadModeratorStats = async function() {
+            try {
+                const response = await fetch('/api/moderation/stats');
+                const stats = await response.json();
+                
+                document.getElementById('total-ads').textContent = stats.total_ads;
+                document.getElementById('pending-ads').textContent = stats.pending_ads;
+                document.getElementById('active-ads').textContent = stats.active_ads;
+                document.getElementById('blocked-users').textContent = stats.blocked_users;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+                showNotification('Ошибка загрузки статистики', 'error');
+            }
+        };
+
+        // Загрузка объявлений на модерации
+        window.loadPendingAds = async function() {
+            try {
+                const response = await fetch('/api/moderation/pending');
+                const ads = await response.json();
+                
+                const container = document.getElementById('pending-ads-list');
+                
+                if (ads.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clock"></i>
+                            <h3>Нет объявлений на модерации</h3>
+                            <p>Все объявления проверены</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const adsHTML = ads.map(ad => `
+                    <div class="pending-ad-card">
+                        <div class="pending-ad-header">
+                            <div class="pending-ad-title">${escapeHtml(ad.title)}</div>
+                            <div class="pending-ad-price">${formatPrice(ad.price)} ₽</div>
+                        </div>
+                        <div class="pending-ad-meta">
+                            <span><i class="fas fa-user"></i> ${escapeHtml(ad.user_name || 'Unknown')}</span>
+                            <span><i class="fas fa-clock"></i> ${formatDate(ad.created_at)}</span>
+                        </div>
+                        <div class="pending-ad-description">${escapeHtml(ad.description)}</div>
+                        <div class="pending-ad-actions">
+                            <button class="btn btn-success" onclick="approveAd('${ad.id}')">
+                                <i class="fas fa-check"></i> Одобрить
+                            </button>
+                            <button class="btn btn-danger" onclick="rejectAd('${ad.id}')">
+                                <i class="fas fa-times"></i> Отклонить
+                            </button>
+                            <button class="btn btn-secondary" onclick="deleteAd('${ad.id}')">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = adsHTML;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки объявлений на модерации:', error);
+                showNotification('Ошибка загрузки объявлений', 'error');
+            }
+        };
+
+        // Одобрение объявления
+        window.approveAd = async function(adId) {
+            try {
+                const response = await fetch(`/api/moderation/approve/${adId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: getCurrentUser()
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('Объявление одобрено', 'success');
+                    await loadPendingAds();
+                    await loadModeratorStats();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка одобрения:', error);
+                showNotification('Ошибка подключения', 'error');
+            }
+        };
+
+        // Отклонение объявления
+        window.rejectAd = async function(adId) {
+            const reason = prompt('Причина отклонения:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`/api/moderation/reject/${adId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: getCurrentUser(),
+                        reason: reason
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('Объявление отклонено', 'success');
+                    await loadPendingAds();
+                    await loadModeratorStats();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка отклонения:', error);
+                showNotification('Ошибка подключения', 'error');
+            }
+        };
+
+        // Удаление объявления
+        window.deleteAd = async function(adId) {
+            if (!confirm('Удалить это объявление?')) return;
+            
+            try {
+                const response = await fetch(`/api/moderation/delete/${adId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: getCurrentUser()
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification('Объявление удалено', 'success');
+                    await loadPendingAds();
+                    await loadModeratorStats();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Ошибка', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка удаления:', error);
+                showNotification('Ошибка подключения', 'error');
+            }
+        };
+
+        // Получение текущего пользователя
+        function getCurrentUser() {
+            const tg = window.Telegram?.WebApp;
+            return tg?.initDataUnsafe?.user || {};
+        }
+
+        // Форматирование цены
+        function formatPrice(price) {
+            return new Intl.NumberFormat('ru-RU').format(price);
+        }
+
+        // Форматирование даты
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'только что';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)} д назад`;
+            
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        // Экранирование HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
         
         // Функции загрузки контента
         async function loadAds() {
