@@ -932,6 +932,21 @@ function refreshReports() {
     showNotification('Обновление жалоб...', 'info');
 }
 
+function refreshSupportMessages() {
+    console.log('Обновление сообщений поддержки...');
+    showNotification('Обновление сообщений поддержки...', 'info');
+}
+
+function refreshPayments() {
+    console.log('Обновление платежей...');
+    showNotification('Обновление платежей...', 'info');
+}
+
+function refreshUsers() {
+    console.log('Обновление пользователей...');
+    showNotification('Обновление пользователей...', 'info');
+}
+
 function editAd(adId) {
     console.log('Редактирование объявления:', adId);
     showNotification('Функция редактирования в разработке', 'info');
@@ -980,9 +995,18 @@ window.closeModal = closeModal;
 // Проверка доступа админа
 function checkAdminAccess() {
     const tgUser = tg.initDataUnsafe.user;
+    console.log('Проверка админа:', tgUser?.id, 'ожидаем: 379036860');
+    
     if (tgUser && tgUser.id === 379036860) {
+        console.log('✅ Админ обнаружен!');
+        // Инициализируем currentUser если еще не установлен
+        if (!currentUser) {
+            currentUser = tgUser;
+        }
         currentUser.isAdmin = true;
         showAdminInterface();
+    } else {
+        console.log('❌ Не админ:', tgUser?.id);
     }
 }
 
@@ -1162,12 +1186,15 @@ window.resetFilters = resetFilters;
 window.removeImage = removeImage;
 window.editProfile = editProfile;
 window.refreshPendingAds = refreshPendingAds;
+window.refreshReports = refreshReports;
+window.refreshSupportMessages = refreshSupportMessages;
+window.refreshPayments = refreshPayments;
+window.refreshUsers = refreshUsers;
 window.openChat = openChat;
 window.closeChat = closeChat;
 window.sendMessage = sendMessage;
 window.openAdminPanel = openAdminPanel;
 window.showAdminSection = showAdminSection;
-window.refreshReports = refreshReports;
 window.editAd = editAd;
 window.deleteAd = deleteAd;
 window.approveAd = approveAd;
@@ -1179,5 +1206,4 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
     initializeApp();
-}/ /   F o r c e   r e b u i l d   0 1 / 2 8 / 2 0 2 6   1 5 : 3 0 : 0 4  
- 
+}

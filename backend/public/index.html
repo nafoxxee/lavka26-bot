@@ -598,6 +598,111 @@
             </div>
         </div>
 
+        <!-- АДМИНСКАЯ ПАНЕЛЬ -->
+        <div class="tab-content" id="admin-tab" style="display: none;">
+            <div class="admin-content">
+                <div class="admin-header">
+                    <h2>🛡️ Панель администратора</h2>
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <span class="stat-number" id="pending-ads-count">0</span>
+                            <span class="stat-label">На модерации</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="support-messages-count">0</span>
+                            <span class="stat-label">Поддержка</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="payments-count">0</span>
+                            <span class="stat-label">Платежи</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" onclick="showAdminSection('pending')">
+                        <i class="fas fa-clock"></i> Модерация
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminSection('support')">
+                        <i class="fas fa-headset"></i> Поддержка
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminSection('payments')">
+                        <i class="fas fa-credit-card"></i> Платежи
+                    </button>
+                    <button class="admin-tab-btn" onclick="showAdminSection('users')">
+                        <i class="fas fa-users"></i> Пользователи
+                    </button>
+                </div>
+
+                <!-- Модерация -->
+                <div class="admin-section" id="admin-pending">
+                    <div class="section-header">
+                        <h3>📋 Объявления на модерации</h3>
+                        <button class="refresh-btn" onclick="refreshPendingAds()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="pending-ads-list" id="pending-ads-list">
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>Нет объявлений на модерации</h3>
+                            <p>Все объявления проверены</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Поддержка -->
+                <div class="admin-section" id="admin-support" style="display: none;">
+                    <div class="section-header">
+                        <h3>🎧 Запросы поддержки</h3>
+                        <button class="refresh-btn" onclick="refreshSupportMessages()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="support-messages-list" id="support-messages-list">
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h3>Нет новых запросов</h3>
+                            <p>Все запросы обработаны</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Платежи -->
+                <div class="admin-section" id="admin-payments" style="display: none;">
+                    <div class="section-header">
+                        <h3>💳 Подтверждение платежей</h3>
+                        <button class="refresh-btn" onclick="refreshPayments()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="payments-list" id="payments-list">
+                        <div class="empty-state">
+                            <i class="fas fa-dollar-sign"></i>
+                            <h3>Нет новых платежей</h3>
+                            <p>Все платежи обработаны</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Пользователи -->
+                <div class="admin-section" id="admin-users" style="display: none;">
+                    <div class="section-header">
+                        <h3>👥 Управление пользователями</h3>
+                        <button class="refresh-btn" onclick="refreshUsers()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <div class="users-list" id="users-list">
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>Загрузка пользователей...</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Модальное окно создания объявления -->
         <div class="modal" id="create-ad-modal">
             <div class="modal-content create-ad-modal">
