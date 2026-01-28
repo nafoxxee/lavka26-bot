@@ -12,30 +12,17 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ (fixed) -->
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
         <header class="app-header">
-            <div class="header-left">
+            <div class="header-content">
                 <div class="app-title">LAVKA26</div>
-            </div>
-            <div class="header-right">
-                <button class="header-btn" onclick="switchTab('messages')">
-                    <i class="fas fa-comment"></i>
-                    <span class="badge" id="messages-badge" style="display: none;"></span>
-                </button>
-                <button class="header-btn" onclick="switchTab('favorites')">
-                    <i class="fas fa-heart"></i>
-                    <span class="badge" id="favorites-badge" style="display: none;"></span>
-                </button>
-                <button class="header-btn" onclick="switchTab('profile')">
-                    <i class="fas fa-user"></i>
-                </button>
             </div>
         </header>
 
-        <!-- ОСНОВНОЙ КОНТЕНТ (scroll) -->
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
         <main class="app-content">
-            <!-- Главная: Лента объявлений -->
-            <div class="tab-content active" id="feed-tab">
+            <!-- Главная страница -->
+            <div class="tab-content active" id="home-tab">
                 <!-- Поисковая строка -->
                 <div class="search-section">
                     <div class="search-bar">
@@ -49,218 +36,194 @@
 
                 <!-- Категории -->
                 <div class="categories-section">
-                    <div class="categories-grid">
-                        <div class="category-item" data-category="electronics">
-                            <i class="fas fa-mobile-alt"></i>
+                    <div class="categories-scroll">
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
                             <span>Электроника</span>
                         </div>
-                        <div class="category-item" data-category="transport">
-                            <i class="fas fa-car"></i>
-                            <span>Автомобили</span>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <span>Транспорт</span>
                         </div>
-                        <div class="category-item" data-category="realestate">
-                            <i class="fas fa-home"></i>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
                             <span>Недвижимость</span>
                         </div>
-                        <div class="category-item" data-category="clothing">
-                            <i class="fas fa-tshirt"></i>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
                             <span>Одежда</span>
                         </div>
-                        <div class="category-item" data-category="home">
-                            <i class="fas fa-couch"></i>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-couch"></i>
+                            </div>
                             <span>Для дома</span>
                         </div>
-                        <div class="category-item" data-category="services">
-                            <i class="fas fa-wrench"></i>
-                            <span>Услуги</span>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <span>Работа</span>
                         </div>
-                        <div class="category-item" data-category="kids">
-                            <i class="fas fa-baby"></i>
-                            <span>Детское</span>
-                        </div>
-                        <div class="category-item" data-category="sport">
-                            <i class="fas fa-dumbbell"></i>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
                             <span>Спорт</span>
+                        </div>
+                        <div class="category-item">
+                            <div class="category-icon">
+                                <i class="fas fa-paw"></i>
+                            </div>
+                            <span>Животные</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Список объявлений -->
                 <div class="ads-section">
-                    <div class="section-header">
-                        <h2>Все объявления</h2>
-                        <button class="sort-btn">
-                            <i class="fas fa-sort"></i>
-                            По дате
-                        </button>
-                    </div>
                     <div class="ads-grid" id="ads-container">
-                        <!-- Объявления будут загружены здесь -->
-                        <div class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>Объявления не найдены</h3>
-                            <p>Будьте первым, кто создаст объявление!</p>
+                        <!-- Примеры объявлений -->
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=iPhone" alt="iPhone 13">
+                                <div class="ad-favorite">
+                                    <i class="far fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-title">iPhone 13 Pro 128 ГБ</div>
+                                <div class="ad-price">65 000 ₽</div>
+                                <div class="ad-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Москва
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=MacBook" alt="MacBook">
+                                <div class="ad-favorite">
+                                    <i class="far fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-title">MacBook Air M1</div>
+                                <div class="ad-price">85 000 ₽</div>
+                                <div class="ad-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Санкт-Петербург
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=BMW" alt="BMW">
+                                <div class="ad-favorite">
+                                    <i class="far fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-title">BMW X5 2020</div>
+                                <div class="ad-price">3 500 000 ₽</div>
+                                <div class="ad-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Казань
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/0066FF/FFFFFF?text=Квартира" alt="Квартира">
+                                <div class="ad-favorite">
+                                    <i class="far fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-title">1-комнатная квартира</div>
+                                <div class="ad-price">5 200 000 ₽</div>
+                                <div class="ad-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Екатеринбург
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Категории -->
+            <!-- Другие вкладки -->
             <div class="tab-content" id="categories-tab">
-                <div class="categories-section">
-                    <div class="section-header">
-                        <h2>Категории</h2>
-                    </div>
-                    <div class="categories-grid">
-                        <div class="category-item" onclick="openCategory('electronics')">
+                <div class="categories-full">
+                    <h2>Категории</h2>
+                    <div class="categories-grid-full">
+                        <div class="category-card">
                             <i class="fas fa-mobile-alt"></i>
                             <span>Электроника</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('transport')">
+                        <div class="category-card">
                             <i class="fas fa-car"></i>
-                            <span>Автомобили</span>
+                            <span>Транспорт</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('realestate')">
+                        <div class="category-card">
                             <i class="fas fa-home"></i>
                             <span>Недвижимость</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('clothing')">
+                        <div class="category-card">
                             <i class="fas fa-tshirt"></i>
-                            <span>Одежда и обувь</span>
+                            <span>Одежда</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('home')">
+                        <div class="category-card">
                             <i class="fas fa-couch"></i>
-                            <span>Товары для дома</span>
+                            <span>Для дома</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('services')">
-                            <i class="fas fa-wrench"></i>
-                            <span>Услуги</span>
+                        <div class="category-card">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Работа</span>
                         </div>
-                        <div class="category-item" onclick="openCategory('kids')">
-                            <i class="fas fa-baby"></i>
-                            <span>Детские товары</span>
-                        </div>
-                        <div class="category-item" onclick="openCategory('sport')">
+                        <div class="category-card">
                             <i class="fas fa-dumbbell"></i>
-                            <span>Спорт и отдых</span>
+                            <span>Спорт</span>
+                        </div>
+                        <div class="category-card">
+                            <i class="fas fa-paw"></i>
+                            <span>Животные</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Избранное -->
             <div class="tab-content" id="favorites-tab">
-                <div class="favorites-section">
-                    <div class="section-header">
-                        <h2>Избранное</h2>
-                        <button class="btn btn-ghost" onclick="clearFavorites()">
-                            <i class="fas fa-trash"></i>
-                            Очистить
-                        </button>
-                    </div>
-                    <div class="favorites-list" id="favorites-list">
-                        <div class="empty-state">
-                            <i class="fas fa-heart"></i>
-                            <h3>У вас пока нет избранных</h3>
-                            <p>Добавляйте понравившиеся объявления ❤️</p>
-                        </div>
+                <div class="favorites-content">
+                    <h2>Избранное</h2>
+                    <div class="empty-state">
+                        <i class="far fa-heart"></i>
+                        <h3>Нет избранных</h3>
+                        <p>Добавляйте понравившиеся объявления</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Мои объявления -->
-            <div class="tab-content" id="my-ads-tab">
-                <div class="my-ads-section">
-                    <div class="section-header">
-                        <h2>Мои объявления</h2>
-                        <button class="btn btn-primary" onclick="openCreateAd()">
-                            <i class="fas fa-plus"></i>
-                            Создать
-                        </button>
-                    </div>
-                    
-                    <!-- Фильтры статусов -->
-                    <div class="status-filters">
-                        <button class="status-filter active" onclick="filterMyAds('all')">Все</button>
-                        <button class="status-filter" onclick="filterMyAds('pending')">На модерации</button>
-                        <button class="status-filter" onclick="filterMyAds('active')">Активные</button>
-                        <button class="status-filter" onclick="filterMyAds('rejected')">Отклоненные</button>
-                    </div>
-                    
-                    <div class="my-ads-list" id="my-ads-list">
-                        <div class="empty-state">
-                            <i class="fas fa-ad"></i>
-                            <h3>У вас пока нет объявлений</h3>
-                            <p>Создайте свое первое объявление</p>
-                            <button class="btn btn-primary" onclick="openCreateAd()">
-                                <i class="fas fa-plus"></i>
-                                Создать объявление
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Страница объявления -->
-            <div class="tab-content" id="ad-detail-tab">
-                <div class="ad-detail-section">
-                    <div class="ad-detail-header">
-                        <button class="btn btn-ghost" onclick="switchTab('feed')">
-                            <i class="fas fa-arrow-left"></i>
-                            Назад
-                        </button>
-                        <button class="btn btn-ghost" onclick="shareAd()">
-                            <i class="fas fa-share"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="ad-detail-content" id="ad-detail-content">
-                        <!-- Контент объявления загрузится здесь -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Чат -->
-            <div class="tab-content" id="chat-tab">
-                <div class="chat-section">
-                    <div class="chat-header">
-                        <button class="btn btn-ghost" onclick="switchTab('ad-detail')">
-                            <i class="fas fa-arrow-left"></i>
-                            Назад
-                        </button>
-                        <div class="chat-user-info">
-                            <h3 id="chat-user-name">Продавец</h3>
-                            <p id="chat-ad-title">Товар</p>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="empty-state">
-                            <i class="fas fa-comment"></i>
-                            <h3>Нет сообщений</h3>
-                            <p>Начните общение с продавцом</p>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-input-container">
-                        <input type="text" id="chat-input" placeholder="Введите сообщение...">
-                        <button class="btn btn-primary" onclick="sendMessage()">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Профиль -->
             <div class="tab-content" id="profile-tab">
-                <div class="profile-section">
+                <div class="profile-content">
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
                         </div>
                         <div class="profile-info">
-                            <h2 id="profile-name">Пользователь</h2>
-                            <p id="profile-username">@username</p>
+                            <h2>Пользователь</h2>
+                            <p>@username</p>
                         </div>
                     </div>
                     <div class="profile-stats">
@@ -274,85 +237,72 @@
                         </div>
                     </div>
                     <div class="profile-menu">
-                        <button class="menu-item" onclick="openCreateAd()">
+                        <button class="menu-item">
                             <i class="fas fa-plus"></i>
                             <span>Создать объявление</span>
                         </button>
-                        <button class="menu-item" onclick="loadMyAds()">
-                            <i class="fas fa-ad"></i>
-                            <span>Мои объявления</span>
-                        </button>
-                        <button class="menu-item" onclick="openSettings()">
+                        <button class="menu-item">
                             <i class="fas fa-cog"></i>
                             <span>Настройки</span>
                         </button>
-                        <button class="menu-item" id="moderator-panel-btn" style="display: none;" onclick="openModeratorPanel()">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>🛡 Панель модератора</span>
-                        </button>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <!-- Панель модератора -->
-            <div class="tab-content" id="moderator-tab">
-                <div class="moderator-section">
-                    <div class="section-header">
-                        <h2>� Панель модератора</h2>
-                        <button class="btn btn-ghost" onclick="loadModeratorStats()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <nav class="tabbar">
+            <button class="tabbar-item active" data-tab="home" onclick="switchTab('home')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="tabbar-item" data-tab="categories" onclick="switchTab('categories')">
+                <i class="fas fa-th-large"></i>
+                <span>Категории</span>
+            </button>
+            <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
+                <i class="fas fa-heart"></i>
+                <span>Избранное</span>
+            </button>
+            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+    </div>
 
-                    <!-- Статистика -->
-                    <div class="stats-grid" id="mod-stats">
-                        <div class="stat-card">
-                            <div class="stat-number" id="total-ads">0</div>
-                            <div class="stat-label">Всего объявлений</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="pending-ads">0</div>
-                            <div class="stat-label">На модерации</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="active-ads">0</div>
-                            <div class="stat-label">Активных</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="blocked-users">0</div>
-                            <div class="stat-label">Заблокировано</div>
-                        </div>
-                    </div>
+    <script src="app.js"></script>
+    <script>
+        // Функция переключения вкладок
+        window.switchTab = function(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Убираем активный класс у всех кнопок
+            document.querySelectorAll('.tabbar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Активируем кнопку
+            document.querySelector(`.tabbar-item[data-tab="${tabName}"]`).classList.add('active');
+        };
 
-                <!-- Объявления на модерации -->
-                <div class="mod-section">
-                    <h3>📋 Объявления на модерации</h3>
-                    <div class="mod-controls">
-                        <button class="btn-secondary" onclick="refreshPendingAds()">
-                            <i class="fas fa-sync"></i> Обновить
-                        </button>
-                    </div>
-                    <div class="pending-ads-list" id="pending-ads-list">
-                        <div class="loading-placeholder">Загрузка объявлений...</div>
-                    </div>
-                </div>
-
-                <!-- Жалобы -->
-                <div class="mod-section">
-                    <h3>🚨 Жалобы</h3>
-                    <div class="mod-controls">
-                        <button class="btn-secondary" onclick="refreshReports()">
-                            <i class="fas fa-sync"></i> Обновить
-                        </button>
-                    </div>
-                    <div class="reports-list" id="reports-list">
-                        <div class="loading-placeholder">Загрузка жалоб...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно создания объявления -->
+        // Инициализация Telegram WebApp
+        document.addEventListener('DOMContentLoaded', function() {
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.ready();
+                tg.expand();
+            }
+        });
+    </script>
+</body>
+</html>
         <div class="modal" id="create-ad-modal">
             <div class="modal-content create-ad-modal">
                 <div class="modal-header">
