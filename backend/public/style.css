@@ -737,6 +737,153 @@ body:not(.profile-active):not(.messages-active) .fab-button {
     font-size: 10px;
 }
 
+/* МОДЕРАЦИЯ ОБЪЯВЛЕНИЙ */
+.pending-ad-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+.pending-ad-header {
+    margin-bottom: 16px;
+}
+
+.pending-ad-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.pending-ad-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.category-badge, .price-badge {
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.category-badge {
+    background: var(--border-light);
+    color: var(--text-secondary);
+}
+
+.price-badge {
+    background: var(--avito-green);
+    color: var(--white);
+}
+
+.pending-ad-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.pending-ad-photos {
+    display: flex;
+    gap: 8px;
+}
+
+.pending-ad-photos img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pending-ad-photos img:hover {
+    transform: scale(1.05);
+}
+
+.no-photos {
+    width: 80px;
+    height: 80px;
+    background: var(--border-light);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.pending-ad-info {
+    min-width: 0;
+}
+
+.pending-ad-info .description {
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.ad-details {
+    display: grid;
+    gap: 8px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.detail-item i {
+    width: 16px;
+    color: var(--text-muted);
+}
+
+.pending-ad-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-approve, .btn-reject {
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.btn-approve {
+    background: var(--avito-green);
+    color: var(--white);
+}
+
+.btn-approve:hover {
+    background: #1B8E3E;
+    transform: translateY(-1px);
+}
+
+.btn-reject {
+    background: var(--avito-red);
+    color: var(--white);
+}
+
+.btn-reject:hover {
+    background: #C62828;
+    transform: translateY(-1px);
+}
+
 .admin-tabs {
     display: flex;
     gap: 8px;
@@ -2857,6 +3004,28 @@ input:checked + .slider:before {
 
 .btn:active {
     transform: scale(0.98);
+}
+
+.create-ad-btn {
+    background: var(--avito-blue);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.create-ad-btn:hover {
+    background: var(--avito-blue-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .publish-btn {

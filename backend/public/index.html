@@ -216,10 +216,6 @@
 
             <!-- Админская панель -->
             <div class="tab-content" id="admin-tab" style="display: none;">
-                <div class="admin-header">
-                    <h2>Панель администратора</h2>
-                </div>
-                
                 <div class="admin-tabs">
                     <button class="admin-tab-btn active" onclick="showAdminSection('pending')">
                         <i class="fas fa-clock"></i>
@@ -240,7 +236,6 @@
                 </div>
 
                 <div class="admin-section" id="admin-pending">
-                    <h3>📋 Объявления на модерации</h3>
                     <div class="admin-content" id="pending-ads-list">
                         <p>Загрузка объявлений...</p>
                     </div>
@@ -949,9 +944,69 @@
         }
         
         function viewPhoto(photoUrl) {
-            // В реальном приложении здесь будет модальное окно с фото
-            console.log('📸 Просмотр фото:', photoUrl);
-            showNotification('Просмотр фото', 'info');
+            // Создаем модальное окно для просмотра фото
+            const modal = document.createElement('div');
+            modal.className = 'photo-modal';
+            modal.innerHTML = `
+                <div class="photo-modal-content">
+                    <button class="photo-modal-close" onclick="this.closest('.photo-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="${photoUrl}" alt="Фото">
+                </div>
+            `;
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                cursor: pointer;
+            `;
+            
+            const content = modal.querySelector('.photo-modal-content');
+            content.style.cssText = `
+                position: relative;
+                max-width: 90%;
+                max-height: 90%;
+            `;
+            
+            const closeBtn = modal.querySelector('.photo-modal-close');
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: -40px;
+                right: 0;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            const img = modal.querySelector('img');
+            img.style.cssText = `
+                max-width: 100%;
+                max-height: 80vh;
+                border-radius: 8px;
+            `;
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+            
+            document.body.appendChild(modal);
         }
         
         function refreshSupportMessages() {
