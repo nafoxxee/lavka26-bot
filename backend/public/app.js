@@ -240,6 +240,36 @@ function goBack() {
     }
 }
 
+// Фильтрация по категориям
+function filterByCategory(category) {
+    currentFilter.category = category;
+    // Переключаемся на главную страницу с фильтром
+    switchTab('feed');
+    // Показываем уведомление
+    showNotification(`Категория: ${getCategoryName(category)}`, 'info');
+    // Загружаем объявления с фильтром
+    loadAds();
+}
+
+// Получение названия категории
+function getCategoryName(category) {
+    const categories = {
+        'transport': 'Транспорт',
+        'electronics': 'Электроника',
+        'property': 'Недвижимость',
+        'clothing': 'Одежда',
+        'jobs': 'Работа',
+        'sports': 'Спорт',
+        'furniture': 'Мебель',
+        'pets': 'Животные',
+        'services': 'Услуги',
+        'food': 'Продукты',
+        'books': 'Книги',
+        'other': 'Другое'
+    };
+    return categories[category] || 'Все категории';
+}
+
 // Получение данных пользователя
 async function getUserDataWithTimeout() {
     const tgUser = tg.initDataUnsafe.user;

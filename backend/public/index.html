@@ -88,11 +88,66 @@
                         </button>
                     </div>
                     <div class="ads-grid" id="ads-container">
-                        <!-- Объявления будут загружены здесь -->
-                        <div class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>Объявления не найдены</h3>
-                            <p>Будьте первым, кто создаст объявление!</p>
+                        <!-- Примеры объявлений -->
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/0089D1/FFFFFF?text=iPhone" alt="iPhone">
+                                <button class="favorite-btn">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-price">25 000 ₽</div>
+                                <h3 class="ad-title">iPhone 12 Pro 128GB</h3>
+                                <p class="ad-description">Отличное состояние, без царапин, оригинал...</p>
+                                <div class="ad-meta">
+                                    <span class="ad-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Москва
+                                    </span>
+                                    <span class="ad-date">2 часа назад</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/21A038/FFFFFF?text=BMW" alt="BMW">
+                                <button class="favorite-btn">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-price">1 200 000 ₽</div>
+                                <h3 class="ad-title">BMW X5 2020</h3>
+                                <p class="ad-description">Полный привод, кожаный салон, идеальное состояние...</p>
+                                <div class="ad-meta">
+                                    <span class="ad-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Санкт-Петербург
+                                    </span>
+                                    <span class="ad-date">5 часов назад</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ad-card">
+                            <div class="ad-image">
+                                <img src="https://via.placeholder.com/200x150/FF6B00/FFFFFF?text=Квартира" alt="Квартира">
+                                <button class="favorite-btn">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="ad-content">
+                                <div class="ad-price">8 500 000 ₽</div>
+                                <h3 class="ad-title">2-комнатная квартира</h3>
+                                <p class="ad-description">Центр города, 5 этаж, 45м², свежий ремонт...</p>
+                                <div class="ad-meta">
+                                    <span class="ad-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Екатеринбург
+                                    </span>
+                                    <span class="ad-date">1 день назад</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -109,6 +164,65 @@
                             <i class="fas fa-heart"></i>
                             <h3>У вас пока нет избранных</h3>
                             <p>Добавляйте понравившиеся объявления</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Категории -->
+            <div class="tab-content" id="categories-tab">
+                <div class="categories-section">
+                    <div class="section-header">
+                        <h2>Категории</h2>
+                    </div>
+                    <div class="categories-grid">
+                        <div class="category-item" onclick="filterByCategory('transport')">
+                            <i class="fas fa-car"></i>
+                            <span>Транспорт</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('electronics')">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Электроника</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('property')">
+                            <i class="fas fa-home"></i>
+                            <span>Недвижимость</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('clothing')">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Одежда</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('jobs')">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Работа</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('sports')">
+                            <i class="fas fa-dumbbell"></i>
+                            <span>Спорт</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('furniture')">
+                            <i class="fas fa-couch"></i>
+                            <span>Мебель</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('pets')">
+                            <i class="fas fa-paw"></i>
+                            <span>Животные</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('services')">
+                            <i class="fas fa-wrench"></i>
+                            <span>Услуги</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('food')">
+                            <i class="fas fa-utensils"></i>
+                            <span>Продукты</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('books')">
+                            <i class="fas fa-book"></i>
+                            <span>Книги</span>
+                        </div>
+                        <div class="category-item" onclick="filterByCategory('other')">
+                            <i class="fas fa-ellipsis-h"></i>
+                            <span>Другое</span>
                         </div>
                     </div>
                 </div>
@@ -149,7 +263,8 @@
             <!-- Профиль -->
             <div class="tab-content" id="profile-tab">
                 <div class="profile-section">
-                    <div class="profile-header">
+                    <!-- Информация о пользователе -->
+                    <div class="profile-card">
                         <div class="profile-avatar">
                             <i class="fas fa-user"></i>
                         </div>
@@ -158,40 +273,68 @@
                             <p>@username</p>
                         </div>
                     </div>
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span>0</span>
-                            <span>Объявлений</span>
-                
-                <!-- Статистика -->
-                <div class="mod-stats">
-                    <h3>📊 Статистика</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="total-ads">0</div>
-                            <div class="stat-label">Всего объявлений</div>
+
+                    <!-- Контакты -->
+                    <div class="contact-card">
+                        <h3>📞 Контакты</h3>
+                        <div class="contact-item">
+                            <i class="fab fa-telegram"></i>
+                            <div class="contact-info">
+                                <span class="contact-label">Telegram</span>
+                                <span class="contact-value">@onfoxx</span>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="pending-ads">0</div>
-                            <div class="stat-label">На модерации</div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div class="contact-info">
+                                <span class="contact-label">Телефон</span>
+                                <span class="contact-value">+7 (XXX) XXX-XX-XX</span>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="active-ads">0</div>
-                            <div class="stat-label">Активных</div>
+                    </div>
+
+                    <!-- Статистика -->
+                    <div class="stats-card">
+                        <h3>📊 Моя активность</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number">0</span>
+                                <span class="stat-label">Объявлений</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">0</span>
+                                <span class="stat-label">Избранных</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">0</span>
+                                <span class="stat-label">Просмотров</span>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="total-reports">0</div>
-                            <div class="stat-label">Жалоб</div>
+                    </div>
+
+                    <!-- Настройки -->
+                    <div class="settings-card">
+                        <h3>⚙️ Настройки</h3>
+                        <div class="settings-list">
+                            <button class="settings-item">
+                                <i class="fas fa-bell"></i>
+                                <span>Уведомления</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button class="settings-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Безопасность</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button class="settings-item">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Помощь</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Объявления на модерации -->
-                <div class="mod-section">
-                    <h3>📋 Объявления на модерации</h3>
-                    <div class="mod-controls">
-                        <button class="btn-secondary" onclick="refreshPendingAds()">
-                            <i class="fas fa-sync"></i> Обновить
+            </div>
                         </button>
                     </div>
                     <div class="pending-ads-list" id="pending-ads-list">
@@ -546,9 +689,9 @@
                 <i class="fas fa-heart"></i>
                 <span>Избранное</span>
             </button>
-            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
+            <button class="tabbar-item" data-tab="messages" onclick="switchTab('messages')">
+                <i class="fas fa-comment"></i>
+                <span>Сообщения</span>
             </button>
         </nav>
 
