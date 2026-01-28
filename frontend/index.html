@@ -529,6 +529,26 @@
             </div>
         </div>
 
+        <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+        <nav class="tabbar">
+            <button class="tabbar-item active" onclick="switchTab('feed')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="tabbar-item" onclick="switchTab('categories')">
+                <i class="fas fa-th-large"></i>
+                <span>Категории</span>
+            </button>
+            <button class="tabbar-item" onclick="switchTab('favorites')">
+                <i class="fas fa-heart"></i>
+                <span>Избранное</span>
+            </button>
+            <button class="tabbar-item" onclick="switchTab('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+
         <!-- Уведомления -->
         <div class="notifications" id="notifications"></div>
     </div>
