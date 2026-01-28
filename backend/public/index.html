@@ -231,8 +231,8 @@
 
                 <div class="admin-section" id="admin-pending">
                     <h3>📋 Объявления на модерации</h3>
-                    <div class="admin-content">
-                        <p>Объявлений на модерации: 0</p>
+                    <div class="admin-content" id="pending-ads-list">
+                        <p>Загрузка объявлений...</p>
                     </div>
                 </div>
 
@@ -381,6 +381,38 @@
                 <div class="modal-footer">
                     <button class="btn-secondary" onclick="closeModal()">Отмена</button>
                     <button class="btn-primary" onclick="submitAd()">Опубликовать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования профиля -->
+        <div class="modal" id="edit-profile-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="back-btn" onclick="closeEditProfile()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Редактировать профиль</h2>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-profile-form">
+                        <div class="form-group">
+                            <label>Имя *</label>
+                            <input type="text" id="profile-name-input" required placeholder="Ваше имя">
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон *</label>
+                            <input type="tel" id="profile-phone-input" required placeholder="+7 XXX XXX-XX-XX">
+                        </div>
+                        <div class="form-group">
+                            <label>О себе</label>
+                            <textarea id="profile-bio-input" rows="3" placeholder="Расскажите о себе..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeEditProfile()">Отмена</button>
+                    <button class="btn-primary" onclick="saveProfile()">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -684,7 +716,154 @@
         
         function refreshPendingAds() {
             console.log('🔄 Обновление объявлений на модерации');
-            // Загрузка данных...
+            
+            const pendingAdsList = document.getElementById('pending-ads-list');
+            if (!pendingAdsList) return;
+            
+            // Загружаем объявления из localStorage
+            const pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
+            
+            if (pendingAds.length === 0) {
+                pendingAdsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <p>Нет объявлений на модерации</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            pendingAdsList.innerHTML = pendingAds.map(ad => `
+                <div class="pending-ad-card" id="pending-ad-${ad.id}">
+                    <div class="pending-ad-header">
+                        <div class="pending-ad-title">${ad.title}</div>
+                        <div class="pending-ad-meta">
+                            <span class="category-badge">${getCategoryName(ad.category)}</span>
+                            <span class="price-badge">${ad.price}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pending-ad-content">
+                        <div class="pending-ad-photos">
+                            ${ad.photos && ad.photos.length > 0 ? 
+                                ad.photos.slice(0, 3).map(photo => `
+                                    <img src="${photo}" alt="Фото" onclick="viewPhoto('${photo}')">
+                                `).join('') : 
+                                '<div class="no-photos"><i class="fas fa-image"></i></div>'
+                            }
+                        </div>
+                        
+                        <div class="pending-ad-info">
+                            <div class="description">${ad.description}</div>
+                            
+                            <div class="ad-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${ad.location}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>${ad.phone}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>${ad.user_name}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>${formatDate(ad.created_at)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pending-ad-actions">
+                        <button class="btn-approve" onclick="approveAd(${ad.id})">
+                            <i class="fas fa-check"></i>
+                            <span>Опубликовать</span>
+                        </button>
+                        <button class="btn-reject" onclick="showRejectModal(${ad.id})">
+                            <i class="fas fa-times"></i>
+                            <span>Отклонить</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getCategoryName(category) {
+            const categories = {
+                'transport': '🚗 Транспорт',
+                'electronics': '📱 Электроника',
+                'property': '🏠 Недвижимость',
+                'clothing': '👕 Одежда',
+                'jobs': '💼 Работа',
+                'services': '🔧 Услуги',
+                'animals': '🐾 Животные',
+                'other': '📦 Прочее'
+            };
+            return categories[category] || category;
+        }
+        
+        function approveAd(adId) {
+            console.log('✅ Одобрение объявления:', adId);
+            
+            // Перемещаем в опубликованные
+            let pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
+            let approvedAds = JSON.parse(localStorage.getItem('approvedAds') || '[]');
+            
+            const adIndex = pendingAds.findIndex(ad => ad.id === adId);
+            if (adIndex !== -1) {
+                const ad = pendingAds[adIndex];
+                ad.status = 'approved';
+                ad.approved_at = new Date().toISOString();
+                
+                approvedAds.push(ad);
+                pendingAds.splice(adIndex, 1);
+                
+                localStorage.setItem('pendingAds', JSON.stringify(pendingAds));
+                localStorage.setItem('approvedAds', JSON.stringify(approvedAds));
+                
+                showNotification('Объявление опубликовано', 'success');
+                refreshPendingAds();
+            }
+        }
+        
+        function showRejectModal(adId) {
+            const reason = prompt('Укажите причину отклонения:');
+            if (reason) {
+                rejectAd(adId, reason);
+            }
+        }
+        
+        function rejectAd(adId, reason) {
+            console.log('❌ Отклонение объявления:', adId, reason);
+            
+            let pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
+            let rejectedAds = JSON.parse(localStorage.getItem('rejectedAds') || '[]');
+            
+            const adIndex = pendingAds.findIndex(ad => ad.id === adId);
+            if (adIndex !== -1) {
+                const ad = pendingAds[adIndex];
+                ad.status = 'rejected';
+                ad.rejected_at = new Date().toISOString();
+                ad.reject_reason = reason;
+                
+                rejectedAds.push(ad);
+                pendingAds.splice(adIndex, 1);
+                
+                localStorage.setItem('pendingAds', JSON.stringify(pendingAds));
+                localStorage.setItem('rejectedAds', JSON.stringify(rejectedAds));
+                
+                showNotification('Объявление отклонено', 'error');
+                refreshPendingAds();
+            }
+        }
+        
+        function viewPhoto(photoUrl) {
+            // В реальном приложении здесь будет модальное окно с фото
+            console.log('📸 Просмотр фото:', photoUrl);
+            showNotification('Просмотр фото', 'info');
         }
         
         function refreshSupportMessages() {
@@ -778,24 +957,95 @@
         
         function loadProfile() {
             console.log('📥 Загрузка профиля');
-        }
-        
-        function loadAdminPanel() {
-            console.log('📥 Загрузка админ панели');
-        }
-        
-        function filterByCategory(category) {
-            currentFilter.category = category;
-            loadAds();
-            switchTab('feed');
-        }
-        
-        function openAd(adId) {
-            console.log('📄 Открытие объявления:', adId);
+            
+            // Загружаем данные профиля из localStorage
+            const profileData = JSON.parse(localStorage.getItem('userProfile') || '{}');
+            
+            // Если есть данные от Telegram, используем их
+            if (currentUser) {
+                profileData.name = profileData.name || currentUser.first_name || 'Пользователь';
+                profileData.phone = profileData.phone || '';
+                profileData.bio = profileData.bio || '';
+                profileData.telegram_id = currentUser.id;
+            }
+            
+            // Обновляем UI
+            const profileName = document.getElementById('profile-name');
+            const profilePhone = document.getElementById('profile-phone');
+            
+            if (profileName) {
+                profileName.textContent = profileData.name || 'Загрузка...';
+            }
+            if (profilePhone) {
+                profilePhone.textContent = profileData.phone || '+7 XXX XXX-XX-XX';
+            }
+            
+            // Сохраняем в глобальную переменную
+            window.userProfile = profileData;
         }
         
         function showEditProfile() {
-            console.log('✏️ Редактирование профиля');
+            console.log('✏️ Открытие редактирования профиля');
+            
+            const modal = document.getElementById('edit-profile-modal');
+            if (!modal) return;
+            
+            // Заполняем форму текущими данными
+            const profileData = window.userProfile || {};
+            
+            const nameInput = document.getElementById('profile-name-input');
+            const phoneInput = document.getElementById('profile-phone-input');
+            const bioInput = document.getElementById('profile-bio-input');
+            
+            if (nameInput) nameInput.value = profileData.name || '';
+            if (phoneInput) phoneInput.value = profileData.phone || '';
+            if (bioInput) bioInput.value = profileData.bio || '';
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeEditProfile() {
+            const modal = document.getElementById('edit-profile-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        function saveProfile() {
+            console.log('💾 Сохранение профиля');
+            
+            const nameInput = document.getElementById('profile-name-input');
+            const phoneInput = document.getElementById('profile-phone-input');
+            const bioInput = document.getElementById('profile-bio-input');
+            
+            // Валидация
+            if (!nameInput?.value.trim() || !phoneInput?.value.trim()) {
+                showNotification('Заполните обязательные поля', 'error');
+                return;
+            }
+            
+            // Обновляем данные профиля
+            const profileData = {
+                ...window.userProfile,
+                name: nameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                bio: bioInput.value.trim(),
+                updated_at: new Date().toISOString()
+            };
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('userProfile', JSON.stringify(profileData));
+            window.userProfile = profileData;
+            
+            // Обновляем UI
+            const profileName = document.getElementById('profile-name');
+            const profilePhone = document.getElementById('profile-phone');
+            
+            if (profileName) profileName.textContent = profileData.name;
+            if (profilePhone) profilePhone.textContent = profileData.phone;
+            
+            showNotification('Профиль обновлен', 'success');
+            closeEditProfile();
         }
         
         function showSettings() {
@@ -808,8 +1058,77 @@
         
         function submitAd() {
             console.log('📤 Отправка объявления');
-            showNotification('Объявление отправлено на модерацию', 'success');
-            closeModal();
+            
+            // Собираем данные формы
+            const title = document.getElementById('ad-title').value;
+            const category = document.getElementById('ad-category').value;
+            const price = document.getElementById('ad-price').value;
+            const description = document.getElementById('ad-description').value;
+            const location = document.getElementById('ad-location').value;
+            const phone = document.getElementById('ad-phone').value;
+            
+            // Валидация
+            if (!title || !category || !description || !location || !phone) {
+                showNotification('Заполните все обязательные поля', 'error');
+                return;
+            }
+            
+            // Создаем объект объявления
+            const adData = {
+                title: title,
+                category: category,
+                price: price || 'Договорная',
+                description: description,
+                location: location,
+                phone: phone,
+                photos: uploadedPhotos.map(p => p.url),
+                user_id: currentUser?.id || 'anonymous',
+                user_name: currentUser?.first_name || 'Аноним',
+                created_at: new Date().toISOString(),
+                status: 'pending' // На модерации
+            };
+            
+            // Отправляем на сервер
+            sendAdToModeration(adData);
+        }
+        
+        function sendAdToModeration(adData) {
+            // Показываем загрузку
+            showNotification('Отправка на модерацию...', 'info');
+            
+            // Имитируем отправку (в реальном приложении здесь будет fetch к API)
+            setTimeout(() => {
+                // Сохраняем в localStorage для демонстрации
+                const pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
+                adData.id = Date.now();
+                pendingAds.push(adData);
+                localStorage.setItem('pendingAds', JSON.stringify(pendingAds));
+                
+                console.log('✅ Объявление отправлено на модерацию:', adData);
+                
+                showNotification('Объявление отправлено на модерацию', 'success');
+                closeModal();
+                
+                // Очищаем форму
+                document.getElementById('create-ad-form').reset();
+                uploadedPhotos = [];
+                
+                // Обновляем фото сетку
+                const photoGrid = document.getElementById('photo-grid');
+                if (photoGrid) {
+                    photoGrid.innerHTML = `
+                        <div class="add-photo-btn" onclick="document.getElementById('ad-photos').click()">
+                            <i class="fas fa-camera"></i>
+                            <span>Добавить фото</span>
+                        </div>
+                    `;
+                }
+                
+                // Если админ, обновляем панель модерации
+                if (currentUser && currentUser.id === 379036860) {
+                    refreshPendingAds();
+                }
+            }, 1500);
         }
         
         // Геолокация
@@ -949,6 +1268,8 @@
         window.filterByCategory = filterByCategory;
         window.openAd = openAd;
         window.showEditProfile = showEditProfile;
+        window.closeEditProfile = closeEditProfile;
+        window.saveProfile = saveProfile;
         window.showSettings = showSettings;
         window.showAbout = showAbout;
         window.submitAd = submitAd;
@@ -956,6 +1277,10 @@
         window.selectLocation = selectLocation;
         window.handlePhotos = handlePhotos;
         window.removePhoto = removePhoto;
+        window.approveAd = approveAd;
+        window.showRejectModal = showRejectModal;
+        window.rejectAd = rejectAd;
+        window.viewPhoto = viewPhoto;
         
         // Проверка элементов
         setTimeout(() => {
