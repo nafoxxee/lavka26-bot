@@ -1237,4 +1237,5 @@ function handleImageUpload(event) {
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-}
+}/ /   F o r c e   r e b u i l d   0 1 / 2 8 / 2 0 2 6   1 6 : 5 8 : 5 4  
+ 
