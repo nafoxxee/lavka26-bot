@@ -3024,29 +3024,530 @@ input:checked + .slider:before {
     color: var(--primary-color);
 }
 
-.profile-ads-preview,
-.profile-favorites-preview {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
+/* Страница объявления */
+.ad-detail-section {
+    padding: var(--spacing-md);
 }
 
-.btn-link {
-    background: transparent;
-    border: none;
-    color: var(--avito-blue);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+.ad-detail-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: var(--transition);
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--border-light);
 }
 
-.btn-link:hover {
-    color: var(--avito-blue-hover);
+.ad-detail-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.ad-gallery {
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--secondary-color);
+}
+
+.gallery-item {
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image-large {
+    width: 100%;
+    height: 300px;
+    background-color: var(--secondary-color);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 48px;
+}
+
+.ad-details {
+    margin-bottom: var(--spacing-lg);
+}
+
+.ad-price-large {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.ad-meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.ad-meta-info span {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.ad-description-full h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.ad-description-full p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+}
+
+.ad-seller-info {
+    margin-bottom: var(--spacing-lg);
+}
+
+.ad-seller-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.seller-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--secondary-color);
+    border-radius: var(--radius-lg);
+}
+
+.seller-avatar {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.seller-details {
+    flex: 1;
+}
+
+.seller-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.seller-rating {
+    color: var(--warning);
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--border-light);
+}
+
+.action-btn {
+    flex: 1;
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.action-btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.action-btn.secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.action-btn.secondary:hover {
+    background-color: var(--border-light);
+}
+
+/* Чат */
+.chat-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--background);
+}
+
+.chat-user-info {
+    text-align: center;
+}
+
+.chat-user-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+}
+
+.chat-user-info p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background-color: var(--surface);
+}
+
+.message {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.message.own {
+    align-items: flex-end;
+}
+
+.message.other {
+    align-items: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    background-color: var(--background);
+    box-shadow: var(--shadow-sm);
+}
+
+.message.own .message-content {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.message-text {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: var(--spacing-xs);
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+    background-color: var(--background);
+}
+
+.chat-input-container input {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    outline: none;
+}
+
+.chat-input-container input:focus {
+    border-color: var(--primary-color);
+}
+
+/* Мои объявления */
+.my-ads-section {
+    padding: var(--spacing-md);
+}
+
+.my-ads-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+}
+
+.my-ads-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status-filters {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+}
+
+.status-filter {
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.status-filter.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.status-filter:hover:not(.active) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.my-ads-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.my-ad-card {
+    background-color: var(--background);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.my-ad-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.my-ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.my-ad-header h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.status-badge {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #FFF3CD;
+    color: #856404;
+}
+
+.status-active {
+    background-color: #D4EDDA;
+    color: #155724;
+}
+
+.status-rejected {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.my-ad-content {
+    padding: var(--spacing-md);
+    flex: 1;
+}
+
+.my-ad-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.my-ad-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.my-ad-description {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.my-ad-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.my-ad-actions .btn {
+    flex: 1;
+    min-width: 100px;
+    font-size: 12px;
+    padding: var(--spacing-sm);
+}
+
+/* Избранное */
+.favorites-section {
+    padding: var(--spacing-md);
+}
+
+.favorites-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+/* Сообщения */
+.messages-section {
+    padding: var(--spacing-md);
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.message-item {
+    background-color: var(--background);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    transition: all 0.2s ease;
+}
+
+.message-item:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.message-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.message-item-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.message-item-time {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.message-item-preview {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: var(--spacing-sm);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.message-item-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Адаптивность для новых страниц */
+@media (max-width: 768px) {
+    .ad-gallery {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+    
+    .my-ad-card {
+        flex-direction: column;
+    }
+    
+    .my-ad-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
+    .my-ad-actions {
+        flex-direction: column;
+    }
+    
+    .favorites-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-filters {
+        flex-wrap: wrap;
+    }
 }
 
 .settings-list {
