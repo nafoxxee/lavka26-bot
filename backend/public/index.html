@@ -61,9 +61,6 @@
 
                 <!-- Категории -->
                 <div class="categories-section">
-                    <div class="section-header">
-                        <h2>Категории</h2>
-                    </div>
                     <div class="categories-grid">
                         <div class="category-item" onclick="filterByCategory('transport')">
                             <i class="fas fa-car"></i>
@@ -114,9 +111,6 @@
 
             <!-- Избранное -->
             <div class="tab-content" id="favorites-tab" style="display: none;">
-                <div class="section-header">
-                    <h2>Избранное</h2>
-                </div>
                 <div class="ads-grid" id="favorites-grid">
                     <div class="empty-state">
                         <i class="fas fa-heart"></i>
@@ -127,9 +121,6 @@
 
             <!-- Сообщения -->
             <div class="tab-content" id="messages-tab" style="display: none;">
-                <div class="section-header">
-                    <h2>Сообщения</h2>
-                </div>
                 <div class="messages-list" id="messages-list">
                     <div class="empty-state">
                         <i class="fas fa-comment"></i>
@@ -189,8 +180,7 @@
 
             <!-- Мои объявления -->
             <div class="tab-content" id="my-ads-tab" style="display: none;">
-                <div class="section-header">
-                    <h2>Мои объявления</h2>
+                <div class="my-ads-header">
                     <button class="create-ad-btn" onclick="openCreateAd()">
                         <i class="fas fa-plus"></i>
                         <span>Создать</span>
@@ -1096,39 +1086,36 @@
             // Показываем загрузку
             showNotification('Отправка на модерацию...', 'info');
             
-            // Имитируем отправку (в реальном приложении здесь будет fetch к API)
-            setTimeout(() => {
-                // Сохраняем в localStorage для демонстрации
-                const pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
-                adData.id = Date.now();
-                pendingAds.push(adData);
-                localStorage.setItem('pendingAds', JSON.stringify(pendingAds));
-                
-                console.log('✅ Объявление отправлено на модерацию:', adData);
-                
-                showNotification('Объявление отправлено на модерацию', 'success');
-                closeModal();
-                
-                // Очищаем форму
-                document.getElementById('create-ad-form').reset();
-                uploadedPhotos = [];
-                
-                // Обновляем фото сетку
-                const photoGrid = document.getElementById('photo-grid');
-                if (photoGrid) {
-                    photoGrid.innerHTML = `
-                        <div class="add-photo-btn" onclick="document.getElementById('ad-photos').click()">
-                            <i class="fas fa-camera"></i>
-                            <span>Добавить фото</span>
-                        </div>
-                    `;
-                }
-                
-                // Если админ, обновляем панель модерации
-                if (currentUser && currentUser.id === 379036860) {
-                    refreshPendingAds();
-                }
-            }, 1500);
+            // Сохраняем в localStorage для демонстрации
+            const pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
+            adData.id = Date.now();
+            pendingAds.push(adData);
+            localStorage.setItem('pendingAds', JSON.stringify(pendingAds));
+            
+            console.log('✅ Объявление отправлено на модерацию:', adData);
+            
+            showNotification('Объявление отправлено на модерацию', 'success');
+            closeModal();
+            
+            // Очищаем форму
+            document.getElementById('create-ad-form').reset();
+            uploadedPhotos = [];
+            
+            // Обновляем фото сетку
+            const photoGrid = document.getElementById('photo-grid');
+            if (photoGrid) {
+                photoGrid.innerHTML = `
+                    <div class="add-photo-btn" onclick="document.getElementById('ad-photos').click()">
+                        <i class="fas fa-camera"></i>
+                        <span>Добавить фото</span>
+                    </div>
+                `;
+            }
+            
+            // Если админ, обновляем панель модерации
+            if (currentUser && currentUser.id === 379036860) {
+                refreshPendingAds();
+            }
         }
         
         // Геолокация

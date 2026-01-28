@@ -647,6 +647,14 @@ body:not(.profile-active):not(.messages-active) .fab-button {
     color: var(--text-muted);
 }
 
+/* МОИ ОБЪЯВЛЕНИЯ */
+.my-ads-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    padding: 0 16px;
+}
+
 .admin-tabs {
     display: flex;
     gap: 8px;
