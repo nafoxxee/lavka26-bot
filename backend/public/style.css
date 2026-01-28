@@ -712,6 +712,11 @@ body:not(.profile-active):not(.messages-active) .fab-button {
     color: var(--white);
 }
 
+.status-badge.unpublished {
+    background: var(--text-muted);
+    color: var(--white);
+}
+
 .ad-card.pending {
     border-left: 4px solid var(--avito-orange);
 }
@@ -719,6 +724,11 @@ body:not(.profile-active):not(.messages-active) .fab-button {
 .ad-card.rejected {
     border-left: 4px solid var(--avito-red);
     opacity: 0.8;
+}
+
+.ad-card.unpublished {
+    border-left: 4px solid var(--text-muted);
+    opacity: 0.7;
 }
 
 .reject-reason {
@@ -881,6 +891,48 @@ body:not(.profile-active):not(.messages-active) .fab-button {
 
 .btn-reject:hover {
     background: #C62828;
+    transform: translateY(-1px);
+}
+
+/* КНОПКИ УПРАВЛЕНИЯ ОБЪЯВЛЕНИЯМИ */
+.ad-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+}
+
+.btn-unpublish, .btn-republish {
+    padding: 8px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-unpublish {
+    background: var(--text-muted);
+    color: var(--white);
+}
+
+.btn-unpublish:hover {
+    background: #666;
+    transform: translateY(-1px);
+}
+
+.btn-republish {
+    background: var(--avito-blue);
+    color: var(--white);
+}
+
+.btn-republish:hover {
+    background: var(--avito-blue-hover);
     transform: translateY(-1px);
 }
 

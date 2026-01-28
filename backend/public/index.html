@@ -648,22 +648,33 @@
             `;
             
             try {
-                const params = new URLSearchParams();
-                if (currentFilter.category) params.append('category', currentFilter.category);
-                if (currentFilter.search) params.append('search', currentFilter.search);
+                // Загружаем только одобренные объявления для главной ленты
+                const approvedAds = JSON.parse(localStorage.getItem('approvedAds') || '[]');
+                const unpublishedAds = JSON.parse(localStorage.getItem('unpublishedAds') || '[]');
                 
-                const response = await fetch(`${API_BASE}/ads?${params}`);
-                if (response.ok) {
-                    ads = await response.json();
-                    renderAds(ads);
-                } else {
-                    // Если API недоступен, показываем что нет объявлений
-                    console.warn('API недоступен, показываем пустой список');
-                    renderAds([]);
+                // Фильтруем: показываем только одобренные, которые не сняты с публикации
+                const activeAds = approvedAds.filter(ad => {
+                    return !unpublishedAds.some(unpub => unpub.id === ad.id);
+                });
+                
+                // Применяем фильтры поиска и категории
+                let filteredAds = activeAds;
+                
+                if (currentFilter.search) {
+                    filteredAds = filteredAds.filter(ad => 
+                        ad.title.toLowerCase().includes(currentFilter.search.toLowerCase()) ||
+                        ad.description.toLowerCase().includes(currentFilter.search.toLowerCase())
+                    );
                 }
+                
+                if (currentFilter.category) {
+                    filteredAds = filteredAds.filter(ad => ad.category === currentFilter.category);
+                }
+                
+                renderAds(filteredAds);
+                
             } catch (error) {
                 console.error('Ошибка загрузки объявлений:', error);
-                // Показываем что нет объявлений вместо ошибки
                 renderAds([]);
             }
         }
@@ -686,7 +697,7 @@
             adsList.innerHTML = adsToRender.map(ad => `
                 <div class="ad-card" onclick="openAd(${ad.id})">
                     <div class="ad-image">
-                        ${ad.photo ? `<img src="${ad.photo}" alt="${ad.title}">` : '<i class="fas fa-image"></i>'}
+                        ${ad.photos && ad.photos.length > 0 ? `<img src="${ad.photos[0]}" alt="${ad.title}">` : '<i class="fas fa-image"></i>'}
                     </div>
                     <div class="ad-info">
                         <h3 class="ad-title">${ad.title}</h3>
@@ -1134,7 +1145,7 @@
             const myAdsGrid = document.getElementById('my-ads-grid');
             if (!myAdsGrid) return;
             
-            // Загружаем одобренные объявления пользователя
+            // Загружаем одобренные и ожидающие объявления пользователя
             const approvedAds = JSON.parse(localStorage.getItem('approvedAds') || '[]');
             const pendingAds = JSON.parse(localStorage.getItem('pendingAds') || '[]');
             
@@ -1170,6 +1181,14 @@
                         </div>
                         <div class="ad-date">${formatDate(ad.created_at)}</div>
                     </div>
+                    ${ad.status === 'approved' ? `
+                        <div class="ad-actions">
+                            <button class="btn-unpublish" onclick="event.stopPropagation(); unpublishAd(${ad.id})">
+                                <i class="fas fa-eye-slash"></i>
+                                <span>Снять с публикации</span>
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             `).join('');
         }
@@ -1178,13 +1197,17 @@
             const archivedGrid = document.getElementById('my-ads-archived-grid');
             if (!archivedGrid) return;
             
-            // Загружаем отклоненные объявления пользователя
+            // Загружаем отклоненные и снятые с публикации объявления
             const rejectedAds = JSON.parse(localStorage.getItem('rejectedAds') || '[]');
+            const unpublishedAds = JSON.parse(localStorage.getItem('unpublishedAds') || '[]');
             
             // Фильтруем объявления текущего пользователя
             const userRejectedAds = rejectedAds.filter(ad => ad.user_id === currentUser?.id);
+            const userUnpublishedAds = unpublishedAds.filter(ad => ad.user_id === currentUser?.id);
             
-            if (userRejectedAds.length === 0) {
+            const allArchivedAds = [...userRejectedAds, ...userUnpublishedAds];
+            
+            if (allArchivedAds.length === 0) {
                 archivedGrid.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-archive"></i>
@@ -1194,23 +1217,42 @@
                 return;
             }
             
-            archivedGrid.innerHTML = userRejectedAds.map(ad => `
-                <div class="ad-card rejected" onclick="openRejectedAd(${ad.id})">
-                    <div class="ad-image">
-                        ${ad.photos && ad.photos.length > 0 ? `<img src="${ad.photos[0]}" alt="${ad.title}">` : '<i class="fas fa-image"></i>'}
-                        <div class="status-badge rejected">Отклонено</div>
-                    </div>
-                    <div class="ad-info">
-                        <h3 class="ad-title">${ad.title}</h3>
-                        <div class="ad-price">${ad.price || 'Договорная'}</div>
-                        <div class="reject-reason">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>${ad.reject_reason}</span>
+            archivedGrid.innerHTML = allArchivedAds.map(ad => {
+                const isRejected = ad.status === 'rejected';
+                const isUnpublished = ad.status === 'unpublished';
+                
+                return `
+                    <div class="ad-card ${isRejected ? 'rejected' : 'unpublished'}" onclick="openArchivedAd(${ad.id})">
+                        <div class="ad-image">
+                            ${ad.photos && ad.photos.length > 0 ? `<img src="${ad.photos[0]}" alt="${ad.title}">` : '<i class="fas fa-image"></i>'}
+                            <div class="status-badge ${isRejected ? 'rejected' : 'unpublished'}">
+                                ${isRejected ? 'Отклонено' : 'Снято с публикации'}
+                            </div>
                         </div>
-                        <div class="ad-date">Отклонено ${formatDate(ad.rejected_at)}</div>
+                        <div class="ad-info">
+                            <h3 class="ad-title">${ad.title}</h3>
+                            <div class="ad-price">${ad.price || 'Договорная'}</div>
+                            ${isRejected ? `
+                                <div class="reject-reason">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>${ad.reject_reason}</span>
+                                </div>
+                            ` : ''}
+                            <div class="ad-date">
+                                ${isRejected ? `Отклонено ${formatDate(ad.rejected_at)}` : `Снято ${formatDate(ad.unpublished_at)}`}
+                            </div>
+                        </div>
+                        ${isUnpublished ? `
+                            <div class="ad-actions">
+                                <button class="btn-republish" onclick="event.stopPropagation(); republishAd(${ad.id})">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Опубликовать снова</span>
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
         
         function openRejectedAd(adId) {
@@ -1219,6 +1261,79 @@
             
             if (ad) {
                 showNotification(`Причина отклонения: ${ad.reject_reason}`, 'error');
+            }
+        }
+        
+        function openArchivedAd(adId) {
+            const rejectedAds = JSON.parse(localStorage.getItem('rejectedAds') || '[]');
+            const unpublishedAds = JSON.parse(localStorage.getItem('unpublishedAds') || '[]');
+            
+            const ad = rejectedAds.find(a => a.id === adId) || unpublishedAds.find(a => a.id === adId);
+            
+            if (ad) {
+                if (ad.status === 'rejected') {
+                    showNotification(`Причина отклонения: ${ad.reject_reason}`, 'error');
+                } else if (ad.status === 'unpublished') {
+                    showNotification('Объявление снято с публикации. Вы можете опубликовать его снова.', 'info');
+                }
+            }
+        }
+        
+        function unpublishAd(adId) {
+            if (!confirm('Вы уверены, что хотите снять объявление с публикации?')) {
+                return;
+            }
+            
+            console.log('🔒 Снятие объявления с публикации:', adId);
+            
+            // Перемещаем из одобренных в снятые с публикации
+            let approvedAds = JSON.parse(localStorage.getItem('approvedAds') || '[]');
+            let unpublishedAds = JSON.parse(localStorage.getItem('unpublishedAds') || '[]');
+            
+            const adIndex = approvedAds.findIndex(ad => ad.id === adId);
+            if (adIndex !== -1) {
+                const ad = approvedAds[adIndex];
+                ad.status = 'unpublished';
+                ad.unpublished_at = new Date().toISOString();
+                ad.approved_at = undefined; // Убираем дату одобрения
+                
+                unpublishedAds.push(ad);
+                approvedAds.splice(adIndex, 1);
+                
+                localStorage.setItem('approvedAds', JSON.stringify(approvedAds));
+                localStorage.setItem('unpublishedAds', JSON.stringify(unpublishedAds));
+                
+                showNotification('Объявление снято с публикации', 'success');
+                loadActiveAds(); // Обновляем активные объявления
+            }
+        }
+        
+        function republishAd(adId) {
+            if (!confirm('Опубликовать объявление снова?')) {
+                return;
+            }
+            
+            console.log('👁️ Повторная публикация объявления:', adId);
+            
+            // Перемещаем из снятых обратно в одобренные
+            let unpublishedAds = JSON.parse(localStorage.getItem('unpublishedAds') || '[]');
+            let approvedAds = JSON.parse(localStorage.getItem('approvedAds') || '[]');
+            
+            const adIndex = unpublishedAds.findIndex(ad => ad.id === adId);
+            if (adIndex !== -1) {
+                const ad = unpublishedAds[adIndex];
+                ad.status = 'approved';
+                ad.approved_at = new Date().toISOString();
+                ad.unpublished_at = undefined; // Убираем дату снятия
+                
+                approvedAds.push(ad);
+                unpublishedAds.splice(adIndex, 1);
+                
+                localStorage.setItem('approvedAds', JSON.stringify(approvedAds));
+                localStorage.setItem('unpublishedAds', JSON.stringify(unpublishedAds));
+                
+                showNotification('Объявление опубликовано снова', 'success');
+                loadArchivedAds(); // Обновляем архив
             }
         }
         
@@ -1552,6 +1667,9 @@
         window.loadActiveAds = loadActiveAds;
         window.loadArchivedAds = loadArchivedAds;
         window.openRejectedAd = openRejectedAd;
+        window.openArchivedAd = openArchivedAd;
+        window.unpublishAd = unpublishAd;
+        window.republishAd = republishAd;
         
         // Проверка элементов
         setTimeout(() => {
