@@ -502,8 +502,8 @@
     color: var(--white);
     font-size: 24px;
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
-    z-index: 999;
+    box-shadow: 0 4px 16px rgba(0, 137, 209, 0.3);
+    z-index: 1001;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -513,10 +513,34 @@
 .fab-button:hover {
     background-color: var(--avito-blue-hover);
     transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 137, 209, 0.4);
 }
 
 .fab-button:active {
     transform: scale(0.95);
+}
+
+/* Кнопка "Ещё" */
+.more-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    color: var(--avito-blue);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.more-btn:hover {
+    background-color: var(--border-light);
+}
+
+.more-btn i {
+    font-size: 12px;
 }
 
 /* НИЖНИЙ ТАББАР (fixed) */

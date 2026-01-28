@@ -21,12 +21,6 @@
                 <div class="app-title" id="header-title">Lavka26</div>
             </div>
             <div class="header-right">
-                <button class="header-btn" onclick="switchTab('messages')">
-                    <i class="fas fa-comment"></i>
-                </button>
-                <button class="header-btn" onclick="switchTab('favorites')">
-                    <i class="fas fa-heart"></i>
-                </button>
                 <button class="header-btn" onclick="switchTab('profile')">
                     <i class="fas fa-user"></i>
                 </button>
@@ -50,30 +44,29 @@
 
                 <!-- Категории -->
                 <div class="categories-section">
+                    <div class="section-header">
+                        <h2>Категории</h2>
+                        <button class="more-btn" onclick="showAllCategories()">
+                            <span>Ещё</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                     <div class="categories-grid">
-                        <div class="category-item">
+                        <div class="category-item" onclick="filterByCategory('transport')">
                             <i class="fas fa-car"></i>
                             <span>Транспорт</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" onclick="filterByCategory('electronics')">
                             <i class="fas fa-mobile-alt"></i>
                             <span>Электроника</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" onclick="filterByCategory('property')">
                             <i class="fas fa-home"></i>
                             <span>Недвижимость</span>
                         </div>
-                        <div class="category-item">
+                        <div class="category-item" onclick="filterByCategory('clothing')">
                             <i class="fas fa-tshirt"></i>
                             <span>Одежда</span>
-                        </div>
-                        <div class="category-item">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Работа</span>
-                        </div>
-                        <div class="category-item">
-                            <i class="fas fa-dumbbell"></i>
-                            <span>Спорт</span>
                         </div>
                     </div>
                 </div>
@@ -681,10 +674,6 @@
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="tabbar-item" data-tab="categories" onclick="switchTab('categories')">
-                <i class="fas fa-th-large"></i>
-                <span>Категории</span>
-            </button>
             <button class="tabbar-item" data-tab="favorites" onclick="switchTab('favorites')">
                 <i class="fas fa-heart"></i>
                 <span>Избранное</span>
@@ -693,7 +682,16 @@
                 <i class="fas fa-comment"></i>
                 <span>Сообщения</span>
             </button>
+            <button class="tabbar-item" data-tab="profile" onclick="switchTab('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
         </nav>
+
+        <!-- КНОПКА СОЗДАНИЯ ОБЪЯВЛЕНИЯ -->
+        <button class="fab-button" onclick="openCreateAd()">
+            <i class="fas fa-plus"></i>
+        </button>
 
         <!-- Уведомления -->
         <div class="notifications" id="notifications"></div>

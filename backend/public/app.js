@@ -316,7 +316,7 @@ async function loadCategories() {
 
 // Загрузка объявлений
 async function loadAds() {
-    const adsList = document.getElementById('ads-list');
+    const adsList = document.getElementById('ads-container');
     if (!adsList) return;
     
     // Показываем скелетон
@@ -350,7 +350,7 @@ async function loadAds() {
 
 // Отображение объявлений
 function renderAds(adsToRender) {
-    const adsList = document.getElementById('ads-list');
+    const adsList = document.getElementById('ads-container');
     if (!adsList) return;
     
     if (adsToRender.length === 0) {
@@ -475,6 +475,12 @@ function closeModal() {
     currentAd = null;
 }
 
+// Показать все категории
+function showAllCategories() {
+    // Переключаемся на вкладку категорий
+    switchTab('categories');
+}
+
 // Открыть создание объявления
 function openCreateAd() {
     if (!currentUser) {
@@ -484,6 +490,9 @@ function openCreateAd() {
     const modalElement = document.getElementById('create-ad-modal');
     if (modalElement) {
         modalElement.style.display = 'flex';
+    } else {
+        // Если модального окна нет, показываем уведомление
+        showNotification('Создание объявления в разработке', 'info');
     }
 }
 
