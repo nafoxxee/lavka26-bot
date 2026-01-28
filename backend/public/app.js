@@ -350,7 +350,7 @@ async function loadCategories() {
 
 // Загрузка объявлений
 async function loadAds() {
-    const adsList = document.getElementById('ads-container');
+    const adsList = document.getElementById('ads-grid');
     if (!adsList) return;
     
     // Показываем скелетон
@@ -384,7 +384,7 @@ async function loadAds() {
 
 // Отображение объявлений
 function renderAds(adsToRender) {
-    const adsList = document.getElementById('ads-container');
+    const adsList = document.getElementById('ads-grid');
     if (!adsList) return;
     
     if (adsToRender.length === 0) {
@@ -1047,11 +1047,9 @@ function showAdminInterface() {
     // Показываем админскую навигацию
     const mainTabbar = document.getElementById('main-tabbar');
     const adminTabbar = document.getElementById('admin-tabbar');
-    const adminButton = document.getElementById('admin-button');
     
     if (mainTabbar) mainTabbar.style.display = 'none';
     if (adminTabbar) adminTabbar.style.display = 'flex';
-    if (adminButton) adminButton.style.display = 'flex';
     
     // Загружаем админские данные
     loadAdminStats();
@@ -1232,6 +1230,7 @@ window.deleteAd = deleteAd;
 window.approveAd = approveAd;
 window.rejectAd = rejectAd;
 window.testFunction = testFunction;
+window.goBack = goBack;
 
 // Запуск приложения
 if (document.readyState === 'loading') {

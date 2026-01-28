@@ -5962,3 +5962,49 @@ input:checked + .slider:before {
         font-size: 18px;
     }
 }
+
+/* FAB Кнопки */
+.fab-button {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #0089D1, #0066A6);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 137, 209, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fab-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 137, 209, 0.4);
+}
+
+.fab-button:active {
+    transform: scale(0.95);
+}
+
+.fab-button.admin {
+    background: linear-gradient(135deg, #FF6B35, #E55100);
+    bottom: 140px;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.fab-button.admin:hover {
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+/* Скрытие FAB на определенных экранах */
+#profile-tab .fab-button,
+#messages-tab .fab-button {
+    display: none !important;
+}
